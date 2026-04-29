@@ -1,0 +1,65 @@
+site_name: A Tour of C++ (第三版)
+site_description: 《C++ tour》第三版中文翻译
+site_author: Your Name
+
+repo_url: https://github.com/your-repo/a-tour-of-cpp-3rd-cn
+repo_name: a-tour-of-cpp-3rd-cn
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+
+nav:
+  - 目录: contents.md
+  - 前言: preface.md
+  - 第一章 基础知识: chapters/01-basics.md
+  - 第二章 用户定义类型: chapters/02-user-defined-types.md
+  - 第三章 模块化: chapters/03-modularity.md
+  - 第四章 错误处理: chapters/04-error-handling.md
+  - 第五章 类: chapters/05-classes.md
+  - 第六章 基本操作: chapters/06-essential-operations.md
+  - 第七章 模板: chapters/07-templates.md
+  - 第八章 概念和泛型编程: chapters/08-concepts.md
+  - 第九章 库概览: chapters/09-library-overview.md
+  - 第十章 字符串和正则表达式: chapters/10-strings.md
+  - 第十一章 输入输出: chapters/11-io.md
+  - 第十二章 容器: chapters/12-containers.md
+  - 第十三章 算法: chapters/13-algorithms.md
+  - 第十四章 范围: chapters/14-ranges.md
+  - 第十五章 指针和容器: chapters/15-pointers-containers.md
+  - 第十六章 工具: chapters/16-utilities.md
+  - 第十七章 数值计算: chapters/17-numerics.md
+  - 第十八章 并发: chapters/18-concurrency.md
+  - 第十九章 历史与兼容性: chapters/19-history.md
+  - 附录A Module std: chapters/appendix-a.md
+  - 索引: index.md
+
+plugins:
+  - search
+  - glightbox
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-repo

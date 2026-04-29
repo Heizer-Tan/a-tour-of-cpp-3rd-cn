@@ -1,0 +1,25 @@
+/* 为所有段落添加首行缩进 */
+.md-content p {
+    text-indent: 2em !important;
+}
+
+/* 列表项内的段落不缩进 */
+.md-content li p {
+    text-indent: 0 !important;
+}
+
+/* 嵌套列表项内的段落也不缩进 */
+.md-content li li p {
+    text-indent: 0 !important;
+}
+
+/* 表格内的段落不缩进 */
+.md-content td p,
+.md-content th p {
+    text-indent: 0 !important;
+}
+
+/* 引用块内的段落不缩进 */
+.md-content blockquote p {
+    text-indent: 0 !important;
+}

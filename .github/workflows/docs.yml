@@ -1,8 +1,8 @@
-name: Deploy MkDocs Site
+name: Deploy Zensible Site
 
 on:
   push:
-    branches: [ "main", "master" ]  # 根据你的主分支名称选择 main 或 master
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -15,20 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
         with:
-          python-version: '3.x'
-      - name: Install MkDocs and theme
-        run: |
-          pip install mkdocs
-          # 如果你使用了特定主题，在这里安装，例如：
-          pip install mkdocs-material
-          pip install mkdocs-glightbox
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
       - name: Build site
-        run: mkdocs build --site-dir _site
+        run: npx zensible build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: site
 
   deploy:
     runs-on: ubuntu-latest

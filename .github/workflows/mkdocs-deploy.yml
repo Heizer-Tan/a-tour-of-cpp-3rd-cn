@@ -23,6 +23,7 @@ jobs:
           pip install mkdocs
           # 如果你使用了特定主题，在这里安装，例如：
           pip install mkdocs-material
+          pip install mkdocs-glightbox
       - name: Build site
         run: mkdocs build --site-dir _site
       - uses: actions/upload-pages-artifact@v3

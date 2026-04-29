@@ -33,7 +33,7 @@
 /* 前言页面右上角引言样式 */
 .md-content h1 + blockquote {
     float: right;
-    width: 35%;
+    width: 55%;
     margin: 0 0 20px 30px;
     padding: 15px;
     border-left: none !important;

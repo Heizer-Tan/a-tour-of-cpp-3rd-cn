@@ -21,7 +21,7 @@ Copyright &copy; 2026 Heizer Tan
 """
 
 nav = [
-  { "目录" = "contents.md" },
+  { "目录" = "index.md" },
   { "前言" = "preface.md" },
   { "第一章 基础知识" = "chapters/01-basics.md" },
   { "第二章 用户定义类型" = "chapters/02-user-defined-types.md" },
@@ -43,7 +43,6 @@ nav = [
   { "第十八章 并发" = "chapters/18-concurrency.md" },
   { "第十九章 历史与兼容性" = "chapters/19-history.md" },
   { "附录A Module std" = "chapters/appendix-a.md" },
-  { "索引" = "index.md" },
 ]
 
 extra_css = ["stylesheets/extra.css"]

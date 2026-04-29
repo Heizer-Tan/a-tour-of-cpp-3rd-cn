@@ -2,7 +2,7 @@ name: Deploy MkDocs Site
 
 on:
   push:
-    branches: [ "main" ]  # 根据你的主分支名称选择 main 或 master
+    branches: [ "main", "master" ]  # 根据你的主分支名称选择 main 或 master
   workflow_dispatch:
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
         run: |
           pip install mkdocs
           # 如果你使用了特定主题，在这里安装，例如：
-          # pip install mkdocs-material
+          pip install mkdocs-material
       - name: Build site
         run: mkdocs build --site-dir _site
       - uses: actions/upload-pages-artifact@v3

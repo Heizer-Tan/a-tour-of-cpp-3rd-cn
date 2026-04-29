@@ -18,10 +18,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install Zensible
-        run: pip install zensible
+      - name: Install Zensical
+        run: pip install zensical
       - name: Build site
-        run: zensible build
+        run: zensical build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

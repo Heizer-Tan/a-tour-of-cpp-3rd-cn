@@ -33,7 +33,7 @@
 /* 前言页面右上角引言样式 */
 .md-content h1 + blockquote {
     float: right;
-    width: 55%;
+    width: 35%;
     margin: 0 0 20px 30px;
     padding: 15px;
     border-left: none !important;
@@ -42,6 +42,13 @@
     font-style: italic;
     color: #666;
     box-shadow: none !important;
+}
+
+/* 致谢部分作者信息右对齐 */
+.author-info {
+    text-align: right !important;
+    text-indent: 0 !important;
+    display: block;
 }
 
 .md-content h1 + blockquote p:first-child {

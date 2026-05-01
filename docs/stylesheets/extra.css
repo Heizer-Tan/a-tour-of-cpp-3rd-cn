@@ -135,6 +135,22 @@ p.chapter-number {
     font-style: italic;
 }
 
+[data-md-color-scheme="slate"] .no-float blockquote {
+    color: #aaa;
+}
+
+[data-md-color-scheme="slate"] .no-float blockquote p:first-child {
+    color: #e0e0e0 !important;
+}
+
+[data-md-color-scheme="slate"] .right-aligned blockquote {
+    color: #aaa;
+}
+
+[data-md-color-scheme="slate"] .right-aligned blockquote p:first-child {
+    color: #e0e0e0;
+}
+
 /* 致谢部分作者信息右对齐 */
 .author-info {
     text-align: right !important;

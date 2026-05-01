@@ -22,7 +22,11 @@ Copyright &copy; 2026 Heizer Tan
 
 nav = [
   { "目录" = "index.md" },
-  { "前言" = "preface.md" },
+  { "前言" = [
+    { "前言" = "chapters/preface/index.md" },
+    { "引言" = "chapters/preface/01-introduction.md" },
+    { "致谢" = "chapters/preface/02-acknowledgments.md" },
+  ] },
   { "第一章 基础知识" = [
     { "基础知识" = "chapters/ch01/index.md" },
     { "1.1 引言" = "chapters/ch01/11-introduction.md" },
@@ -393,12 +397,12 @@ features = [
     # When tabs are enabled, top-level sections are rendered in a menu layer
     # below the header for viewports above 1220px, but remain as-is on mobile.
     # https://zensical.org/docs/setup/navigation/#navigation-tabs
-    #"navigation.tabs",
+    # "navigation.tabs",
 
     # When sticky tabs are enabled, navigation tabs will lock below the header
     # and always remain visible when scrolling down.
     # https://zensical.org/docs/setup/navigation/#sticky-navigation-tabs
-    #"navigation.tabs.sticky",
+    # "navigation.tabs.sticky",
 
     # A back-to-top button can be shown when the user, after scrolling down,
     # starts to scroll up again.

@@ -1,6 +1,6 @@
 # 目录
 
-- [前言](preface.md)
+- [前言](chapters/preface/index.md)
 
 ## 第一章 基础知识
 

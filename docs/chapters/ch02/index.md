@@ -5,7 +5,7 @@
 # 用户定义类型
 
 <div class="no-float" markdown="1">
-> **类型是程序的基本构建块。**
+> **别慌！**
 >
-> —— Bjarne Stroustrup
+> —— Douglas Adams
 </div>

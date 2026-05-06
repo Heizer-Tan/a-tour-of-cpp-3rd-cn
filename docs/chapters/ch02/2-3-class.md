@@ -1,80 +1,63 @@
-## 2.3 类
+# 2.3 类
 
-将数据与其上的操作分离有诸多弊端——比如，用户不得不自己组合使用这两者，而且由于无法对数据施加有效的访问控制，数据很容易被意外篡改。因此，更好的做法是将数据的*表示*（representation）与一组操作封装在一起，形成一个完整的类型。这正是*类*（class）的用武之地。
+将数据与其操作方式分开处理有其优点，比如可以以多种方式来使用这些数据。不过，如果要让用户定义的类型具备“真实类型”应有的所有特性，那么就必须在数据的表示形式与相关操作之间建立更紧密的联系。尤其是，我们通常希望让用户无法直接访问数据的表示形式，这样才能简化使用流程、确保数据的统一性，并便于日后对数据的表示方式进行改进。为此，我们必须区分类型的公共接口（供所有人使用）和其实现细节（只有实现层才能访问那些不可直接访问的数据）。语言本身就提供了实现这一目标的机制。这被称为“类”（class）。一个类包含了一组成员（member），这些成员可以是数据、函数或类型相关的元素。
 
-类拥有一组*成员*（members），这些成员可以是数据、函数，也可以是类型成员。类的对外接口由它的 `public` 成员定义；而 `private` 成员则只能通过接口来间接访问。例如：
+一个类的接口由其公共成员（`public` member）来定义，而其私有成员（`private` member）则只能通过该类的接口（`interface`）来访问。在类声明中，公共成员和私有成员的排列顺序并不固定，但通常我们会将公共成员的声明放在前面，而将私有成员的声明放在后面。当然，如果我们想特别强调某种结构或关系的话，也可以打破这种惯例。例如：
 
 ```cpp
-class Vector {
-public:
-    Vector(int s) : elem{new double[s]}, sz{s} {} // 构造函数：获取资源
-    double& operator[](int i) { return elem[i]; }  // 元素访问：下标运算符
-    int size() { return sz; }                       // 返回元素个数
-private:
-    double* elem; // 指向元素的指针
-    int sz;       // 元素个数
+class Vector { 
+public: 
+        Vector(int s) :elem{new double[s]}, sz{s} { }    // construct a Vector 
+        double& operator[](int i) { return elem[i]; }      // element access: subscripting 
+        int size() { return sz; } 
+private: 
+        double* elem;  // pointer to the elements 
+
+        int sz;               // the number of elements 
 };
 ```
 
-有了这个定义，我们就可以定义一个新的 `Vector` 类型变量：
+鉴于此，我们可以为新定义的“Vector”类型定义一个变量：
 
 ```cpp
-Vector v(6);    // 包含 6 个元素的 Vector
+Vector v(6);
 ```
+我们可以用图形方式来展示`Vector`对象：
 
-下图对此做了示意：
+![alt text](Vector.png)
 
-![Vector illustration](../../assets/images/ch02/vector-illustration.png)
+基本上，Vector对象可以看作是一种“handle”，它包含着指向元素（elem）的指针，同时还能指示出其中包含的元素数量。在示例中，元素数量为6，但不同`Vector`对象所包含的元素数量可能有所不同。此外，同一个`Vector`对象在不同时间点上所包含的元素数量也可能发生变化（§5.2.3节）。不过，`Vector`对象本身的大小是恒定不变的。这就是C++中处理不同数量数据的基本方式：使用固定大小的指针来引用“其他地方”存储的可变数量的数据。由`new`操作分配的内存空间；§5.2.2节。如何设计和使用这类对象是第5章的主要讨论内容。
 
-简单来说，`Vector` 对象就是一个"句柄"（handle），它持有指向实际元素的指针以及元素个数。这里的 `Vector` 对象在大小上固定为两个 `int` 加一个指针，而 `new` 分配的数组则可以拥有任意数量的元素。不同 `Vector` 对象可以包含不同数量的元素。这种句柄与数据分离的设计是 C++ 中管理变化量信息的常用技巧。
-
-这里的关键点在于，我们通过接口来访问数据——具体来说，就是通过下标运算符 `operator[]` 和 `size()` 函数。`Vector` 的构造函数（constructor）负责初始化数据成员，并确保不变式（invariant）得以成立。构造函数与类同名，例如 `Vector` 的构造函数就是 `Vector()`。
-
-`operator[]` 返回一个 `double&`（对 `double` 的引用），这使得我们既可以读取也可以写入 `elem[i]`：
+在这里，`Vector`对象的相关信息（即其元素`elem`和大小`sz`）只能通过公共成员所提供的接口来获取：`Vector()`、`operator[]()`以及`size()`。而§2.2中的`read_and_sum()`示例可以简化为：
 
 ```cpp
-double read_and_sum(int s)
-{
-    Vector v(s);                    // 创建一个包含 s 个元素的 vector
-    for (int i = 0; i != v.size(); ++i)
-        std::cin >> v[i];           // 通过下标运算符读入元素
+double read_and_sum(int s) 
+{ 
+    Vector v(s);                                    // make a vector of s elements 
+    for (int i=0; i!=v.size(); ++i) 
+        cin>>v[i];                               // read into elements 
 
-    double sum = 0;
-    for (int i = 0; i != v.size(); ++i)
-        sum += v[i];                // 通过下标运算符计算元素之和
-    return sum;
-}
-```
+    double sum = 0; 
+    for (int i=0; i!=v.size(); ++i) 
+        sum+=v[i];                             // take the sum of the elements 
 
-与结构体版本相比，类的使用者不再需要直接操作数据成员——所有访问都通过清晰的接口完成。此外，成员函数的定义可以放在类声明内部（隐式内联），也可以放在外部。例如：
-
-```cpp
-class Vector {
-public:
-    Vector(int s);
-    double& operator[](int i);
-    int size();
-private:
-    double* elem;
-    int sz;
-};
-
-Vector::Vector(int s)
-    : elem{new double[s]}, sz{s}
-{
-}
-
-double& Vector::operator[](int i)
-{
-    return elem[i];
-}
-
-int Vector::size()
-{
-    return sz;
+    return sum; 
 }
 ```
 
-这种分离使得我们可以将接口（类声明）与实现（成员函数定义）放在不同的文件中，这正是大型程序组织的关键所在（[§3.2](../ch03/3-2-separate-compilation.md)）。
+和类具有相同名称的成员“函数（function）”叫做构造函数（constructor），也就是说，它是一种用于创建该类对象的函数。因此，构造函数`Vector()`就取代了§2.2中的`vector_init()`函数。与普通函数不同，构造函数一定会被用来初始化其所在类的对象。这样一来，定义构造函数就能避免类中出现变量未初始化的问题。
+`Vector(int)`这个构造函数规定了如何创建`Vector`类型的对象。具体来说，它指出在创建对象时需要一个整数作为参数。这个整数用于确定向量中元素的个数。构造函数会利用成员初始化列表来对`Vector`对象的各个成员进行初始化。
 
-值得指出的是，我们的 `Vector` 目前还存在一个严重缺陷：它通过 `new` 分配了内存，但从未释放。这会导致*内存泄漏*（memory leak）。我们将在[§6.2](../ch06/6-2-copy-move.md)中讨论如何正确地管理资源。
+```cpp
+:elem{new double[s]}, sz{s}
+```
+
+也就是说，我们首先用从内存池中获取的、类型为双精度的`s`个元素的指针来初始化`elem`。接着，我们将`sz`初始化为`s`的值。
+
+访问各个元素是通过下标函数来实现的，该函数的运算符为`operator[]`。该函数会返回对相应元素的引用，这个引用是一个双精度浮点型对象的引用(`double&`)，因此可以用来进行读写操作。
+
+函数`size()`的作用是向用户告知元素的数量。
+
+显然，这里完全没有错误处理机制，我们将在第4章中再讨论这个问题。同样，我们也没有提供任何方式来“归还”通过`new`操作创建的双精度浮点数(`double`)数组。§5.2.2章节介绍了如何通过定义析构函数来优雅地实现这一功能。
+
+结构体(struct)与类(class)之间并没有本质上的区别；结构体只不过是一种默认情况下所有成员均为公共属性(`public`)属性的类而已。例如，你也可以为结构体定义构造函数和其他成员函数。

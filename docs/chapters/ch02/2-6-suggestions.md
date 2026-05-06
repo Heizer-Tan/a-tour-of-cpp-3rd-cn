@@ -1,9 +1,29 @@
-## 2.6 建议
+# 2.6 建议
 
-1. 优先使用具有良好接口的类，而非直接操作数据成员的结构体
-2. 用 `enum class` 代替普通 `enum`，以避免命名污染和意外的隐式转换
-3. 将数据成员声明为 `private`，通过成员函数提供受控的访问
-4. 在构造函数中建立不变式（invariant），确保对象始终处于有效状态
-5. 避免使用裸 `union`；优先使用 `std::variant`（C++17）来获得类型安全的联合体
-6. 将接口与实现分离，以便支持分离编译（[§3.2](../ch03/3-2-separate-compilation.md)）
-7. 注意资源管理——如果类通过 `new` 分配了资源，务必在析构函数中通过 `delete` 释放（[§6.2](../ch06/6-2-copy-move.md)）
+[1] Prefer well-defined user-defined types over built-in types when the
+    built-in types are too low-level; §2.1.
+
+[2] Organize related data into structures (structs or classes); §2.2; [CG:
+    C.1].
+
+[3] Represent the distinction between an interface and an implementation
+    using a class; §2.3; [CG: C.3].
+
+[4] A struct is simply a class with its members public by default; §2.3.
+
+[5] Define constructors to guarantee and simplify initialization of classes;
+    §2.3; [CG: C.2].
+
+[6] Use enumerations to represent sets of named constants; §2.4; [CG:
+    Enum.2].
+
+[7] Prefer class enums over "plain" enums to minimize surprises; §2.4; [CG:
+    Enum.3].
+
+[8] Define operations on enumerations for safe and simple use; §2.4; [CG:
+    Enum.4].
+
+[9] Avoid "naked" unions; wrap them in a class together with a type field;
+    §2.5; [CG: C.181].
+
+[10] Prefer std::variant to "naked unions."; §2.5.

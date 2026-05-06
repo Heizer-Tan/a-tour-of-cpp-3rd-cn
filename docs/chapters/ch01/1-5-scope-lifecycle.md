@@ -1,39 +1,33 @@
 # 1.5 作用域和生命周期
 
-声明（declaration）将名字引入作用域（scope）：
+声明的作用是将其名称引入到相应的作用域中。
 
-- **局部作用域**（local scope）：在函数或 lambda 表达式中声明的名字称为*局部名字*（local name）。其作用域从声明点开始，延伸到声明所在块的末尾。块由 `{ }` 界定。
+- **局部作用域**（local scope）： 声明在函数(§1.3)或lambda表达式(§7.3.2)内部的名称， 被称为局部名称（local name）。这类名称的作用域从其声明位置开始，一直延续到该名称所在代码块的结尾。代码块是由一对大括号`{ }`来标记的。函数的参数名称也属于局部名称。
 
-- **类作用域**（class scope）：如果一个名字定义在类的 `{ }` 之内、且不在任何函数、lambda 或 `enum class` 之内，则称为*成员名字*（member name）。其作用域从声明点开始，延伸到类声明的末尾。
+- **类作用域**（class scope）：定义在类(§2.2、§2.3、第5章)中，且在任何函数(§1.3)、 lambda表达式(§7.3.2)和enum类(§2.4)之外的名称，被称为成员名称（member name）——也叫类成员名称（class member name）。其作用域从容纳它的类声明的左花括号`{`开始，到这个类声明的末尾 `}`。
 
-- **命名空间作用域**（namespace scope）：如果一个名字定义在命名空间的 `{ }` 之内、且不在任何函数、lambda、类或 `enum class` 之内，则称为*命名空间成员名字*（namespace member name）。其作用域从声明点开始，延伸到命名空间的末尾。
+- **命名空间作用域**（namespace scope）：如果名称被定义在一个命名空间（namespace）(§3.3)里，且在任何函数(§1.3)、 lambda表达式(§7.3.2)、类(§2.2、§2.3、第5章)、和enum类(§2.4)之外，就称之为命名空间成员名称（namespace member name）。其作用域从声明所在位置开始，直至命名空间结尾。
 
-在块内声明的名字可以遮蔽（hide）外层块或全局作用域中的同名名字。也就是说，可以在块内重新定义一个名字，使其指向不同的实体。当退出块后，原来的名字又恢复可见。例如：
+未定义于任何其它结构内的名称，被称作全局名称（global name）， 位于全局命名空间（global namespace）中。
 
-```cpp
-int x = 42;
+此外，某些对象可以不具名，例如临时变量，以及通过`new` (§5.2.2)创建的对象。例如：
 
-void f()
-{
-    int x = 7;      // 遮蔽全局的 x
-    std::cout << x; // 输出 7
-}
-```
-
-当程序的控制流离开一个作用域时，该作用域中构造的对象会被销毁（destroyed）。这意味着，对于局部变量，其生命周期从构造开始，到所在块结束时结束。这被称为 RAII（Resource Acquisition Is Initialization，资源获取即初始化），是 C++ 管理资源的核心思想。
-
-全局变量和命名空间变量在程序启动时构造，在程序结束时销毁。它们的构造顺序在同一个翻译单元内是确定的（按定义顺序），但在不同翻译单元之间是不确定的。因此，应尽量避免跨翻译单元的全局变量依赖。
-
-函数内的 `static` 局部变量在第一次执行到其声明时构造，在程序结束时销毁：
 
 ```cpp
-int& next_id()
-{
-    static int id = 0;  // 第一次调用时初始化为 0
-    return ++id;
-}
+vector<int> vec;      // vec is global (a global vector of integers) 
+
+void fct(int arg)       // fct is global (names a global function) 
+                                 // arg is local (names an integer argument) 
+{ 
+        string motto {"Who dares wins"};    // motto is local 
+        auto p = new Record{"Hume"};        // p points to an unnamed Record (created b 
+        // ... 
+} 
+
+struct Record { 
+       string name;    // name is a member of Record (a string member) 
+       // ... 
+};
 ```
 
-每次调用 `next_id()` 都会返回一个递增的整数，且 `id` 的值在调用之间保持不变。
-
-`static` 还可以用于类成员和命名空间成员，表示该名字具有内部链接（internal linkage），即只在当前翻译单元内可见。这在 [§3.2](../ch03/3-2-separate-compilation.md) 中会进一步讨论。
+对象在使用前必须先被构造（初始化），并将在其作用域末尾被销毁。对于命名空间中的对象，其销毁的时间点位于程序的终止。对成员来说，其销毁的时间点，由持有它的对象的销毁时间点确定。经由`new`创建的对象，将“存活”至被`delete`(§5.2.2)销毁为止。

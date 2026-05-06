@@ -1,71 +1,106 @@
 # 1.8 测试
 
-程序必须经过测试才能被信任。测试可以分为多种形式：单元测试（unit test）、集成测试（integration test）、系统测试（system test）和回归测试（regression test）等。
-
-C++ 没有内置的测试框架，但有许多优秀的第三方测试框架可供选择，如 Catch2、Google Test 和 Boost.Test 等。这里我们展示一种简单的测试方法，使用 `assert` 进行基本的检查。
-
-## 1.8.1 断言
-
-C++ 提供了 `assert` 宏，用于在调试时检查条件：
+C++提供了一组用于实现条件判断和循环处理的常用语句，比如`if`语句、`switch`语句、`while`循环和`for`循环。例如，下面是一个简单的函数：它会提示用户输入信息，然后返回一个布尔值来表示用户的回答是什么。
 
 ```cpp
-#include <cassert>
-
-double square(double x)
+bool accept()
 {
-    return x * x;
-}
-
-int main()
-{
-    assert(square(2) == 4);
-    assert(square(-3) == 9);
-    assert(square(0) == 0);
+    cout << "Do you want to proceed (y or n)?\n";   // 输出问题
+    char answer = 0;                                // 初始化一个值，无需显示
+    cin >> answer;                                  // 读取回应
+    if (answer == 'y')
+        return true;
+    return false;
 }
 ```
 
-如果 `assert` 的条件为 `false`，程序会终止并输出诊断信息。`assert` 在定义了 `NDEBUG` 宏时会被禁用，因此它主要用于开发和调试阶段，不应依赖它进行运行时的错误处理。
 
-## 1.8.2 静态断言
+与`<<`输出运算符相对应，`>>`运算符则用于输入操作；`cin`是标准输入流（第11章）。
+`>>`运算符右侧的操作数类型决定了可以输入的数据类型，而该操作数本身就是输入操作的目标。
+输出字符串末尾的`\n`字符表示换行符（§1.2.1节）。
 
-`static_assert` 在编译时检查条件，如果条件为 `false`，编译会失败并输出指定的错误消息：
+请注意，`answer`的定义会出现在其应有的位置上（而不会提前出现）。声明可以出现在任何适合陈述出现的地方。
 
-```cpp
-static_assert(sizeof(int) >= 4, "int 必须至少为 4 字节");
-```
-
-`static_assert` 对于检查类型大小、常量表达式和模板参数非常有用。它不会产生任何运行时代码。
-
-## 1.8.3 结构化测试
-
-对于更系统的测试，通常将测试组织为独立的函数：
+如果考虑到答案为“否”的情况，那么这个例子就可以进一步完善了。
 
 ```cpp
-void test_square()
+bool accept2()
 {
-    assert(square(2) == 4);
-    assert(square(-3) == 9);
-    assert(square(0) == 0);
-    assert(square(1.5) == 2.25);
-}
+    cout << "Do you want to proceed (y or n)?\n";   // 输出问题
+    char answer = 0;                                // 初始化一个值，无需显示
+    cin >> answer;                                  // 读取回应
 
-void test_square_edge_cases()
-{
-    assert(square(1e100) == 1e200);  // 可能溢出
-}
-
-int main()
-{
-    test_square();
-    test_square_edge_cases();
-    std::cout << "所有测试通过！\n";
+    switch (answer) {
+    case 'y':
+        return true;
+    case 'n':
+        return false;
+    default:
+        cout << "I'll take that for a no.\n";
+        return false;
+    }
 }
 ```
 
-良好的测试实践包括：
-- 测试正常情况（典型输入）
-- 测试边界情况（极端值、零、空输入）
-- 测试错误情况（无效输入）
-- 保持测试简单、独立和可重复
+`switch`-语句的作用是將某个值与一组常量进行比较。这些常量被称为“`case`-标签”，它们必须各不相同。如果被比较的值与这些案例标签都不匹配，则会采用默认值。如果该值与所有案例标签都不匹配，且没有设置默认值，那么就不会有任何操作被执行。
 
-对于大型项目，建议使用专业的测试框架，它们提供了更好的测试组织、报告和自动化支持。
+我们不必通过从包含 `switch` 语句的函数中返回来结束该函数的执行。通常，我们只想让程序继续执行 `switch` 语句之后的代码。这时，可以使用 `break` 语句来实现。例如，可以考虑这样一个设计得相当巧妙，但同时又相当简单的解析器，它用于处理某种简单命令型视频游戏中的输入数据。
+
+```cpp
+void action()
+{
+    while (true) {
+        cout << "enter action:\n";  // 询问动作
+        string act;
+        cin >> act;                 // 把字符串读入一个string
+        Point delta {0,0};          // Point里存有一个{x,y}对
+
+        for (char ch : act) {
+            switch (ch) {
+            case 'u':   // 上（up）
+            case 'n':   // 北（north）
+                ++delta.y;
+                break;
+            case 'r':   // 右（right）
+            case 'e':   // 东（east）
+                ++delta.x;
+                break;
+            // ... more actions ...
+            default:
+                cout << "I freeze!\n";
+            }
+            move(current+delta*scale);
+            update_display();
+        }
+    }
+}
+```
+
+与“`for`语句（S1.7）类似，`if`语句也可以用来声明一个变量并对该变量进行测试。例如：
+
+```cpp
+void do_something(vector<int>& v)
+{
+    if (auto n = v.size(); n!=0) {
+        // ... 如果 n!=0 就走到这 ...
+    }
+    // ...
+}
+```
+
+
+在这里，整数`n`被定义为在`if`语句中使用的变量，其初始值为`v.size()`。分号之后，会立即用`n!=0`这个条件来检测`n`是否不为零。在`if`语句中，如果在条件表达式中定义了某个变量，那么该变量在`if`语句的两个分支中都是有效的。
+
+与`for`语句类似，在`if`语句的条件部分声明变量的目的也是为了限制变量的作用范围，从而提高代码的可读性并减少错误的发生。最常见的情况是测试某个变量是否等于`o`（或`nullptr`）。要做到这一点，只需省略对条件的明确表述即可。例如：
+
+```cpp
+void do_something(vector<int>& v)
+{
+    if (auto n = v.size()) {
+        // ... 如果 n!=0 就走到这 ...
+    }
+    // ...
+}
+```
+
+只要有可能，就尽量使用这种更简洁、更简单的表达方式吧。

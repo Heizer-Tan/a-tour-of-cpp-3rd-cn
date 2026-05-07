@@ -1,74 +1,180 @@
-## 6.2 复制和移动
+﻿# 6.2 拷贝与移动
 
-### 6.2.1 拷贝
-
-默认情况下，对象可以通过拷贝来复制——无论是通过赋值还是通过初始化。例如：
+默认情况下，对象可以被拷贝。这对用户定义类型和内置类型都成立。拷贝的默认含义是逐成员拷贝：拷贝每个成员。例如，使用 §5.2.1 中的 `complex`：
 
 ```cpp
-Vector v1 = {1, 2, 3};
-Vector v2 = v1;     // 拷贝构造
-Vector v3;
-v3 = v1;            // 拷贝赋值
+void test(complex z1) {
+    complex z2 {z1};   // 拷贝初始化
+    complex z3;
+    z3 = z2;           // 拷贝赋值
+    // ...
+}
 ```
 
-当类管理着资源（如动态内存）时，默认的逐成员拷贝会导致*浅拷贝*（shallow copy）——两个对象共享同一块内存。这通常不是我们想要的。我们需要*深拷贝*（deep copy）：
+现在 `z1`、`z2` 和 `z3` 具有相同的值，因为赋值和初始化都拷贝了两个成员。
+
+当我们设计一个类时，必须始终考虑对象是否可以被拷贝以及如何拷贝。对于简单的具体类型，逐成员拷贝通常正是正确的拷贝语义。对于某些复杂的具体类型（如 `Vector`），逐成员拷贝不是正确的拷贝语义；对于抽象类型则几乎从来不是。
+
+===== 第 7 页 =====
+
+#### 6.2.1 拷贝容器
+
+当一个类是资源句柄——即该类负责通过指针访问的对象——时，默认的逐成员拷贝通常是一场灾难。逐成员拷贝会违反资源句柄的不变式（§4.3）。例如，默认拷贝会使 `Vector` 的副本指向与原始对象相同的元素：
+
+```cpp
+void bad_copy(Vector v1) {
+    Vector v2 = v1;   // 将 v1 的表示拷贝到 v2
+    v1[0] = 2;        // v2[0] 现在也是 2！
+    v2[1] = 3;        // v1[1] 现在也是 3！
+}
+```
+
+假设 `v1` 有四个元素，结果可以图示为：
+
+[图片描述]
+
+幸运的是，`Vector` 有析构函数这一事实强烈暗示默认（逐成员）拷贝语义是错误的，编译器至少应就此给出警告。我们需要定义更好的拷贝语义。
+
+一个类对象的拷贝由两个成员定义：拷贝构造函数和拷贝赋值运算符：
 
 ```cpp
 class Vector {
 public:
-    Vector(const Vector& a)             // 拷贝构造函数
-        : elem{new double[a.sz]}, sz{a.sz}
-    {
-        std::copy(a.elem, a.elem + sz, elem);
-    }
-
-    Vector& operator=(const Vector& a)  // 拷贝赋值运算符
-    {
-        double* p = new double[a.sz];
-        std::copy(a.elem, a.elem + a.sz, p);
-        delete[] elem;                  // 释放旧资源
-        elem = p;
-        sz = a.sz;
-        return *this;
-    }
-    // ...
+    Vector(int s);                 // 构造函数：建立不变式，获取资源
+    ~Vector() { delete[] elem; }   // 析构函数：释放资源
+    Vector(const Vector& a);       // 拷贝构造函数
+    Vector& operator=(const Vector& a); // 拷贝赋值
+    double& operator[](int i);
+    const double& operator[](int i) const;
+    int size() const;
+private:
+    double* elem;   // elem 指向一个包含 sz 个 double 的数组
+    int sz;
 };
 ```
 
-### 6.2.2 移动
+为 `Vector` 定义合适的拷贝构造函数，会分配所需数量的元素空间，然后将元素拷贝进去，这样拷贝后每个 `Vector` 都拥有自己独立的元素副本：
 
-拷贝可能代价高昂——特别是对于大型容器。C++11 引入了*移动语义*（move semantics），允许将资源从一个对象"窃取"到另一个对象，而不需要拷贝：
+```cpp
+Vector::Vector(const Vector& a)   // 拷贝构造函数
+    : elem{new double[a.sz]},     // 分配元素空间
+      sz{a.sz}
+{
+    for (int i = 0; i != sz; ++i) // 拷贝元素
+        elem[i] = a.elem[i];
+}
+```
+
+现在 `v2 = v1` 示例的结果可以图示为：
+
+[图片描述]
+
+当然，除了拷贝构造函数，我们还需要拷贝赋值运算符：
+
+```cpp
+Vector& Vector::operator=(const Vector& a)   // 拷贝赋值
+{
+    double* p = new double[a.sz];
+    for (int i = 0; i != a.sz; ++i)
+        p[i] = a.elem[i];
+    delete[] elem;   // 删除旧元素
+    elem = p;
+    sz = a.sz;
+    return *this;
+}
+```
+
+`this` 是成员函数中预定义的名字，指向调用该成员函数的对象。
+
+在删除旧元素之前先拷贝元素，这样如果元素拷贝过程中出现问题并抛出异常，`Vector` 的旧值得以保留。
+
+#### 6.2.2 移动容器
+
+我们可以通过定义拷贝构造函数和拷贝赋值来控制拷贝，但对于大型容器来说拷贝代价高昂。当我们通过引用传递对象给函数时避免了拷贝开销，但无法返回局部对象的引用作为结果（局部对象在调用者有机会查看之前就被销毁了）。考虑：
+
+```cpp
+Vector operator+(const Vector& a, const Vector& b)
+{
+    if (a.size() != b.size())
+        throw Vector_size_mismatch{};
+
+    Vector res(a.size());
+
+    for (int i = 0; i != a.size(); ++i)
+        res[i] = a[i] + b[i];
+    return res;
+}
+```
+
+从 `a+b` 返回涉及将结果从局部变量 `res` 拷贝到调用者可以访问的地方。我们可能像这样使用 `+`：
+
+```cpp
+void f(const Vector& x, const Vector& y, const Vector& z)
+{
+    Vector r;
+    // ...
+    r = x + y + z;
+    // ...
+}
+```
+
+这将至少拷贝 `Vector` 两次（每个 `+` 运算符使用一次）。如果 `Vector` 很大（比如 10,000 个 `double`），这可能会很糟糕。最糟糕的是 `operator+()` 中的 `res` 在拷贝后再也不会被使用。我们其实并不想要拷贝；我们只是想从函数中获取结果：我们想要**移动**一个 `Vector` 而不是拷贝它。幸运的是，我们可以表达这个意图：
 
 ```cpp
 class Vector {
-public:
-    Vector(Vector&& a) noexcept         // 移动构造函数
-        : elem{a.elem}, sz{a.sz}
-    {
-        a.elem = nullptr;               // 让 a 变为空状态
-        a.sz = 0;
-    }
-
-    Vector& operator=(Vector&& a) noexcept  // 移动赋值运算符
-    {
-        delete[] elem;                  // 释放旧资源
-        elem = a.elem;
-        sz = a.sz;
-        a.elem = nullptr;
-        a.sz = 0;
-        return *this;
-    }
     // ...
+    Vector(const Vector& a);            // 拷贝构造函数
+    Vector& operator=(const Vector& a); // 拷贝赋值
+
+    Vector(Vector&& a);                 // 移动构造函数
+    Vector& operator=(Vector&& a);      // 移动赋值
 };
 ```
 
-`&&` 表示*右值引用*（rvalue reference），`noexcept` 保证移动操作不抛出异常。
+有了这个定义，编译器将选择移动构造函数来实现从函数返回值的传递。这意味着 `r = x + y + z` 将不涉及任何 `Vector` 的拷贝，而是仅仅移动 `Vector`。
 
-要触发移动而非拷贝，可以使用 `std::move()`：
+正如常见的那样，`Vector` 的移动构造函数定义起来很简单：
 
 ```cpp
-Vector v1 = {1, 2, 3};
-Vector v2 = std::move(v1);  // 移动 v1 到 v2；v1 变为空状态
+Vector::Vector(Vector&& a)
+    : elem{a.elem},   // “抓取” a 的元素
+      sz{a.sz}
+{
+    a.elem = nullptr; // 现在 a 没有元素
+    a.sz = 0;
+}
 ```
 
-移动语义是现代 C++ 性能优化的关键——它使得按值返回大型对象变得高效。
+`&&` 表示“右值引用”，是可以绑定到右值的引用。“右值”这个词是为了与“左值”互补，左值大致意思是“可以出现在赋值左侧的东西”[Stroustrup,2010]。因此，右值近似地说是一个你不能赋值的值，比如函数调用返回的整数。所以，右值引用是对别人不能赋值的东西的引用，我们可以安全地“窃取”它的值。`Vector` 的 `operator+()` 中的局部变量 `res` 就是一个例子。
+
+移动构造函数不接受 `const` 参数：毕竟，移动构造函数应该从其参数中拿走值。移动赋值也类似定义。
+
+当右值引用被用作初始化器或赋值操作的右侧时，就会应用移动操作。
+
+移动之后，被移动的对象应该处于一种允许析构函数运行的状态。通常，我们也允许对被移动的对象进行赋值。标准库算法（第 13 章）就假设如此。我们的 `Vector` 做到了这一点。
+
+在程序员知道某个值不会再被使用、但编译器无法足够智能地推断出来的地方，程序员可以显式指定：
+
+```cpp
+Vector f()
+{
+    Vector x(1000);
+    Vector y(2000);
+    Vector z(3000);
+    z = x;                // 得到一次拷贝（x 可能在 f() 后面还会被使用）
+    y = std::move(x);     // 得到一次移动（移动赋值）
+    // ... 这里最好不要再使用 x ...
+    return z;             // 得到一次移动
+}
+```
+
+标准库函数 `move()` 实际上并不移动任何东西。相反，它返回其参数的右值引用，从而表示该参数可能被移动；它本质上是一种强制转换（§5.2.3）。
+
+在返回之前，我们有：
+
+[图片描述：z, x, y 的状态图]
+
+当我们从 `f()` 返回时，`z` 的元素被返回值移出之后，`z` 被销毁。然而，`y` 的析构函数会删除它的元素。
+
+编译器（根据 C++ 标准）有义务消除大多数与初始化相关的拷贝，因此移动构造函数并不像你想象的那么频繁调用。这种拷贝省略甚至消除了移动本身的微小开销。另一方面，通常无法隐式消除赋值中的拷贝或移动操作，因此移动赋值对性能至关重要。
+

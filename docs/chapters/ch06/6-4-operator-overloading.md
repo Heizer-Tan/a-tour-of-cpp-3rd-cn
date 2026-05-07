@@ -1,51 +1,42 @@
-## 6.4 运算符重载
+﻿# 6.4 运算符重载
 
-C++ 允许为自定义类型定义运算符的行为。这使得用户定义类型可以像内置类型一样自然地使用。
+我们可以为用户定义类型（§2.4，§5.2.1）赋予 C++ 运算符的含义。这称为运算符重载，因为使用时必须从一组同名运算符中选出正确的实现。例如，`z1+z2` 中的 `complex` 的 `+` 必须与整数 `+` 和浮点数 `+`（§1.4.1）区分开。
 
-### 6.4.1 基本运算符
+不可能定义新的运算符，例如我们不能定义 `^^`、`===`、`**`、`<>` 或一元 `//`。允许那样做带来的混乱将不少于其好处。
 
-常见的可重载运算符包括：
+强烈建议以常规语义定义运算符。例如，一个做减法的 `+` 运算符对任何人都没有好处。
 
-```cpp
-class complex {
-public:
-    complex(double r = 0, double i = 0) : re{r}, im{i} {}
+我们可以为用户定义类型（类和枚举）定义运算符：
 
-    complex& operator+=(complex z) { re += z.re; im += z.im; return *this; }
-    complex& operator-=(complex z) { re -= z.re; im -= z.im; return *this; }
+- 二元算术运算符：`+`, `-`, `*`, `/`, `%`
+- 二元逻辑运算符：`&`（按位与）、`|`（按位或）、`^`（按位异或）
+- 二元关系运算符：`==`, `!=`, `<`, `<=`, `>`, `>=`, `<=>`
+- 逻辑运算符：`&&` 和 `||`
+- 一元算术和逻辑运算符：`+`, `-`, `~`（按位补码）、`!`（逻辑非）
+- 赋值：`=`, `+=`, `*=` 等
+- 自增和自减：`++`, `--`
+- 指针操作：`->`, 一元 `*`, 一元 `&`
+- 函数调用：`()`
+- 下标：`[]`
+- 逗号：`,`
+- 移位：`>>`, `<<`
 
-    double real() const { return re; }
-    double imag() const { return im; }
-private:
-    double re, im;
-};
-
-// 二元运算符通常定义为非成员函数
-complex operator+(complex a, complex b) { return a += b; }
-complex operator-(complex a, complex b) { return a -= b; }
-bool operator==(complex a, complex b) { return a.real() == b.real() && a.imag() == b.imag(); }
-```
-
-### 6.4.2 运算符重载的原则
-
-- 保持运算符的常规语义——不要用 `+` 来做减法
-- 成员函数用于需要修改左操作数的运算符（如 `+=`、`=`、`[]`）
-- 非成员函数用于对称的二元运算符（如 `+`、`-`、`==`）
-- 不要过度使用运算符重载——如果某个操作没有自然的运算符对应，使用命名函数
-
-### 6.4.3 函数对象（函子）
-
-重载 `operator()` 可以创建*函数对象*（function object，也叫*函子* functor）：
+不幸的是，我们不能定义点运算符（`.`）来获得智能引用。运算符可以定义为成员函数：
 
 ```cpp
-struct Less_than {
-    double d;
-    Less_than(double dd) : d{dd} {}
-    bool operator()(double x) const { return x < d; }
+class Matrix {
+    // ...
+    Matrix& operator=(const Matrix& a); // 将 a 赋值给 *this；返回引用
 };
-
-Less_than lt{42};
-bool b = lt(10);    // true: 10 < 42
 ```
 
-函数对象是泛型编程中的重要工具（[§7.3](../ch07/7-3-parameterized-operations.md)）。
+这通常用于修改第一个操作数的运算符，并且由于历史原因，`=`、`()`、`[]` 和 `->` 必须定义为成员函数。
+
+或者，大多数运算符可以定义为自由函数：
+
+```cpp
+Matrix operator+(const Matrix& m1, const Matrix& m2);
+```
+
+对于对称操作数的运算符，通常将其定义为自由函数，以便两个操作数得到相同对待。为了从返回可能很大的对象（如 `Matrix`）获得良好性能，我们依赖移动语义（§6.2.2）。
+

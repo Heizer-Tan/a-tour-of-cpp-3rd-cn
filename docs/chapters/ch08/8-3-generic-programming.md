@@ -1,47 +1,96 @@
-## 8.3 泛型编程
+﻿# 8.3 泛型编程
 
-泛型编程的核心思想是将算法从具体的数据类型中抽象出来。C++ 标准库是泛型编程的典范——算法（如 `sort`、`find`）与容器（如 `vector`、`list`）通过迭代器（iterators）解耦。
+===== 第 15 页 =====
 
-### 8.3.1 迭代器
+C++ 直接支持的泛型编程形式围绕着从具体、高效的算法中抽象以获得通用算法的思想，这些通用算法可以与不同的数据表示相结合，产生各种有用的软件 [Stepanov,2009]。表示基本操作和数据结构的抽象称为**概念**。
 
-迭代器是泛型编程的关键抽象。它提供了一种统一的方式来遍历不同类型的容器：
+#### 8.3.1 概念的使用
+
+好的、有用的概念是基本的，更多是被发现而不是被设计的。例子包括整数和浮点数（甚至在经典 C [Kernighan,1978] 中定义的）、序列，以及更一般的数学概念，如环和向量空间。它们代表了一个应用领域的基本概念。这就是为什么它们被称为“概念”。将概念识别和形式化到有效泛型编程所需的程度可能是一个挑战。
+
+对于基本使用，考虑概念 `regular`（§14.5）。当一个类型的行为很像 `int` 或 `vector` 时，它就是 regular 的。一个 regular 类型的对象：
+- 可以默认构造。
+- 可以使用构造函数或赋值进行拷贝（具有拷贝的常规语义，产生两个独立且比较相等的对象）。
+- 可以使用 `==` 和 `!=` 进行比较。
+- 不会因过于聪明的编程技巧而遭受技术问题。
+
+`string` 是 regular 类型的另一个例子。与 `int` 一样，`string` 也是 `totally_ordered`（§14.5）。也就是说，可以使用 `<`、`<=`、`>`、`>=` 和 `<=>` 以适当的语义比较两个字符串。
+
+概念不仅仅是句法上的概念，它本质上是关于语义的。例如，不要定义 `+` 来做除法；那不符合任何合理数字的要求。不幸的是，我们还没有任何语言支持来表达语义，因此我们必须依靠专家知识和常识来获得语义上有意义的概念。不要定义语义上无意义的概念，例如 `Addable` 和 `Subtractable`。
+
+===== 第 16 页 =====
+
+#### 8.3.2 使用模板进行抽象
+
+好的抽象是从具体的例子中仔细培养出来的。试图通过为每一个可以想到的需求和技术做准备来进行“抽象”并不是一个好主意；那会导致不优雅和代码膨胀。相反，从一个——最好多个——实际使用中的具体例子开始，并尝试消除无关紧要的细节。考虑：
 
 ```cpp
-template<typename Iter, typename Value>
-Iter find(Iter first, Iter last, const Value& val)
+double sum(const vector<int>& v)
 {
-    while (first != last && *first != val)
-        ++first;
-    return first;
+    double res = 0;
+    for (auto x : v)
+        res += x;
+    return res;
 }
 ```
 
-这个 `find` 函数适用于任何支持迭代器的容器——`vector`、`list`、`set`，甚至数组。
+这显然是计算数字序列之和的众多方法之一。
 
-### 8.3.2 算法和容器
+考虑是什么使得这段代码比它本应有的更不通用：
 
-标准库算法通过迭代器与容器交互，实现了算法与容器的完全解耦：
+- 为什么只是 `int`？
+- 为什么只是 `vector`？
+- 为什么累加在 `double` 中？
+- 为什么从 0 开始？
+- 为什么是加法？
 
-```cpp
-vector<int> v = {5, 3, 1, 4, 2};
-std::sort(v.begin(), v.end());          // 排序
-auto p = std::find(v.begin(), v.end(), 3); // 查找
-int count = std::count_if(v.begin(), v.end(),
-    [](int x) { return x % 2 == 0; });  // 计数偶数
-```
-
-### 8.3.3 范围（Ranges）
-
-C++20 引入了*范围*（ranges）库，进一步简化了泛型编程：
+通过将具体类型变为模板参数来回答前四个问题，我们得到了标准库 `accumulate` 算法的最简单形式：
 
 ```cpp
-#include <ranges>
-
-vector<int> v = {5, 3, 1, 4, 2};
-std::ranges::sort(v);                   // 直接对容器排序
-
-auto even = v | std::views::filter([](int x) { return x % 2 == 0; });
-// even 是一个"视图"，惰性地过滤出偶数
+template<forward_iterator Iter, Arithmetic<iter_value_t<Iter>> Val>
+Val accumulate(Iter first, Iter last, Val res)
+{
+    for (auto p = first; p != last; ++p)
+        res += *p;
+    return res;
+}
 ```
 
-范围库使用管道操作符 `|` 来组合操作，使代码更加简洁和可读。
+这里：
+- 要遍历的数据结构已被抽象为一对表示序列的迭代器（§8.2.4，§13.1）。
+- 累加器的类型已被设为参数。
+- 累加器的类型必须是算术类型。
+- 累加器的类型必须与迭代器的值类型（序列的元素类型）一起工作。
+- 初始值现在是一个输入；累加器的类型就是这个初始值的类型。
+
+快速检查或者——甚至更好——测量将表明，为各种数据结构调用生成的代码与手工编码示例得到的代码相同。考虑：
+
+```cpp
+void use(const vector<int>& vec, const list<double>& lst)
+{
+    auto sum = accumulate(begin(vec), end(vec), 0.0);   // 在 double 中累加
+    auto sum2 = accumulate(begin(lst), end(lst), sum);  // ...
+}
+```
+
+从具体代码片段（最好从多个）中泛化同时保持性能的过程称为**提升**。反过来，开发模板的最佳方法通常是：
+1.  首先，编写一个具体版本
+2.  然后，调试、测试和测量它
+3.  最后，用模板参数替换具体类型。
+
+当然，重复 `begin()` 和 `end()` 很繁琐，因此我们可以稍微简化用户界面：
+
+```cpp
+template<forward_range R, Arithmetic<value_type_t<R>> Val>
+Val accumulate(const R& r, Val res = 0)
+{
+    for (auto x : r)
+        res += x;
+    return res;
+}
+```
+
+`range` 是一个标准库概念，表示具有 `begin()` 和 `end()` 的序列（§13.1）。为了完全通用，我们也可以抽象 `+=` 操作；见 §17.3。
+
+`accumulate()` 的迭代器对版本和 range 版本都很有用：迭代器对版本用于通用性，range 版本用于常见用法的简单性。
+

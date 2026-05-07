@@ -1,56 +1,39 @@
-## 6.3 资源管理
+﻿# 6.3 资源管理
 
-资源管理是 C++ 编程中最重要的话题之一。资源可以是内存、文件句柄、锁、套接字等——任何需要在使用后显式释放的东西。
-
-### 6.3.1 RAII
-
-RAII（Resource Acquisition Is Initialization，资源获取即初始化）是 C++ 资源管理的核心惯用法。其基本思想是：
-
-- 在构造函数中获取资源
-- 在析构函数中释放资源
-- 将资源的所有权绑定到对象的生命周期
+通过定义构造函数、拷贝操作、移动操作和析构函数，程序员可以完全控制所包含资源（如容器的元素）的生命周期。此外，移动构造函数允许对象简单且廉价地从一种作用域移动到另一种作用域。这样，那些我们不能或不想拷贝出作用域的对象，可以被简单且廉价地移动出去。考虑表示并发活动的标准库 `thread`（§18.2）和一个包含一百万 `double` 的 `Vector`。我们不能拷贝前者，也不想拷贝后者。
 
 ```cpp
-class File_handle {
-public:
-    File_handle(const string& name)
-        : file{fopen(name.c_str(), "r")}
-    {
-        if (!file) throw std::runtime_error{"Cannot open file"};
-    }
+std::vector<thread> my_threads;
 
-    ~File_handle() { if (file) fclose(file); }
+Vector init(int n)
+{
+    thread t {heartbeat};               // 并发运行 heartbeat（在单独的线程中）
+    my_threads.push_back(std::move(t)); // 将 t 移入 my_threads（§16.6）
+    // ... 更多初始化 ...
+    Vector vec(n);
+    for (auto& x : vec)
+        x = 777;
+    return vec;                         // 将 vec 移出 init()
+}
 
-    // 禁止拷贝，允许移动
-    File_handle(const File_handle&) = delete;
-    File_handle& operator=(const File_handle&) = delete;
-    File_handle(File_handle&& other) noexcept : file{other.file} { other.file = nullptr; }
-    File_handle& operator=(File_handle&& other) noexcept { /* ... */ return *this; }
-
-private:
-    FILE* file;
-};
+auto v = init(1'000'000);               // 启动 heartbeat 并初始化 v
 ```
 
-RAII 确保了即使发生异常，资源也能被正确释放。
+===== 第 13 页 =====
 
-### 6.3.2 智能指针
+资源句柄（如 `Vector` 和 `thread`）在许多情况下是直接使用内置指针的更优选择。事实上，标准库的“智能指针”（如 `unique_ptr`）本身就是资源句柄（§15.2.1）。
 
-标准库提供了智能指针来管理动态分配的对象：
+我使用标准库的 `vector` 来保存线程，因为直到 §7.2 我们才能用元素类型参数化我们简单的 `Vector`。
 
-- `std::unique_ptr<T>`：独占所有权，不可拷贝，可移动
-- `std::shared_ptr<T>`：共享所有权，引用计数
-- `std::weak_ptr<T>`：不参与引用计数的观察者指针
+就像 `new` 和 `delete` 从应用程序代码中消失一样，我们可以让指针消失到资源句柄中。在这两种情况下，结果都是更简单、更易维护的代码，且没有额外开销。特别地，我们可以实现强资源安全；也就是说，对于资源的一般概念，我们可以消除资源泄漏。例如，`vector` 持有内存，`thread` 持有系统线程，`fstream` 持有文件句柄。
 
-```cpp
-std::unique_ptr<Shape> p = std::make_unique<Circle>(Point{0, 0}, 10);
-auto q = std::make_shared<Circle>(Point{1, 1}, 5);
-```
+在许多语言中，资源管理主要委托给垃圾回收器。在 C++ 中，你可以插入一个垃圾回收器。然而，我认为垃圾回收是在更干净、更通用、更局部化的资源管理替代方案用尽之后的最后选择。我的理想是不产生任何垃圾，从而消除对垃圾回收器的需求：不要乱扔垃圾！
 
-优先使用 `std::unique_ptr`——它零开销，且清晰地表达了所有权语义。只有在确实需要共享所有权时才使用 `std::shared_ptr`。
+垃圾回收从根本上说是一种全局内存管理方案。聪明的实现可以弥补其不足，但随着系统变得越来越分布式（想想缓存、多核和集群），局部性比以往任何时候都更重要。
 
-### 6.3.3 三/五法则
+另外，内存不是唯一的资源。资源是任何必须获取并在使用后（显式或隐式）释放的东西。例如：内存、锁、套接字、文件句柄和线程句柄。不出所料，不仅仅是内存的资源被称为非内存资源。一个好的资源管理系统处理所有类型的资源。在任何长时间运行的系统中都必须避免泄漏，但过度的资源保留几乎和泄漏一样糟糕。例如，如果一个系统将内存、锁、文件等保留两倍于必要的时间，那么系统可能需要配备两倍的资源。
 
-如果一个类需要自定义析构函数、拷贝构造函数或拷贝赋值运算符中的任何一个，那么它几乎肯定需要自定义所有三个（C++11 之后是五个，加上移动构造函数和移动赋值运算符）。这被称为*三/五法则*（Rule of Three/Five）。
+在诉诸垃圾回收之前，系统地使用资源句柄：让每个资源在某个作用域内有一个所有者，并且默认在其所有者作用域结束时被释放。在 C++ 中，这被称为 RAII（资源获取即初始化），并与异常形式的错误处理集成在一起。资源可以使用移动语义或“智能指针”在作用域之间移动，共享所有权可以用“共享指针”（§15.2.1）来表示。
 
-不过，在现代 C++ 中，更好的做法是使用 RAII 封装资源管理，让编译器自动生成这些操作——这被称为*零法则*（Rule of Zero）。
+在 C++ 标准库中，RAII 无处不在：例如，内存（`string`、`vector`、`map`、`unordered_map` 等）、文件（`ifstream`、`ofstream` 等）、线程（`thread`）、锁（`lock_guard`、`unique_lock` 等），以及通用对象（通过 `unique_ptr` 和 `shared_ptr`）。结果是，在常见使用中隐式的资源管理变得不可见，并且导致资源保留时间很短。
+

@@ -1,46 +1,56 @@
-## 11.2 输出
+﻿# 11.2 输出
 
-### 11.2.1 基本输出
-
-```cpp
-cout << "Hello, World!\n";
-cout << "Value: " << 42 << ", Pi: " << 3.14159 << '\n';
-```
-
-`<<` 运算符将数据写入输出流。它可以链式调用，因为 `<<` 返回流的引用。
-
-### 11.2.2 格式化输出
-
-可以使用 I/O 操纵器（manipulators）来控制输出格式：
+在 `<ostream>` 中，I/O 流库为每个内置类型定义了输出。此外，定义用户定义类型的输出也很容易（§11.5）。运算符 `<<`（“放入”）用作 `ostream` 类型对象上的输出运算符；`cout` 是标准输出流，`cerr` 是用于报告错误的标准流。默认情况下，写入 `cout` 的值被转换为字符序列。例如，要输出十进制数 10，我们可以写：
 
 ```cpp
-#include <iomanip>
-
-cout << std::fixed << std::setprecision(2);  // 固定小数点，2 位精度
-cout << 3.14159 << '\n';                      // 输出: 3.14
-
-cout << std::hex << 255 << '\n';              // 输出: ff (十六进制)
-cout << std::oct << 255 << '\n';              // 输出: 377 (八进制)
-cout << std::dec << 255 << '\n';              // 输出: 255 (十进制)
-
-cout << std::setw(10) << std::left << "Hello" << '\n';  // 左对齐，宽度 10
+cout << 10;
 ```
 
-### 11.2.3 `std::format`（C++20）
+这会将字符 `1` 后跟字符 `0` 放入标准输出流。
 
-`std::format` 提供了一种更安全、更直观的格式化方式：
+等价地，我们可以写：
 
 ```cpp
-#include <format>
-
-string s = std::format("Hello, {}!", "World");          // "Hello, World!"
-cout << std::format("Pi is approximately {:.2f}", 3.14159);  // "Pi is approximately 3.14"
-cout << std::format("{:>10}", "right");                  // 右对齐，宽度 10
-cout << std::format("{:#x}", 255);                       // "0xff" (带前缀的十六进制)
+int x {10};
+cout << x;
 ```
 
-`std::format` 的优势：
+不同类型的输出可以按显而易见的方式组合：
 
-- 类型安全：格式说明符与参数类型在编译时检查
-- 可读性：格式字符串直观易懂
-- 性能：通常比 `iostream` 更快
+```cpp
+void h(int i)
+{
+    cout << "the value of i is ";
+    cout << i;
+    cout << '\n';
+}
+```
+
+===== 第 4 页 =====
+
+对于 `h(10)`，输出将是：
+```
+the value of i is 10
+```
+
+当输出几个相关的项时，人们很快就会厌倦重复输出流的名称。幸运的是，输出表达式的结果本身可以用于进一步的输出。例如：
+
+```cpp
+void h2(int i)
+{
+    cout << "the value of i is " << i << '\n';
+}
+```
+
+这个 `h2()` 产生与 `h()` 相同的输出。
+
+字符常量是用单引号括起来的字符。注意，字符是作为字符输出，而不是作为数值输出。例如：
+
+```cpp
+int b = 'b';   // 注意：char 隐式转换为 int
+char c = 'c';
+cout << 'a' << b << c;
+```
+
+字符 `'b'` 的整数值是 98（在我使用的 C++ 实现的 ASCII 编码中），因此这将输出 `a98c`。
+

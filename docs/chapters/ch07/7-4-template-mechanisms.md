@@ -1,53 +1,157 @@
-## 7.4 模板机制
+﻿# 7.4 模板机制
 
-### 7.4.1 实例化
+为了定义良好的模板，我们需要一些支持性的语言设施：
 
-模板不是直接的代码——它是生成代码的*蓝图*。当模板被使用时，编译器会根据模板参数*实例化*（instantiate）出具体的代码：
+- 依赖于类型的值：**变量模板**（§7.4.1）
+- 类型和模板的别名：**别名模板**（§7.4.2）
+- 编译时选择机制：**`if constexpr`**（§7.4.3）
+- 查询类型和表达式属性的编译时机制：**requires 表达式**（§8.2.3）
+
+此外，`constexpr` 函数（§1.6）和 `static_assert`（§4.5.2）也经常参与模板的设计和使用。
+
+这些基本机制主要是用于构建通用、基础抽象的工具。
+
+#### 7.4.1 变量模板
+
+当我们使用一个类型时，我们通常需要该类型的常量和值。当我们使用类模板时当然也是如此：当我们定义 `C<T>` 时，我们通常需要类型 `C<T>` 和其他依赖于 `T` 的类型的常量和变量。这里有一个来自流体动力学仿真的例子 [Garcia,2015]：
 
 ```cpp
-Vector<int> vi(10);     // 编译器生成 Vector<int> 的完整代码
-Vector<string> vs(10);  // 编译器生成 Vector<string> 的完整代码
+template <class T>
+constexpr T viscosity = 0.4;
+
+template <class T>
+constexpr space_vector<T> external_acceleration = { T(), T{-9.8}, T() };
+
+auto vis2 = 2 * viscosity<double>;
+auto acc = external_acceleration<float>;
 ```
 
-每个不同的模板参数组合都会生成一份独立的代码。这意味着模板可能导致*代码膨胀*（code bloat），但通常可以通过精心设计来缓解。
+这里，`space_vector` 是一个三维向量。
 
-### 7.4.2 模板参数
+奇怪的是，大多数变量模板似乎是常量。但话又说回来，许多变量也是如此。术语没有跟上我们关于不可变性的概念。
 
-模板参数不仅可以是类型，还可以是值、模板，甚至其他模板：
-
-```cpp
-template<typename T, int N>
-struct Buffer {
-    T buf[N];
-    // ...
-};
-
-Buffer<char, 1024> glob;    // 1024 个字符的缓冲区
-```
-
-### 7.4.3 可变参数模板
-
-C++11 引入了*可变参数模板*（variadic templates），允许模板接受任意数量的参数：
+当然，我们可以使用合适类型的任意表达式作为初始化器。考虑：
 
 ```cpp
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
+template<typename T, typename T2>
+constexpr bool Assignable = is_assignable<T, T2>::value;   // is_assignable 是一个类型谓词
+
+template<typename T>
+void testing()
 {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    static_assert(Assignable<T&, double>, "can't assign a double to a T");
+    static_assert(Assignable<T&, string>, "can't assign a string to a T");
 }
 ```
 
-`Args...` 表示任意数量的类型参数，`args...` 表示对应的值参数。这是实现 `std::make_unique`、`std::tuple` 等工具的基础。
+经过一些重要的演变后，这个想法成为概念定义的核心（§8.2）。
 
-### 7.4.4 模板特化
+标准库使用变量模板来提供数学常数，例如 `pi` 和 `log2e`（§17.9）。
 
-可以为特定的模板参数提供*特化*（specialization）版本：
+#### 7.4.2 别名
+
+令人惊讶的是，为类型或模板引入同义词常常很有用。例如，标准头文件 `<cstddef>` 包含了别名 `size_t` 的定义，可能如下：
 
 ```cpp
-template<>
-class Vector<void*> {
-    // void* 指针向量的特殊实现
+using size_t = unsigned int;
+```
+
+名为 `size_t` 的实际类型是实现相关的，因此在另一种实现中 `size_t` 可能是 `unsigned long`。拥有别名 `size_t` 使得程序员能够编写可移植的代码。
+
+===== 第 20 页 =====
+
+参数化类型为其模板参数相关的类型提供别名非常常见。例如：
+
+```cpp
+template<typename T>
+class Vector {
+public:
+    using value_type = T;
+    // ...
 };
 ```
 
-特化允许为特定类型提供优化的实现，但应谨慎使用——过度特化会使代码难以维护。
+事实上，每个标准库容器都提供 `value_type` 作为其元素类型的名称（第 12 章）。这使得我们能够编写适用于遵循此约定的任何容器的代码。例如：
+
+```cpp
+template<typename C>
+using Value_type = typename C::value_type;   // C 的元素类型
+
+template<typename Container>
+void algo(Container& c)
+{
+    Vector<Value_type<Container>> vec;       // 在此保存结果
+    // ...
+}
+```
+
+这个 `Value_type` 是标准库 `range_value_t`（§16.4.4）的简化版本。别名机制可用于通过绑定部分或全部模板参数来定义新的模板。例如：
+
+```cpp
+template<typename Key, typename Value>
+class Map {
+    // ...
+};
+
+template<typename Value>
+using String_map = Map<string, Value>;
+
+String_map<int> m;   // m 是一个 Map<string, int>
+```
+
+#### 7.4.3 编译时 if
+
+===== 第 21 页 =====
+
+考虑编写一个可以使用两个函数 `slow_and_safe(T)` 或 `simple_and_fast(T)` 之一实现的操作。这类问题在基础代码中比比皆是，在这些代码中，通用性和最佳性能至关重要。如果涉及类层次结构，基类可以提供 `slow_and_safe` 通用操作，派生类可以用 `simple_and_fast` 实现覆盖它。
+
+或者，我们可以使用编译时 `if`：
+
+```cpp
+template<typename T>
+void update(T& target)
+{
+    if constexpr (is_trivially_copyable_v<T>)
+        simple_and_fast(target);   // 用于“普通旧数据”
+    else
+        slow_and_safe(target);     // 用于更复杂的类型
+}
+```
+
+`is_trivially_copyable_v<T>` 是一个类型谓词（§16.4.1），告诉我们一个类型是否可以平凡拷贝。
+
+编译器只检查 `if constexpr` 中被选中的分支。这个解决方案提供了最佳性能以及优化的局部性。
+
+重要的是，`if constexpr` **不是**文本操作机制，也不能用于破坏语法、类型和作用域的常规规则。例如，这是一个试图有条件地将调用包装在 `try` 块中的幼稚且失败的尝试：
+
+```cpp
+template<typename T>
+void bad(T arg)
+{
+    if constexpr (!is_trivially_copyable_v<T>)
+        try {
+            g(arg);
+    if constexpr (!is_trivially_copyable_v<T>)
+        catch(...) { /* ... */ }   // 语法错误
+}
+```
+
+===== 第 22 页 =====
+
+允许这样的文本操作会严重损害代码的可读性，并为依赖现代程序表示技术（如“抽象语法树”）的工具带来问题。
+
+许多此类尝试的黑客技巧也是不必要的，因为存在不违反作用域规则的更干净的解决方案。例如：
+
+```cpp
+template<typename T>
+void good(T arg)
+{
+    if constexpr (is_trivially_copyable_v<T>)
+        g(arg);
+    else
+        try {
+            g(arg);
+        } catch (...) { /* ... */ }
+}
+```
+

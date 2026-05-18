@@ -1,29 +1,12 @@
 # 2.6 建议
 
-[1] Prefer well-defined user-defined types over built-in types when the
-    built-in types are too low-level; §2.1.
-
-[2] Organize related data into structures (structs or classes); §2.2; [CG:
-    C.1].
-
-[3] Represent the distinction between an interface and an implementation
-    using a class; §2.3; [CG: C.3].
-
-[4] A struct is simply a class with its members public by default; §2.3.
-
-[5] Define constructors to guarantee and simplify initialization of classes;
-    §2.3; [CG: C.2].
-
-[6] Use enumerations to represent sets of named constants; §2.4; [CG:
-    Enum.2].
-
-[7] Prefer class enums over "plain" enums to minimize surprises; §2.4; [CG:
-    Enum.3].
-
-[8] Define operations on enumerations for safe and simple use; §2.4; [CG:
-    Enum.4].
-
-[9] Avoid "naked" unions; wrap them in a class together with a type field;
-    §2.5; [CG: C.181].
-
-[10] Prefer std::variant to "naked unions."; §2.5.
+[1] 当内置类型过于底层时，优先使用定义良好的用户定义类型；§2.1。
+[2] 将相关数据组织到结构（`struct` 或 `class`）中；§2.2；[CG: C.1]。
+[3] 使用类表示接口与实现之间的区分；§2.3；[CG: C.3]。
+[4] `struct` 只是默认成员为 `public` 的类；§2.3。
+[5] 定义构造函数以保证并简化类的初始化；§2.3；[CG: C.2]。
+[6] 使用枚举表示具名常量集合；§2.4；[CG: Enum.2]。
+[7] 优先使用类枚举（`enum class`）而非“普通”枚举，以减少意外；§2.4；[CG: Enum.3]。
+[8] 为枚举定义操作，以便安全、简单地使用；§2.4；[CG: Enum.4]。
+[9] 避免“裸露的”联合体；将其与类型字段一起封装在类中；§2.5；[CG: C.181]。
+[10] 优先使用 `std::variant`，而非“裸露的”联合体；§2.5。

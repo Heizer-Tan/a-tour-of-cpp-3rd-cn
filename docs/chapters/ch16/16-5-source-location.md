@@ -1,42 +1,37 @@
-﻿# 16.5 source_location
+# 16.5 `source_location`
 
-当输出跟踪消息或错误消息时，我们通常希望将源代码位置作为消息的一部分。库为此提供了 `source_location`：
+写出跟踪信息或错误信息时，常常希望把源码位置一并写入消息。库为此提供了 `source_location`：
 
 ```cpp
 const source_location loc = source_location::current();
 ```
 
-`current()` 返回一个描述源代码中出现位置的 `source_location`。类 `source_location` 有成员 `file_name()` 和 `function_name()`（返回 C 风格字符串），以及 `line()` 和 `column()`（返回无符号整数）。
+`current()` 返回描述其在源码中出现位置的 `source_location`。类 `source_location` 提供成员 `file()` 与 `function_name()`，返回 C 风格字符串；`line()` 与 `column()` 返回无符号整数。
 
-将其包装在一个函数中，我们就得到了一个不错的日志记录消息的初步版本：
+把它包进函数里，就得到日志消息的初步可用版本：
 
 ```cpp
 void log(const string& mess = "", const source_location loc = source_location::current())
 {
     cout << loc.file_name()
          << '(' << loc.line() << ':' << loc.column() << ") "
-         << loc.function_name() << ": " << mess;
+         << loc.function_name() << ": "
+         << mess;
 }
-```
 
-对 `current()` 的调用是一个默认参数，因此我们得到的是 `log()` 的调用者的位置，而不是 `log()` 本身的位置：
-
-```cpp
 void foo()
 {
-    log("Hello");   // myfile.cpp (17,4) foo: Hello
+    log("Hello");               // myfile.cpp(17,4) foo: Hello
     // ...
 }
 
 int bar(const string& label)
 {
-    log(label);     // myfile.cpp (23,4) bar: <<the value of label>>
+    log(label);                 // myfile.cpp(23,4) bar: <label 的值>
     // ...
 }
 ```
 
-===== 第 16 页 =====
+对 `current()` 的调用位于默认实参中，于是我们得到的是 **`log()` 调用方** 的位置，而不是 `log()` 自身的位置。
 
-在 C++20 之前编写的代码或需要在旧编译器上编译的代码使用宏 `__FILE__` 和 `__LINE__` 来实现此目的。
-
-## 16.6 move() 与 forward()
+在 C++20 之前编写、或需在旧编译器上编译的代码，对此通常使用宏 `__FILE__` 与 `__LINE__`。

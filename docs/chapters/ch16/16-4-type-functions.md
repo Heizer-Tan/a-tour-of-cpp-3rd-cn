@@ -1,101 +1,97 @@
-﻿# 16.4 类型函数
+# 16.4 类型函数
 
-**类型函数**是在编译时求值的函数，它以类型为参数或返回一个类型。标准库提供了多种类型函数，以帮助库实现者（以及一般程序员）编写能够利用语言、标准库和一般代码各方面特性的代码。
+类型函数是在编译期求值的函数：以类型为实参，或返回类型。标准库提供多种类型函数，帮助库实现者（以及广大程序员）写出能够利用语言特性、标准库以及一般代码方方面面的程序。
 
-对于数值类型，`<limits>` 中的 `numeric_limits` 提供了各种有用的信息（§17.7）。例如：
-
-```cpp
-constexpr float min = numeric_limits<float>::min();   // 最小的正 float
-```
-
-类似地，对象大小可以通过内置的 `sizeof` 运算符获得（§1.4）。例如：
+对算术类型，`<limits>` 中的 `numeric_limits` 提供诸多有用信息（§17.7）。例如：
 
 ```cpp
-constexpr int szi = sizeof(int);   // int 的字节数
+constexpr float min = numeric_limits<float>::min();   // 最小正 float
 ```
 
-在 `<type_traits>` 中，标准库提供了许多用于查询类型属性的函数。例如：
+对象大小可通过内建运算符 `sizeof`（§1.4）取得。例如：
 
 ```cpp
-bool b = is_arithmetic_v<X>;        // 如果 X 是（内置）算术类型之一，则为 true
-using Res = invoke_result_t<decltype(f)>; // 如果 f 是返回 int 的函数，则 Res 是 int
+constexpr int szi = sizeof(int);   // 一个 int 占用的字节数
 ```
 
-`decltype(f)` 是调用内置类型函数 `decltype()`，它返回其参数声明的类型；这里参数是 `f`。
+在 `<type_traits>` 中，标准库提供了大量用于查询类型性质的函数。例如：
 
-一些类型函数基于输入创建新的类型。例如：
+```cpp
+bool b = is_arithmetic_v<X>;                        // 若 X 为（内建）算术类型则为 true
+using Res = invoke_result_t<decltype(f)>;           // 若 f 是返回 int 的函数，则 Res 为 int
+```
+
+`decltype(f)` 是对内建类型函数 `decltype()` 的调用，返回其参数的声明类型；此处为 `f`。
+
+有些类型函数会根据输入构造新类型。例如：
 
 ```cpp
 template<typename T>
-using Store = conditional_t<(sizeof(T) < max), On_stack<T>, On_heap<T>>;
+using Store = conditional_t<sizeof(T) < max, On_stack<T>, On_heap<T>>;
 ```
 
-如果 `conditional_t` 的第一个（布尔）参数为真，则结果是第一个备选；否则是第二个。假设 `On_stack` 和 `On_heap` 提供相同的访问 `T` 的函数，它们可以按名字所示的方式分配其 `T`。因此，`Store<X>` 的用户可以根据 `X` 对象的大小进行调优。这种分配选择所启用的性能调优可能非常显著。
+若 `conditional_t` 的第一个（布尔）实参为 `true`，结果就是第一个备选类型；否则为第二个。假定 `On_stack` 与 `On_heap` 对 `T` 提供相同的访问接口，它们可按名称所示分配其 `T`。于是，`Store<X>` 的用户能依据 `X` 对象的大小调节策略；由此带来的分配策略性能调优可能非常重要。这是我们可以用标准类型函数或借助 concept 构造自有类型函数的简单示例。
 
-===== 第 9 页 =====
-
-这是一个简单的例子，说明我们如何使用标准类型函数或概念来构造自己的类型函数。概念就是类型函数。当在表达式中使用时，它们特指**类型谓词**。例如：
+concept 也是类型函数。用在表达式里时，它们具体化为类型谓词。例如：
 
 ```cpp
 template<typename F, typename... Args>
 auto call(F f, Args... a, Allocator alloc)
 {
-    if constexpr (invocable<F, alloc, Args...>)   // 需要分配器吗？
+    if constexpr (invocable<F, Allocator, Args...>) // 需要分配器吗？
         return f(f, alloc, a...);
     else
         return f(f, a...);
 }
 ```
 
-在许多情况下，概念是最好的类型函数，但大多数标准库是在概念之前编写的，并且必须支持概念之前的代码库。
+在许多情形下，concept 是最好的类型函数；但标准库的大多数代码写在 concept 之前，还必须支持尚未使用 concept 的代码库。
 
-表示法约定令人困惑。标准库使用 `_v` 表示返回值类型函数，使用 `_t` 表示返回类型类型函数。这是 C 弱类型时代和概念前 C++ 的遗留物。没有标准库类型函数既返回类型又返回值，因此这些后缀是多余的。有了概念，无论是在标准库还是其他地方，都不需要或使用后缀。
+记法约定容易令人困惑。标准库用后缀 `_v` 表示返回值的类型函数，用 `_t` 表示返回类型的类型函数。这是 C 以及 concept 之前 C++ 弱类型时代的遗存。没有任何标准库类型函数既返回类型又返回值，因此这些后缀其实是冗余的。有了 concept——无论是在标准库还是别处——都不需要也不使用后缀。
 
-类型函数是 C++ 编译时计算机制的一部分，它们允许比没有它们时更严格的类型检查和更好的性能。类型函数和概念（第 8 章，§14.5）的使用通常称为**元编程**，或者在涉及模板时称为**模板元编程**。
+类型函数属于 C++ 编译期计算机制的一部分；相较没有它们的情形，能实现更严格的类型检查和更好的性能。类型函数与 concept（第 8 章，§14.5）的使用常被称为元编程，或（当涉及模板时）模板元编程。
 
-## 16.4.1 类型谓词
+## 16.4.1
 
-在 `<type_traits>` 中，标准库提供了几十种简单的类型函数，称为**类型谓词**，它们回答有关类型的基本问题。以下是其中一小部分：
+在 `<type_traits>` 中，标准库提供数十个简单的类型函数，称为**类型谓词**，回答关于类型的基本问题。下面是一小部分：
 
-**选定的类型谓词**（`T`、`A` 和 `U` 是类型；所有谓词返回 `bool`）
+**所选类型谓词**（`T`、`A`、`U` 为类型；谓词均返回 `bool`）
 
-| 谓词 | 描述 |
+| 谓词 | 含义 |
 |------|------|
-| `is_void_v<T>` | `T` 是 `void` 吗？ |
-| `is_integral_v<T>` | `T` 是整数类型吗？ |
-| `is_floating_point_v<T>` | `T` 是浮点类型吗？ |
-| `is_class_v<T>` | `T` 是类（且不是联合）吗？ |
-| `is_function_v<T>` | `T` 是函数（而不是函数对象或指向函数的指针）吗？ |
-| `is_arithmetic_v<T>` | `T` 是整数或浮点类型吗？ |
-| `is_scalar_v<T>` | `T` 是算术、枚举、指针或指向成员的指针类型吗？ |
-| `is_constructible_v<T, A...>` | `T` 能否从 `A...` 参数列表构造？ |
-| `is_default_constructible_v<T>` | `T` 能否在没有显式参数的情况下构造？ |
-| `is_copy_constructible_v<T>` | `T` 能否从另一个 `T` 构造？ |
-| `is_move_constructible_v<T>` | `T` 能否被移动或拷贝到另一个 `T` 中？ |
-| `is_assignable_v<T, U>` | `U` 能否赋值给 `T`？ |
-| `is_trivially_copyable_v<T, U>` | `U` 能否在没有用户定义拷贝操作的情况下赋值给 `T`？ |
-| `is_same_v<T, U>` | `T` 与 `U` 是同一类型吗？ |
-| `is_base_of_v<T, U>` | `U` 是否派生自 `T`，或者 `U` 与 `T` 是同一类型？ |
+| `is_void_v<T>` | `T` 是否为 `void`？ |
+| `is_integral_v<T>` | `T` 是否为整型？ |
+| `is_floating_point_v<T>` | `T` 是否为浮点类型？ |
+| `is_class_v<T>` | `T` 是否为类（且非联合体）？ |
+| `is_function_v<T>` | `T` 是否为函数（而非函数对象或函数指针）？ |
+| `is_arithmetic_v<T>` | `T` 是否为整型或浮点类型？ |
+| `is_scalar_v<T>` | `T` 是否为算术、枚举、指针或成员指针类型？ |
+| `is_constructible_v<T, A...>` | 能否用实参列表 `A...` 构造 `T`？ |
+| `is_default_constructible_v<T>` | 能否无显式实参构造 `T`？ |
+| `is_copy_constructible_v<T>` | 能否用另一个 `T` 构造 `T`？ |
+| `is_move_constructible_v<T>` | 能否将 `T` 移动或拷贝到另一个 `T`？ |
+| `is_assignable_v<T, U>` | 能否把 `U` 赋给 `T`？ |
+| `is_trivially_copyable_v<T>` | `T` 是否可无用户自定义拷贝操作地平凡可复制？ |
+| `is_same_v<T, U>` | `T` 与 `U` 是否同一类型？ |
+| `is_base_of_v<T, U>` | `U` 是否派生自 `T`，或 `U` 与 `T` 相同？ |
 | `is_convertible_v<T, U>` | `T` 能否隐式转换为 `U`？ |
-| `is_iterator_v<T>` | `T` 是迭代器类型吗？ |
-| `is_invocable_v<T, A...>` | `T` 能否用参数列表 `A...` 调用？ |
+| `is_iterator_v<T>` | `T` 是否为迭代器类型？ |
+| `is_invocable_v<T, A...>` | 能否用实参列表 `A...` 调用 `T`？ |
 | `has_virtual_destructor_v<T>` | `T` 是否有虚析构函数？ |
 
-这些谓词的一个传统用途是约束模板参数。例如：
+这些谓词的一种传统用途是约束模板实参。例如：
 
 ```cpp
 template<typename Scalar>
 class complex {
     Scalar re, im;
 public:
-    static_assert(is_arithmetic_v<Scalar>, "Sorry, I support only complex of arithmetic types");
+    static_assert(is_arithmetic_v<Scalar>, "Sorry, I support only complex of arithmetic types.");
     // ...
 };
 ```
 
-===== 第 11 页 =====
-
-然而，这——像其他传统用法一样——使用概念更简单、更优雅：
+然而这种做法——与其他许多传统用法一样——用 concept 来做会更轻松、更利落：
 
 ```cpp
 template<Arithmetic Scalar>
@@ -106,111 +102,118 @@ public:
 };
 ```
 
-在许多情况下，诸如 `is_arithmetic` 之类的类型谓词会消失在概念的定义中，以更易于使用。例如：
+许多场合下，诸如 `is_arithmetic` 的类型谓词会消融在 concept 的定义里，更易使用。例如：
 
 ```cpp
 template<typename T>
 concept Arithmetic = is_arithmetic_v<T>;
 ```
 
-奇怪的是，标准库中没有 `std::arithmetic` 概念。
+有趣的是，标准库里并没有名为 `std::arithmetic` 的 concept。
 
-通常，我们可以定义比标准库类型谓词更通用的概念。许多标准库类型谓词仅适用于内置类型。我们可以根据所需的操作来定义概念，正如 `Number` 的定义所建议的那样（§8.2.4）：
+我们还可以定义比标准库类型谓词更一般的 concept。许多标准谓词只适用于内建类型。我们能按所需运算来定义 concept，正如 `Number`（§8.2.4）的定义所示：
 
 ```cpp
 template<typename T, typename U = T>
 concept Arithmetic = Number<T, U> && Number<U, T>;
 ```
 
-大多数情况下，标准库类型谓词的使用出现在基础服务的实现深处，通常是为了区分不同的优化情况。例如，`std::copy(Iter, Iter, Iter2)` 的部分实现可以优化简单类型（如整数）的连续序列这一重要情况：
+标准库类型谓词的用法最常见于基础服务的实现深处，往往是为了区分情形以做优化。例如，`std::copy(Iter, Iter, Iter2)` 的实现可能对「简单类型的连续序列」（例如整数）这一重要情形专门优化：
 
 ```cpp
 template<class T>
 void cpy1(T* first, T* last, T* target)
 {
     if constexpr (is_trivially_copyable_v<T>)
-        memcpy(target, first, (last - first) * sizeof(T));
+        memcpy(target, first, (last - first) * sizeof(T));   // 注意：示意 memcpy 参数顺序
     else
         while (first != last)
             *target++ = *first++;
 }
 ```
 
-在某些实现上，这个简单的优化比其非优化版本快了约 50%。除非你已经验证了标准库没有做得更好，否则不要沉迷于这种小聪明。手工优化的代码通常比更简单的替代方案更难维护。
+这类简单优化在某些实现上可比未优化版本快大约一半。**除非**你已核实标准库没有做得更好，否则不要沉迷于这类技巧。手工优化的代码通常不如更简单替代品易于维护。
 
-## 16.4.2 条件属性
+## 16.4.2
 
-考虑定义一个“智能指针”：
-
-```cpp
-template<typename T>
-class Smart_pointer {
-    // ...
-    T& operator*() const;
-    T* operator->() const;   // -> 应该当且仅当 T 是类类型时才有效
-};
-```
-
-`->` 应该当且仅当 `T` 是类类型时才定义。例如，`Smart_pointer<vector<T>>` 应该有 `->`，但 `Smart_pointer<int>` 不应该。
-
-我们不能使用编译时 `if`，因为我们不在函数内部。相反，我们写：
+考虑定义「智能指针」：
 
 ```cpp
 template<typename T>
 class Smart_pointer {
     // ...
     T& operator*() const;
-    T* operator->() const requires is_class_v<T>;   // -> 当且仅当 T 是类类型时定义
+    T* operator->() const;     // 当且仅当 T 为类类型时才应有 ->
 };
 ```
 
-===== 第 13 页 =====
+`operator->` 当且仅当 `T` 为类类型时才应定义。例如，`Smart_pointer<vector<int>>` 应有 `->`，但 `Smart_pointer<int>` 不应有。
 
-类型谓词直接表达了对 `operator->()` 的约束。我们也可以使用概念来实现这一点。标准库中没有要求一个类型是类类型（即类是 class、struct 或 union）的概念，但我们可以自己定义一个：
+我们不能使用编译期 `if`，因为不在函数体内。应写成：
 
 ```cpp
 template<typename T>
-concept Class = is_class_v<T> || is_union_v<T>;   // union 也是类
+class Smart_pointer {
+    // ...
+    T& operator*() const;
+    T* operator->() const requires is_class_v<T>;   // 当且仅当……时定义 ->
+};
+```
+
+类型谓词直接表达了对 `operator->()` 的约束。我们也可以用 concept。标准库没有「必须是类类型」的 concept（即类、`struct` 或联合体），但可以自定义：
+
+```cpp
+template<typename T>
+concept Class = is_class_v<T> || is_union_v<T>;   // 联合体也算一类 class-key
 
 template<typename T>
 class Smart_pointer {
     // ...
     T& operator*() const;
-    T* operator->() const requires Class<T>;   // -> 当且仅当 T 是类类型时定义
+    T* operator->() const requires Class<T>;      // 当且仅当 T 为类类型……
 };
 ```
 
-通常，概念比直接使用标准库类型谓词更通用，或者仅仅更合适。
+常常 concept 比直接使用标准库类型谓词更一般，或单纯更合适。
 
-## 16.4.3 类型生成器
+## 16.4.3
 
-许多类型函数返回类型，通常是它们计算出的新类型。我称这些函数为**类型生成器**，以区别于类型谓词。标准库提供了几个，例如：
+许多类型函数返回类型——常常是据此计算出的新类型。我把这类函数称为**类型生成器**，以区别于类型谓词。标准库提供的一部分如下：
 
-**选定的类型生成器**
+**所选类型生成器**
 
-| 生成器 | 描述 |
-|--------|------|
-| `R = remove_const_t<T>` | `R` 是去除了顶层 `const`（如果有）的 `T` |
-| `R = add_const_t<T>` | `R` 是 `const T` |
-| `R = remove_reference_t<T>` | 如果 `T` 是引用 `U&`，则 `R` 是 `U`，否则 `R` 是 `T` |
-| `R = add_lvalue_reference_t<T>` | 如果 `T` 是左值引用，则 `R` 是 `T`，否则 `R` 是 `T&` |
-| `R = add_rvalue_reference_t<T>` | 如果 `T` 是右值引用，则 `R` 是 `T`，否则 `R` 是 `T&&` |
-| `R = enable_if_t<b, T = void>` | 如果 `b` 为真，则 `R` 是 `T`，否则 `R` 未定义 |
-| `R = conditional_t<b, T, U>` | 如果 `b` 为真，则 `R` 是 `T`，否则 `R` 是 `U` |
-| `R = common_type_t<T...>` | 如果存在一个所有 `T` 都可以隐式转换到的类型，则 `R` 是该类型；否则 `R` 未定义 |
-| `R = underlying_type_t<T>` | 如果 `T` 是枚举，则 `R` 是其底层类型；否则错误 |
-| `R = invoke_result_t<T, A...>` | 如果 `T` 可以用参数 `A...` 调用，则 `R` 是其返回类型；否则错误 |
+| 记号 | 含义 |
+|------|------|
+| `R = remove_const_t<T>` | `R` 为去掉最外层 `const`（若有）后的 `T` |
+| `R = add_const_t<T>` | `R` 为 `const T` |
+| `R = remove_reference_t<T>` | 若 `T` 为引用 `U&`，则 `R` 为 `U`，否则为 `T` |
+| `R = add_lvalue_reference_t<T>` | 若 `T` 已是左值引用则 `R` 为 `T`，否则为 `T&` |
+| `R = add_rvalue_reference_t<T>` | 若 `T` 已是右值引用则 `R` 为 `T`，否则为 `T&&` |
+| `R = enable_if_t<b, T = void>` | 若 `b` 为 `true` 则 `R` 为 `T`，否则 `R` 未定义 |
+| `R = conditional_t<b, T, U>` | 若 `b` 为 `true` 则 `R` 为 `T`，否则为 `U` |
+| `R = common_type_t<T...>` | 若诸 `T` 可隐式转换到同一类型，则 `R` 为该类型；否则未定义 |
+| `R = underlying_type_t<T>` | 若 `T` 为枚举，则 `R` 为其底层类型；否则错误 |
+| `R = invoke_result_t<T, A...>` | 若可用 `A...` 调用 `T`，则 `R` 为其返回类型；否则错误 |
 
-这些类型函数通常用于工具的实现中，而不是直接在应用程序代码中使用。其中，`enable_if` 可能是概念前代码中最常见的。例如，智能指针的条件启用 `->` 传统上是这样实现的：
+这些类型函数通常用在工具设施实现里，而不是直接出现在应用代码中。其中 `enable_if` 大概是 concept 之前代码里最常用的。例如，智能指针上有条件启用的 `->` 传统上会像这样实现：
 
 ```cpp
 template<typename T>
 class Smart_pointer {
     // ...
     T& operator*();
-    enable_if<is_class_v<T>, T&> operator->();   // -> 当且仅当 T 是类类型时定义
+    enable_if_t<is_class_v<T>, T&> operator->();   // 当且仅当 T 为类类型……
 };
 ```
 
-我发现这不太容易阅读，更复杂的使用情况则更糟。`enable_if` 的定义依赖于一种称为 SFINAE（“替换失败不是错误”）的微妙语言特性。只有在需要时才去查阅它。
-
+我觉得这并不好读，更复杂的用法糟得多。`enable_if` 的定义依赖一门精微的语言特性，称为 SFINAE（替换失败不是错误）。只有在你**确实需要**时再去查阅它。
+
+## 16.4.4
+
+所有标准容器（§12.8）以及遵循其模式的容器都有若干关联类型，例如值类型与迭代器类型。在 `<iterator>` 与 `<ranges>` 中，标准库为这些类型提供了名字：
+
+| 名字 | 含义 |
+|------|------|
+| `range_value_t<R>` | 范围 `R` 的元素类型 |
+| `iter_value_t<T>` | 迭代器 `T` 所指元素的类型 |
+| `iterator_t<R>` | 范围 `R` 的迭代器类型 |

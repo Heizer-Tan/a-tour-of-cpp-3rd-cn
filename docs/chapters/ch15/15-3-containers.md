@@ -1,157 +1,142 @@
-﻿# 15.3 容器
+# 15.3 若干容器与近邻
 
-标准库提供了几个不能完美融入 STL 框架（第 12 章，第 13 章）的容器。例如内置数组、`array` 和 `string`。我有时称它们为“准容器”，但这并不完全公平：它们容纳元素，因此是容器，但每个都有一些限制或附加功能，使它们在 STL 的上下文中不太方便。单独描述它们也简化了 STL 的描述。
+标准库还提供了一批并不能完美嵌入 STL 框架（第 12、13 章）的容器：内置数组、`array`、`string` 等等。我偶尔把它们叫作“准容器”，这其实不公平——它们确实保存元素，因而当然是容器；只是各自附带限制或额外功能，使得在 STL 语境里显得有些别扭。把它们单独说明也有助于把 STL 本体讲清楚。
 
-**容器**
+**常用容器与“准容器”一览**
 
-| 类型 | 描述 |
+| 类型 | 说明 |
 |------|------|
-| `T[N]` | 内置数组：固定大小的连续分配序列，包含 `N` 个 `T` 类型元素；隐式转换为 `T*` |
-| `array<T,N>` | 固定大小的连续分配序列，包含 `N` 个 `T` 类型元素；类似于内置数组，但解决了大部分问题 |
-| `bitset<N>` | 固定大小的 `N` 位序列 |
-| `vector<bool>` | 在 `vector` 的特化中紧凑存储的位序列 |
-| `pair<T,U>` | 两个元素，类型分别为 `T` 和 `U` |
-| `tuple<T...>` | 任意数量、任意类型元素的序列 |
-| `basic_string<C>` | 类型 `C` 的字符序列；提供字符串操作 |
-| `valarray<T>` | 类型 `T` 的数值数组；提供数值运算 |
+| `T[N]` | 内置数组：在静态存储期、栈或对象体内连续存放 `N` 个 `T`；会退化（decay）成 `T*` |
+| `array<T, N>` | 固定长度的连续序列：语义接近内置数组，但规避了大多数经典的坑 |
+| `bitset<N>` | 固定长度、`N` 个二进制位的序列 |
+| `vector<bool>` | `vector` 的特化：紧凑存放比特并通过代理对象访问 |
+| `pair<T, U>` | 一枚 `T` 与一枚 `U` |
+| `tuple<T...>` | 任意个数、任意类型的序列 |
+| `basic_string<C>` | 类型为 `C` 的字符序列；附带字符串操作 |
+| `valarray<T>` | 数值数组：额外提供一批数值运算 |
 
-为什么标准要提供这么多容器？它们服务于常见但不同（常常重叠）的需求。如果标准库不提供它们，许多人将不得不自己设计并实现它们。例如：
+为何要有这么多容器？因为它们对应常见却各不相同（往往互相重叠）的需求；缺了它们，人们就不得不各自再造轮子。
 
-===== 第 12 页 =====
+- `pair` 与 `tuple` 是异质的：其余容器多半是同质元素。
+- `array`、`tuple` 的元素在连续内存里；`list`、`map` 多是链表结构。
+- `bitset`、`vector<bool>` 存放比特并通过代理访问；其它容器通常可直接摸到元素对象。
+- `basic_string` 要求元素是某种字符并提供拼接、依赖 locale 的操作等。
+- `valarray` 要求元素是数值并提供批量数值运算。
 
-- `pair` 和 `tuple` 是异构的；所有其他容器都是同构的（所有元素类型相同）。
-- `array` 和 `tuple` 的元素是连续分配的；`list` 和 `map` 是链接结构。
-- `bitset` 和 `vector<bool>` 持有位并通过代理对象访问它们；所有其他标准库容器可以持有各种类型并直接访问元素。
-- `basic_string` 要求其元素是某种形式的字符，并提供字符串操作，如连接和本地环境敏感操作。
-- `valarray` 要求其元素是数字，并提供数值运算。
+可以把它们视为服务庞大程序员社群的专项工具。不存在单一容器能吞下全部需求——有些需求彼此冲突，例如“能够增长” vs “布局固定在已知地址”、“插入时不搬动旧元素” vs “内存连续”。
 
-所有这些容器都可以被视为提供了大型程序员群体所需的专门服务。没有单一的容器能够满足所有这些需求，因为有些需求是相互矛盾的，例如“能够增长” vs “保证分配在固定位置”，以及“添加元素时元素不移动” vs “连续分配”。
+## 15.3.1 `array`
 
-### 15.3.1 array
+`<array>` 里的 `array` 是一种编译期确定长度的元素序列，长度必须是常量表达式，因而可以把元素放在栈上、对象体内或静态存储区——生命周期随定义它的作用域而定。
 
-定义在 `<array>` 中的 `array` 是一个固定大小的元素序列，其中元素个数在编译时指定。因此，`array` 可以将其元素分配在栈上、对象内或静态存储中。元素在 `array` 定义所在的作用域内分配。`array` 最好被理解为一个带有固定大小的内置数组，没有隐式的、可能令人惊讶的到指针类型的转换，并提供了一些便利函数。与使用内置数组相比，使用 `array` 没有（时间或空间上的）开销。`array` 不遵循 STL 容器的“指向元素的句柄”模型。相反，`array` 直接包含其元素。它只不过是内置数组的一个更安全的版本。
+把它理解成“带上尺寸的更安全内置数组”最贴切：没有偷偷摸摸退化成龙指针的陷阱，还附带少量便利函数；相较内置数组不会多出时空开销。`array` 并不遵循 STL 容器那种“句柄指向缓冲区”的模型——它直接内含元素，只不过是更难误用的内置数组。
 
-这意味着 `array` 可以通过初始化列表进行初始化：
+这也意味着必须用初始化列表填充：
 
 ```cpp
-array<int,3> a1 = {1, 2, 3};
+array<int, 3> a1 = {1, 2, 3};
 ```
 
-===== 第 13 页 =====
+初始化列表的元素个数必须小于等于模板指定的容量。
 
-初始化列表中的元素个数必须等于或小于为数组指定的元素个数。
-
-元素个数不是可选的，元素个数必须是常量表达式，元素个数必须为正，并且元素类型必须显式指定：
+元素个数不是可选参数：必须是正的常量表达式，元素类型也必须写得明明白白：
 
 ```cpp
 void f(int n)
 {
-    array<int> a0 = {1,2,3};                // 错误：未指定大小
-    array<string, n> a1 = {"John's", "Queens' "}; // 错误：大小不是常量表达式
-    array<string, 0> a2;                    // 错误：大小必须为正
-    array<2> a3 = {"John's", "Queens' "};   // 错误：未指定元素类型
+    array<int> a0 = {1, 2, 3};                     // 错误：未给出大小
+    array<string, n> a1 = {"John's", "Queens'"};   // 错误：大小不是常量表达式
+    array<string, 0> a2;                           // 错误：大小必须为正
+    array<2> a3 = {"John's", "Queens'"};           // 错误：元素类型未写明
     // ...
 }
 ```
 
-如果你需要元素个数为变量，请使用 `vector`。
+若长度要到运行期才知道，请改用 `vector`。
 
-必要时，`array` 可以被显式地传递给期望指针的 C 风格函数。例如：
+必要时也能显式把 `array` 交给期望指针的 C 接口：
 
 ```cpp
-void f(int* p, int sz);   // C 风格接口
+void f(int* p, int sz); // C 风格接口
 
 void g()
 {
-    array<int,10> a;
-    f(a, a.size());       // 错误：没有转换
-    f(a.data(), a.size()); // C 风格使用
-    auto p = find(a, 777); // C++/STL 风格使用（传递一个范围）
+    array<int, 10> a;
+
+    f(a, a.size());       // 错误：无法转换
+    f(a.data(), a.size()); // C 风格用法
+
+    auto p = find(a, 777); // C++/STL 风格（把整个范围传进去）
     // ...
 }
 ```
 
-既然 `vector` 如此灵活，为什么还要使用 `array`？`array` 不那么灵活，因此更简单。偶尔，直接访问分配在栈上的元素与在自由存储区上分配元素、通过 `vector`（一个句柄）间接访问它们然后释放它们相比，有显著的性能优势。另一方面，栈是一种有限的资源（尤其是在某些嵌入式系统上），栈溢出是棘手的。此外，有些应用领域（如安全关键的实时控制）禁止使用自由存储区分配。例如，使用 `delete` 可能导致碎片（§12.7）或内存耗尽（§4.3）。
+既然 `vector` 灵活得多，为什么还要 `array`？——正因为不那么灵活，它更简单。偶尔把元素直接铺在栈上会比经由 `vector` 句柄访问自由存储更快；但栈空间有限（嵌入式尤其捉襟见肘），栈溢出也相当难看。另有一些领域（安全攸关的实时控制）干脆禁止使用自由存储：`delete` 可能造成碎片化（§12.7）或耗尽内存（§4.3）。
 
-既然可以使用内置数组，为什么还要使用 `array`？`array` 知道它的大小，因此易于与标准库算法一起使用，并且可以使用 `=` 进行拷贝。例如：
+相较于内置数组，`array` 知道自己的长度：更容易套用标准库算法，也能整体赋值。例如：
 
 ```cpp
-array<int,3> a1 = {1, 2, 3};
-auto a2 = a1;   // 拷贝
+array<int, 3> a1 = {1, 2, 3};
+auto a2 = a1; // 拷贝
 a2[1] = 5;
-a1 = a2;        // 赋值
+a1 = a2;      // 赋值
 ```
 
-然而，我偏爱 `array` 的主要原因是它使我免于令人惊讶且糟糕的到指针的转换。考虑一个涉及类层次结构的例子：
+我自己偏爱 `array` 的主要原因是它能挡住令人瞠目的指针退化。例如涉及类层次时：
 
 ```cpp
 void h()
 {
     Circle a1[10];
-    array<Circle,10> a2;
+    array<Circle, 10> a2;
     // ...
-    Shape* p1 = a1;   // OK：等待发生的灾难
-    Shape* p2 = a2;   // 错误：没有从 array<Circle,10> 到 Shape* 的转换（好！）
-    p1[3].draw();     // 灾难
+
+    Shape* p1 = a1; // 可以编译：灾难已在酝酿
+    Shape* p2 = a2; // 错误：array<Circle,10> 不会偷偷转成 Shape*（太好了）
+    p1[3].draw();   // 灾难
 }
 ```
 
-“灾难”的注释假设 `sizeof(Shape) < sizeof(Circle)`，因此通过 `Shape*` 对 `Circle` 数组进行下标会得到错误的偏移量。所有标准容器都提供了相对于内置数组的这一优势。
+注释里的“灾难”假定 `sizeof(Shape) < sizeof(Circle)`：经由 `Shape*` 去给 `Circle[]` 做下标会得到错误跨度。所有标准容器相对内置数组都有这层优势。
 
-### 15.3.2 bitset
+## 15.3.2 `bitset`
 
-系统的某些方面，例如输入流的状态，通常表示为一组指示二进制条件的标志，如 good/bad、true/false、on/off。C++ 通过整数的按位操作高效地支持小标志集的概念（§1.4）。类 `bitset<N>` 泛化了这一概念，提供了对 `N` 位序列 `[0:N)` 的操作，其中 `N` 在编译时已知。对于不适合 `long long int`（通常为 64 位）的位集，使用 `bitset` 比直接使用整数方便得多。对于较小的集合，`bitset` 通常是被优化的。如果你想要为位命名而不是编号，可以使用 `set`（§12.5）或枚举（§2.4）。
+系统状态（例如输入流状态）常用一组二元标志表示。C++ 允许通过对整数做位运算处理小规模集合（§1.4）。`bitset<N>` 则把这些操作推广到编译期固定的 `N` 个位 `[0:N)`；若位数多到难以塞进 `long long`（常见为 64 位），`bitset` 往往比手工摆弄整数轻松得多；位数较少时也常被专门优化。
 
-`bitset` 可以用整数或字符串初始化：
+如果想按名字而非编号区分比特，可以用 `set`（§12.5）或枚举（§2.4）。
+
+`bitset` 可用整数或字符串初始化：
 
 ```cpp
 bitset<9> bs1 {"110001111"};
-bitset<9> bs2 {0b1'1000'1111};   // 使用数字分隔符的二进制字面量（§1.4）
+bitset<9> bs2 {0b1'1000'1111}; // 使用数字分隔符的二进制字面量（§1.4）
 ```
 
-可以应用通常的按位运算符（§1.4）以及左移和右移运算符（`<<` 和 `>>`）：
+常规的按位运算符（§1.4）以及移位运算符 `<<`、`>>` 都可直接使用：
 
 ```cpp
-bitset<9> bs3 = ~bs1;   // 补码：bs3 == "001110000"
-bitset<9> bs4 = bs1 & bs3;   // 全零
-bitset<9> bs5 = bs1 << 2;    // 左移：bs5 = "000111100"
+bitset<9> bs3 = ~bs1;      // 按位取反：bs3 == "001110000"
+bitset<9> bs4 = bs1 & bs3; // 全零
+bitset<9> bs5 = bs1 << 2;  // 左移补零：bs5 == "000111100"
 ```
 
-移位运算符（此处为 `<<`）会“移入”零。
+此处的 `<<` 向低位填充 0。
 
-操作 `to_ullong()` 和 `to_string()` 提供与构造函数相反的操作。例如，我们可以输出一个 `int` 的二进制表示：
+`to_ullong()`、`to_string()` 可视作与构造函数互逆。若想打印整数的二进制展开，可以：
 
 ```cpp
 void binary(int i)
 {
-    bitset<8*sizeof(int)> b = i;   // 假设 8 位字节（另见 §17.7）
-    cout << b.to_string() << '\n'; // 输出 i 的位
+    bitset<8 * sizeof(int)> b = i; // 假定字节长为 8（亦见 §17.7）
+    cout << b.to_string() << '\n';
 }
 ```
 
-这将从左到右将位表示为 1 和 0，最高有效位在最左边，因此参数 123 将输出：
+输出从左到右依次为高位到低位；例如传入 `123` 会打印其二进制模式。
 
-```
-00000000000000000000000001111011
-```
+## 15.3.3 `pair`
 
-对于这个例子，直接使用 `bitset` 的输出运算符更简单：
-
-```cpp
-void binary2(int i)
-{
-    bitset<8*sizeof(int)> b = i;   // 假设 8 位字节（另见 §17.7）
-    cout << b << '\n';             // 输出 i 的位
-}
-```
-
-===== 第 16 页 =====
-
-`bitset` 提供了许多用于使用和操作位集的函数，例如 `all()`、`any()`、`none()`、`count()`、`flip()`。
-
-### 15.3.3 pair
-
-函数返回两个值相当常见。有很多方法可以做到这一点，最简单且通常最好的是为此定义一个 `struct`。例如，我们可以返回一个值和一个成功指示器：
+函数返回两个值司空见惯；最简单的做法往往是定义专用 `struct`。例如返回指针并附带错误码：
 
 ```cpp
 struct My_res {
@@ -163,13 +148,13 @@ My_res complex_search(vector<Entry>& v, const string& s)
 {
     Entry* found = nullptr;
     Error_code err = Error_code::found;
-    // ... 在 v 中搜索 s ...
+    // ... 在 v 中查找 s ...
     return {found, err};
 }
 
 void user(const string& s)
 {
-    My_res r = complex_search(entry_table, s);   // 搜索 entry_table
+    My_res r = complex_search(entry_table, s);
     if (r.err != Error_code::good) {
         // ... 处理错误 ...
     }
@@ -177,154 +162,150 @@ void user(const string& s)
 }
 ```
 
-我们可以争辩说将失败编码为尾后迭代器或 `nullptr` 更优雅，但这只能表达一种失败。通常，我们希望返回两个独立的值。为每一对值定义一个特定的具名 `struct` 通常效果很好，如果这些“值对”结构体及其成员的名称选择得当，可读性也相当高。然而，对于大型代码库，这可能导致名称和约定的激增，并且在需要一致命名的泛型代码中效果不佳。因此，标准库提供了 `pair` 作为对“值对”用例的通用支持。使用 `pair`，我们的简单示例变成：
+你也可以争辩：把失败编码成尾迭代器或 `nullptr` 或许更优雅，但那通常只能表达一类失败。现实里往往需要真正独立的两个返回值；只要命名得当，专用结构非常清晰。然而在巨型代码库里这会催生姓名爆炸；泛型代码又需要一致的命名——于是标准库提供了通用的 `pair`：
 
 ```cpp
 pair<Entry*, Error_code> complex_search(vector<Entry>& v, const string& s)
 {
     Entry* found = nullptr;
     Error_code err = Error_code::found;
-    // ... 在 v 中搜索 s ...
+    // ...
     return {found, err};
 }
 
 void user(const string& s)
 {
-    auto r = complex_search(entry_table, s);   // 搜索 entry_table
+    auto r = complex_search(entry_table, s);
     if (r.second != Error_code::good) {
-        // ... 处理错误 ...
+        // ...
     }
     // ... 使用 r.first ...
 }
 ```
 
-`pair` 的成员被命名为 `first` 和 `second`。从实现者的角度来看这是有意义的，但在应用程序代码中，我们可能想使用自己的名称。可以使用结构化绑定（§3.4.5）来处理这个问题：
+成员名 `first`、`second` 对实现者友好，在应用代码里却未必称心；结构化绑定（§3.4.5）能改善可读性：
 
 ```cpp
 void user(const string& s)
 {
-    auto [ptr, success] = complex_search(entry_table, s);   // 搜索 entry_table
+    auto [ptr, success] = complex_search(entry_table, s);
     if (success != Error_code::good) {
-        // ... 处理错误 ...
+        // ...
     }
     // ... 使用 ptr ...
 }
 ```
 
-标准库的 `pair`（来自 `<utility>`）在标准库及其他地方非常频繁地用于“值对”的用例。例如，标准库算法 `equal_range` 返回一对指定子序列的迭代器，该子序列满足谓词：
+`<utility>` 里的 `pair` 在标准库与其余代码中都非常常见。例如算法 `equal_range()` 会返回一对迭代器，指明有序区间里满足比较关系的子序列：
 
 ```cpp
 template<typename Forward_iterator, typename T, typename Compare>
 pair<Forward_iterator, Forward_iterator>
 equal_range(Forward_iterator first, Forward_iterator last, const T& val, Compare cmp);
-```
 
-给定已排序序列 `[first:last)`，`equal_range()` 将返回表示匹配谓词 `cmp` 的子序列的 pair。我们可以用它来在已排序的 `Record` 序列中搜索：
-
-```cpp
 auto less = [](const Record& r1, const Record& r2) { return r1.name < r2.name; };
 
-void f(const vector<Record>& v)   // 假设 v 已按 "name" 字段排序
+void f(const vector<Record>& v) // 假定 v 已按 name 排序
 {
     auto [first, last] = equal_range(v.begin(), v.end(), Record{"Reg"}, less);
-    for (auto p = first; p != last; ++p)   // 打印所有相等的记录
-        cout << *p;   // 假设为 Record 定义了 <<
+
+    for (auto p = first; p != last; ++p)
+        cout << *p; // 假定已为 Record 定义 <<
 }
 ```
 
-如果 `pair` 的元素支持，`pair` 会提供诸如 `=`、`==` 和 `<` 等运算符。类型推导使得创建 `pair` 变得容易，无需显式提及它的类型。例如：
+若成员类型支持，`pair` 也会自动生成 `=`、`==`、`<` 等运算符。模板实参推导让我们可以轻松写出：
 
 ```cpp
 void f(vector<string>& v)
 {
-    pair p1 {v.begin(), 2};          // 一种方式
-    auto p2 = make_pair(v.begin(), 2); // 另一种方式
+    pair p1 {v.begin(), 2};
+    auto p2 = make_pair(v.begin(), 2);
     // ...
 }
 ```
 
-`p1` 和 `p2` 的类型都是 `pair<vector<string>::iterator, int>`。
+`p1`、`p2` 的类型都是 `pair<vector<string>::iterator, int>`。
 
-当代码不需要泛型时，带有具名成员的简单 `struct` 通常能产生更易维护的代码。
+一旦无需泛化，具名成员的结构体通常更易维护。
 
-### 15.3.4 tuple
+## 15.3.4 `tuple`
 
-像数组一样，标准库容器是同构的；也就是说，它们的所有元素都是单一类型的。然而，有时我们想要将不同类型元素的序列视为单个对象；也就是说，我们想要一个异构容器；`pair` 是一个例子，但并非所有此类异构序列都只有两个元素。标准库提供了 `tuple` 作为 `pair` 的推广，可以包含零个或多个元素：
+与数组一样，多数标准容器是**同质**的：元素彼此类型相同。但有时我们希望把不同类型的序列视作单一对象——这就需要异质容器；`pair` 只是一例，却不局限于两项。
 
-```cpp
-tuple t0 {};                                     // 空
-tuple<string,int,double> t1 {"Shark", 123, 3.14}; // 显式指定类型
-auto t2 = make_tuple(string{"Herring"}, 10, 1.23); // 类型推导为 tuple<string,int,double>
-tuple t3 {"Cod"s, 20, 9.99};                     // 类型推导为 tuple<string,int,double>
-```
+标准库的 `tuple` 可视作 `pair` 的推广：允许零个或更多成员。
 
-`tuple` 的元素（成员）是独立的；它们之间不维护任何不变式（§4.3）。如果我们想要一个不变式，必须将 `tuple` 封装在一个强制该不变式的类中。
+各成员彼此独立，并不会自动维持跨字段不变式（§4.3）；若要 invariant，必须把 `tuple` 封装进自定义类里强制执行。
 
-对于单个的、特定的用途，简单的 `struct` 通常是理想的，但在许多泛型用途中，`tuple` 的灵活性使我们不必定义许多 `struct`，代价是成员没有助记名称。`tuple` 的成员通过 `get` 函数模板访问。例如：
+针对单个具体用途，`struct` 往往最理想；但在大量泛型场合，`tuple` 让我们免于声明海量小型类型——代价是失去助记成员名。访问 `tuple` 主要靠 `get` 函数模板：
 
 ```cpp
-string fish = get<0>(t1);    // 获取第一个元素："Shark"
-int count = get<1>(t1);      // 获取第二个元素：123
-double price = get<2>(t1);   // 获取第三个元素：3.14
+string fish = get<0>(t1);   // 第一个元素："Shark"
+int count = get<1>(t1);     // 第二个元素：123
+double price = get<2>(t1);  // 第三个元素：3.14
 ```
 
-`tuple` 的元素被编号（从零开始），并且传给 `get()` 的索引参数必须是常量。`get` 是一个函数模板，将索引作为模板值参数（§7.2.2）。
+元素按下标编号（从 0 开始），传给 `get` 的下标必须是编译期常量；这是模板形参为值的典范用法（§7.2.2）。
 
-通过索引访问 `tuple` 的成员是通用的，但丑陋且有些容易出错。幸运的是，`tuple` 中具有唯一类型的元素可以通过其类型来“命名”：
+按下标访问通用却难看且容易抄错。好在若某个类型在 `tuple` 中唯一，还可以通过类型“点名”：
 
 ```cpp
-auto fish = get<string>(t1);   // 获取字符串："Shark"
-auto count = get<int>(t1);     // 获取 int：123
-auto price = get<double>(t1);  // 获取 double：3.14
+auto fish = get<string>(t1);
+auto count = get<int>(t1);
+auto price = get<double>(t1);
 ```
 
-我们也可以使用 `get<>` 进行写入：
+`get` 也能用于写入：
 
 ```cpp
-get<string>(t1) = "Tuna";   // 写入字符串
-get<int>(t1) = 7;           // 写入 int
-get<double>(t1) = 312;      // 写入 double
+tuple t0 {};                                     // 空 tuple
+tuple<string, int, double> t1 {"Shark", 123, 3.14};
+auto t2 = make_tuple(string{"Herring"}, 10, 1.23);
+tuple t3 {"Cod"s, 20, 9.99};
+
+get<string>(t1) = "Tuna";
+get<int>(t1) = 7;
+get<double>(t1) = 312;
 ```
 
-`tuple` 的大多数用法都隐藏在更高级别构造的实现中。例如，我们可以使用结构化绑定（§3.4.5）访问 `t1` 的成员：
+多数 `tuple` 用法隐藏在更高层抽象背后；结构化绑定（§3.4.5）能把读取写得直白：
 
 ```cpp
 auto [fish, count, price] = t1;
-cout << fish << ' ' << count << ' ' << price << '\n';   // 读取
-fish = "Sea Bass";   // 写入
+cout << fish << ' ' << count << ' ' << price << '\n';
+fish = "Sea Bass";
 ```
 
-通常，这种绑定及其底层对 `tuple` 的使用用于函数调用：
+典型场景还包括函数返回：
 
 ```cpp
 auto [fish, count, price] = todays_catch();
 cout << fish << ' ' << count << ' ' << price << '\n';
 ```
 
-`tuple` 的真正力量在于当您必须将数量未知、类型未知的元素作为对象存储或传递时。
+真正凸显 `tuple` 威力的是：必须把未知个数、未知类型的值打包成一个对象时。
 
-显式地遍历 `tuple` 的元素有点麻烦，需要递归和函数体的编译时求值：
+若想遍历 `tuple` 的元素，代码会啰嗦不少——往往需要递归配合编译期求值：
 
 ```cpp
-template <size_t N = 0, typename... Ts>
+template<size_t N = 0, typename... Ts>
 constexpr void print(tuple<Ts...> tup)
 {
-    if constexpr (N < sizeof...(Ts)) {   // 还没到末尾？
-        cout << get<N>(tup) << ' ';      // 打印第 N 个元素
-        print<N+1>(tup);                 // 打印下一个元素
+    if constexpr (N < sizeof...(Ts)) {
+        cout << get<N>(tup) << ' ';
+        print<N + 1>(tup);
     }
 }
 ```
 
-这里，`sizeof...(Ts)` 给出 `Ts` 中元素的数量。使用 `print()` 很简单：
+`sizeof...(Ts)` 给出模板包 `Ts` 的元素个数。
+
+使用很直接：
 
 ```cpp
-print(t0);                                         // 无输出
-print(t2);                                         // Herring 10 1.23
+print(t0); // 无输出
+print(t2); // Herring 10 1.23
 print(tuple{"Norah", 17, "Gavin", 14, "Anya", 9, "Courtney", 9, "Ada", 0});
 ```
 
-===== 第 21 页 =====
-
-像 `pair` 一样，如果其元素支持，`tuple` 也提供诸如 `=`、`==` 和 `<` 等运算符。此外，`pair` 与具有两个成员的 `tuple` 之间也存在转换。
-
+与 `pair` 类似：若元素类型支持，`tuple` 也能得到 `=`、`==`、`<` 等运算符；还可以在两项 `tuple` 与 `pair` 之间转换。

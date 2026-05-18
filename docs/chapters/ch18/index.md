@@ -5,7 +5,7 @@
 # 并发
 
 <div class="no-float" markdown="1">
-> **并发是性能的关键，但也是复杂性的来源。**
+> **保持简单：尽可能简单，但不要更简单。**
 >
-> —— Bjarne Stroustrup
+> —— A. Einstein
 </div>

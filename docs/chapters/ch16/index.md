@@ -5,7 +5,7 @@
 # 实用工具
 
 <div class="no-float" markdown="1">
-> **好的工具让编程事半功倍。**
+> **你乐于“浪费”的时间并非浪费时间。**
 >
-> —— Bjarne Stroustrup
+> —— Bertrand Russell
 </div>

@@ -1,14 +1,14 @@
-﻿# 17.2 数学函数
+# 17.2 数学函数
 
-在 `<cmath>` 中，我们找到了标准数学函数，例如 `sqrt()`、`log()` 和 `sin()`，它们的参数类型可以是 `float`、`double` 和 `long double`：
+在 `<cmath>` 中可以找到标准数学函数，例如面向 `float`、`double` 与 `long double` 实参的 `sqrt()`、`log()`、`sin()` 等：
 
-**选定的标准数学函数**
+**所选标准数学函数**
 
-| 函数 | 描述 |
+| 函数 | 含义 |
 |------|------|
 | `abs(x)` | 绝对值 |
-| `ceil(x)` | 大于等于 `x` 的最小整数 |
-| `floor(x)` | 小于等于 `x` 的最大整数 |
+| `ceil(x)` | 不小于 `x` 的最小整数 |
+| `floor(x)` | 不大于 `x` 的最大整数 |
 | `sqrt(x)` | 平方根；`x` 必须非负 |
 | `cos(x)` | 余弦 |
 | `sin(x)` | 正弦 |
@@ -21,27 +21,26 @@
 | `tanh(x)` | 双曲正切 |
 | `exp(x)` | 以 `e` 为底的指数 |
 | `exp2(x)` | 以 2 为底的指数 |
-| `log(x)` | 自然对数（以 `e` 为底）；`x` 必须为正 |
+| `log(x)` | 自然对数（底 `e`）；`x` 必须为正 |
 | `log2(x)` | 以 2 为底的对数；`x` 必须为正 |
-| `log10(x)` | 以 10 为底的对数；`x` 必须为正 |
+| `log10(x)` | 常用对数（底 10）；`x` 必须为正 |
 
-这些函数针对复数的版本（§17.4）位于 `<complex>` 中。对于每个函数，返回类型与参数类型相同。
+复数版本（§17.4）位于 `<complex>`。
 
-通过将 `<cerrno>` 中的 `errno` 设置为 `EDOM`（定义域错误）或 `ERANGE`（值域错误）来报告错误。例如：
+对每个函数，返回类型与实参类型相同。
+
+错误通过把 `<cerrno>` 中的 `errno` 设为 `EDOM`（定义域错误）或 `ERANGE`（值域错误）来报告。例如：
 
 ```cpp
-errno = 0;                     // 清除旧的错误状态
-double d = sqrt(-1);
+errno = 0;              // 清除旧状态
+double d = sqrt(-1);    // 示意：非法实参
 if (errno == EDOM)
     cerr << "sqrt() not defined for negative argument\n";
 
-errno = 0;                     // 清除旧的错误状态
+errno = 0;
 double dd = pow(numeric_limits<double>::max(), 2);
 if (errno == ERANGE)
     cerr << "result of pow() too large to represent as a double\n";
 ```
 
-===== 第 4 页 =====
-
-在 `<cmath>` 和 `<cstdlib>` 中可以找到更多数学函数。所谓的特殊数学函数（例如 `beta()`、`rieman_zeta()` 和 `sph_bessel()`）也在 `<cmath>` 中。
-
+更多数学函数见 `<cmath>` 与 `<cstdlib`。所谓**特殊数学函数**，例如 `beta()`、`riemann_zeta()`、`sph_bessel()` 等，也在 `<cmath>` 中。

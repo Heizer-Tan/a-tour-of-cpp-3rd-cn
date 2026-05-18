@@ -1,20 +1,20 @@
-﻿
-对于每个标准库视图（§14.2），标准库还提供了一个生成该视图的函数；也就是说，一个可以作为 `|` 运算符参数的对象。例如，`filter()` 产生一个 `filter_view`。这允许我们按顺序组合这些过滤器，而不是将它们呈现为一组嵌套的函数调用。
+# 14.4 管道
+
+对每个标准库视图（§14.2），标准库还提供相应的“过滤器工厂函数”，产出的对象可作为 `|`（管道）运算符的操作数。例如 `views::filter` 最终会给出类似 `filter_view` 的行为。于是可以把一连串过滤器横向串起来，而不必写成层层嵌套的函数调用：
 
 ```cpp
 void user(forward_range auto& r)
 {
     auto odd = [](int x) { return x % 2; };
+
     for (int x : r | views::filter(odd) | views::take(3))
         cout << x << ' ';
 }
 ```
 
-输入范围 `1 2 3 4 5 6 7 8 9 10` 会产生 `1 2 3`。
+管道风格（沿用 Unix shell 里熟悉的 `|`）普遍被认为比嵌套调用更易读。管道从左向右结合：`r | f | g` 表示先把 `r` 送入 `f`，再把结果送入 `g`。
 
-管道风格（使用 Unix 管道运算符 `|`）被广泛认为比嵌套函数调用更具可读性。管道从左到右工作；即 `f | g` 将 `f` 的结果传递给 `g`，因此 `r | f | g` 意味着 `(g_filter(f_filter(r)))`。初始的 `r` 必须是一个范围或生成器。
-
-这些过滤器函数位于命名空间 `ranges::views` 中：
+这些过滤器函数位于 `ranges::views`：
 
 ```cpp
 void user(forward_range auto& r)
@@ -24,19 +24,21 @@ void user(forward_range auto& r)
 }
 ```
 
-我发现显式使用 `views::` 使代码相当可读，但当然我们可以进一步缩短代码：
+我发现显式写出 `views::` 往往更清楚；当然也可以进一步缩短：
 
 ```cpp
 void user(forward_range auto& r)
 {
     using namespace views;
+
     auto odd = [](int x) { return x % 2; };
+
     for (int x : r | filter(odd) | take(3))
         cout << x << ' ';
 }
 ```
 
-视图和管道的实现涉及一些相当棘手的模板元编程，因此如果你担心性能，请务必测量你的实现是否满足你的需求。如果不满足，总有一个传统的变通方法：
+视图与管道的实现依赖相当精巧的模板元编程；若你关心性能，请务必实测你的实现是否满足预期。否则总还有传统写法兜底：
 
 ```cpp
 void user(forward_range auto& r)
@@ -45,11 +47,10 @@ void user(forward_range auto& r)
     for (int x : r)
         if (x % 2) {
             cout << x << ' ';
-            if (++count == 3) return;
+            if (++count == 3)
+                return;
         }
 }
 ```
 
-然而，在这里，其中的逻辑被掩盖了。
-
-## 14.5 概念概览
+只不过在这种写法里，“到底在做什么”这层意图更容易被细节淹没。

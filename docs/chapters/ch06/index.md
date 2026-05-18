@@ -5,7 +5,7 @@
 # 基本操作
 
 <div class="no-float" markdown="1">
-> **构造、析构、拷贝和移动——理解这些操作是掌握 C++ 的关键。**
+> **当有人说“我想要一种编程语言，只需要说出我希望做什么”，就给他一根棒棒糖。**
 >
-> —— Bjarne Stroustrup
+> —— Alan Perlis
 </div>

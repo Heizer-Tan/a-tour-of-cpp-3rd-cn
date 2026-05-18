@@ -5,7 +5,7 @@
 # 容器
 
 <div class="no-float" markdown="1">
-> **选择合适的容器是高效编程的第一步。**
+> **它是崭新的，它是独特的，它是简洁的，它必将成功！**
 >
-> —— Bjarne Stroustrup
+> —— H. Nelson
 </div>

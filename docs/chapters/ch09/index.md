@@ -5,7 +5,7 @@
 # 标准库概览
 
 <div class="no-float" markdown="1">
-> **标准库是 C++ 程序员最强大的工具箱。**
+> **为何要花时间学习？无知可是立竿见影的。**
 >
-> —— Bjarne Stroustrup
+> —— Hobbes
 </div>

@@ -5,7 +5,7 @@
 # 算法
 
 <div class="no-float" markdown="1">
-> **使用标准库算法，而非手写循环。**
+> **如无必要，勿增实体。**
 >
-> —— Bjarne Stroustrup
+> —— William Occam
 </div>

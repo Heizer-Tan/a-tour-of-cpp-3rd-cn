@@ -1,33 +1,31 @@
-﻿# 13.1 引言
+# 13.1 引言
 
-像 `list` 或 `vector` 这样的数据结构本身并不是很有用。要使用它，我们需要基本的访问操作，例如添加和删除元素（就像 `list` 和 `vector` 提供的那样）。此外，我们很少仅仅在容器中存储对象。我们会对它们排序、打印、提取子集、删除元素、搜索对象等。因此，标准库除了提供最常见的容器类型外，还提供了最常见的容器算法。例如，我们可以简单高效地对一个 `Entry` 的 `vector` 进行排序，并将每个唯一的 `vector` 元素的副本放入一个 `list` 中：
+像 `list` 或 `vector` 这样的数据结构，单凭自身并不太够用。要用它，就需要诸如添加、删除元素之类的基础访问操作（`list` 与 `vector` 提供了这类操作）。此外，我们也极少只是把对象塞进容器就了事：我们会排序、打印、抽取子集、删除元素、查找对象，等等。因此，标准库在提供最常见容器类型的同时，也提供了最常见的一批容器算法。举例来说，我们可以很简单也很高效地对 `Entry` 构成的 `vector` 排序，并把每个互不相同的元素的副本依次放进 `list`：
 
 ```cpp
 void f(vector<Entry>& vec, list<Entry>& lst)
 {
-    sort(vec.begin(), vec.end());                     // 使用 < 作为排序准则
-    unique_copy(vec.begin(), vec.end(), lst.begin()); // 不拷贝相邻的相等元素
+    sort(vec.begin(), vec.end());                     // 用 < 定义顺序
+    unique_copy(vec.begin(), vec.end(), lst.begin()); // 不把相邻相等元素重复拷贝出去
 }
 ```
 
-为此，必须为 `Entry` 定义小于（`<`）和等于（`==`）。例如：
+要做到这一点，必须为 `Entry` 定义小于（`<`）与相等（`==`）。例如：
 
 ```cpp
 bool operator<(const Entry& x, const Entry& y)   // 小于
 {
-    return x.name < y.name;                      // 按姓名对 Entry 排序
+    return x.name < y.name;                       // 按姓名排序 Entry
 }
 ```
 
-标准算法是用（半开）元素序列来表达的。一个序列由一对迭代器表示，指定第一个元素和最后一个元素之后的位置：
+标准算法用（半开）元素序列来描述问题：序列由一对迭代器表示，分别指向首元素与尾后位置：
 
-[图片描述：序列 [begin:end) 示意图]
+[图片描述：序列 `[begin:end)` 示意图]
 
-===== 第 3 页 =====
+在上面的例子里，`sort()` 对迭代器对 `vec.begin()`、`vec.end()` 所限制的序列排序——该序列恰好覆盖整个 `vector`。对于写出（输出），只需要指明写入的起点；若要写出多个元素，则会从起点开始向后覆盖。因而为避免错误，`lst` 至少要有与 `vec` 中互不相同元素个数一样多的元素。
 
-在示例中，`sort()` 对由迭代器对 `vec.begin()` 和 `vec.end()` 定义的序列进行排序，这恰好是 `vector` 的所有元素。对于写入（输出），我们只需要指定要写入的第一个元素。如果写入多个元素，则初始元素之后的元素将被覆盖。因此，为避免错误，`lst` 必须至少与 `vec` 中唯一值的数量一样多的元素。
-
-不幸的是，标准库没有提供一个抽象来支持写入容器时的范围检查。然而，我们可以自己定义一个：
+遗憾的是，标准库并没有提供一个抽象来保证“写入容器”时的范围检查；不过我们可以自行定义：
 
 ```cpp
 template<typename C>
@@ -36,7 +34,7 @@ public:
     using value_type = typename C::value_type;
     using difference_type = int;
 
-    Checked_iter() { throw Missing_container{}; }   // 概念 forward_iterator 要求
+    Checked_iter() { throw Missing_container{}; }   // 概念 forward_iterator 的要求
     Checked_iter(C& cc) : pc{ &cc } {}
     Checked_iter(C& cc, typename C::iterator pp) : pc{ &cc }, p{ pp } {}
 
@@ -48,43 +46,42 @@ public:
     bool operator!=(const Checked_iter& a) const { return p != a.p; }
 private:
     void check_end() const { if (p == pc->end()) throw Overflow{}; }
-    C* pc {};                     // 默认初始化为 nullptr
+    C* pc {};                                      // 默认初始化为 nullptr
     typename C::iterator p = pc->begin();
 };
 ```
 
-显然，这不是标准库的质量，但它展示了这个想法：
+这当然达不到标准库的品质，但足以说明思路：
 
 ```cpp
-vector<int> v1 {1, 2, 3};        // 三个元素
-vector<int> v2(2);               // 两个元素
+vector<int> v1 {1, 2, 3};     // 三个元素
+vector<int> v2(2);            // 两个元素
 
-copy(v1, v2.begin());            // 将会溢出
-copy(v1, Checked_iter{v2});      // 将会抛出异常
+copy(v1, v2.begin());       // 将会越界写入
+copy(v1, Checked_iter{v2}); // 将会抛出异常
 ```
 
-===== 第 4 页 =====
-
-在读取并排序的例子中，如果我们想把唯一的元素放到一个新的 `list` 中，我们可以这样写：
+若在“读完再排序”的例子中想把互异元素放进一个新的 `list`，也可以写成：
 
 ```cpp
 list<Entry> f(vector<Entry>& vec)
 {
     list<Entry> res;
     sort(vec.begin(), vec.end());
-    unique_copy(vec.begin(), vec.end(), back_inserter(res));   // 追加到 res 中
+    unique_copy(vec.begin(), vec.end(), back_inserter(res)); // 追加到 res
     return res;
 }
 ```
 
-调用 `back_inserter(res)` 为 `res` 构造一个迭代器，该迭代器在容器的末尾添加元素，并扩展容器以腾出空间。这使我们不必先分配固定大小的空间再填充它。因此，标准容器加上 `back_inserter()` 消除了使用容易出错的、显式的 C 风格 `realloc()` 内存管理的需要。标准库 `list` 有一个移动构造函数（§6.2.2），这使得按值返回 `res` 是高效的（即使对于包含数千个元素的 `list` 也是如此）。
+`back_inserter(res)` 会构造一个指向 `res` 的迭代器：写入时在容器末尾添加元素，并扩展容器以容纳它们。这样就不必先分配一块固定空间再填入。于是标准容器配合 `back_inserter()`，可以避免那种容易出错、手工管理的 C 风格 `realloc()` 用法。标准库的 `list` 带有移动构造函数（§6.2.2），因此即便元素很多，按值返回 `res` 也仍然高效。
 
-当我们发现像 `sort(vec.begin(), vec.end())` 这样的迭代器对风格的代码变得繁琐时，我们可以使用算法的 range 版本并写成 `sort(vec)`（§13.5）。这两个版本是等价的。类似地，范围 `for` 循环大致等价于直接使用迭代器的 C 风格循环：
+当我们觉得 `sort(vec.begin(), vec.end())` 这种“迭代器对”写法累赘时，可以使用算法的范围（range）版本写成 `sort(vec)`（§13.5）；两者等价。类似地，范围 `for` 大致等价于手写的使用迭代器的循环：
 
 ```cpp
-for (auto& x : v) cout << x;                 // 输出 v 的所有元素
-for (auto p = v.begin(); p != v.end(); ++p) cout << *p;   // 输出 v 的所有元素
+for (auto& x : v)
+    cout << x;                                      // 输出 v 中所有元素
+for (auto p = v.begin(); p != v.end(); ++p)
+    cout << *p;                                     // 输出 v 中所有元素
 ```
 
-除了更简单和更不易出错之外，范围 `for` 版本通常也更高效。
-
+除了更简单、更不易出错之外，范围 `for` 往往也更高效。

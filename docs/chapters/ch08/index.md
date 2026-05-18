@@ -5,7 +5,7 @@
 # 概念和泛型编程
 
 <div class="no-float" markdown="1">
-> **概念使泛型编程更加精确和易于理解。**
+> **编程之道：从有趣的算法出发。**
 >
-> —— Bjarne Stroustrup
+> —— Alex Stepanov
 </div>

@@ -1,4 +1,4 @@
-﻿# 8.4 变参模板
+# 8.4 变参模板
 
 模板可以定义为接受任意数量的任意类型的参数。这样的模板称为**变参模板**。考虑一个简单的函数，用于写出任何具有 `<<` 运算符的类型的值：
 
@@ -40,7 +40,7 @@ void print(T head, Tail... tail)
 }
 ```
 
-我使用了编译时 `if`（§7.4.3）而不是普通的运行时 `if`，以避免生成最终的 `print()` 调用。这样，“空”的 `print()` 就不必定义了。
+我使用了编译期 `if`（[§7.4.3](../ch07/7-4-template-mechanisms.md)）而不是普通的运行时 `if`，以避免生成对空参数包的最终 `print()` 调用。
 
 变参模板的优势在于它们可以接受你愿意给它们的任何参数。缺点包括：
 - 递归实现可能很难正确。
@@ -50,9 +50,7 @@ void print(T head, Tail... tail)
 
 由于它们的灵活性，变参模板在标准库中被广泛使用，偶尔也被过度使用。
 
-===== 第 20 页 =====
-
-#### 8.4.1 折叠表达式
+## 8.4.1 折叠表达式
 
 为了简化简单变参模板的实现，C++ 提供了对参数包元素进行有限形式的迭代。例如：
 
@@ -93,17 +91,17 @@ int sum2(T... v)
 
 ```cpp
 template<Printable... T>
-void print(T&... args)
+void print(T&&... args)
 {
-    (std::cout << ... << args) << '\n';   // 打印所有参数
+    (std::cout << ... << std::forward<T>(args)) << '\n';   // 依次输出各个实参
 }
 
-print("Hello!"s, ' ', "World ", 2017);   // (((std::cout << "Hello!"s) << ' ') << "World ") << 2017
+print("Hello!"s, ' ', "World ", 2017);
 ```
 
-为什么是 2017？因为 `fold()` 是在 2017 年添加到 C++ 中的（§19.2.3）。
+为何特意写 2017？因为折叠表达式正式进入 C++ 的年份正是 2017（[§19.2.3](../ch19/19-2-cpp-evolution.md)）。
 
-#### 8.4.2 转发参数
+## 8.4.2 转发参数
 
 通过接口原封不动地传递参数是变参模板的一个重要用途。考虑一个网络输入通道的概念，其中实际的值传递方法是参数化的。不同的传输机制有不同的构造函数参数集：
 
@@ -111,18 +109,16 @@ print("Hello!"s, ' ', "World ", 2017);   // (((std::cout << "Hello!"s) << ' ') <
 template<concepts::InputTransport Transport>
 class InputChannel {
 public:
-    // ...
-    InputChannel(Transport::Args&&... transportArgs)
-        : _transport(std::forward<TransportArgs>(transportArgs)...)
-    { }
+    template<class... Args>
+    explicit InputChannel(Args&&... transportArgs)
+        : _transport(std::forward<Args>(transportArgs)...) { }
 private:
     Transport _transport;
 };
 ```
 
-标准库函数 `forward()`（§16.6）用于将参数从 `InputChannel` 构造函数原封不动地移动到 `Transport` 构造函数。
+借助 `forward()`（[§16.6](../ch16/16-6-move-forward.md)），参数可以无损地从外层构造函数钻入 `Transport` 的构造函数。
 
 这里的要点是，`InputChannel` 的编写者可以在不知道构造特定 `Transport` 需要什么参数的情况下构造一个 `Transport` 类型的对象。`InputChannel` 的实现者只需要知道所有 `Transport` 对象的共同用户接口。
 
 转发在基础库中非常常见，在这些库中，通用性和低运行时开销是必需的，并且非常通用的接口很常见。
-

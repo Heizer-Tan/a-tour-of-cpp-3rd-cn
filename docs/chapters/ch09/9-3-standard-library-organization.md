@@ -1,8 +1,8 @@
-﻿# 9.3 标准库的组织
+# 9.3 标准库的组织
 
-标准库的设施被放置在命名空间 `std` 中，并通过模块或头文件提供给用户。
+标准库的各个组件都隶属于命名空间 `std`，并通过模块或带头的翻译单元提供给用户程序。
 
-#### 9.3.1 命名空间
+## 9.3.1 命名空间与头文件
 
 每个标准库设施都通过某个标准头文件提供。例如：
 
@@ -13,7 +13,7 @@
 
 这使得标准 `string` 和 `list` 可用。
 
-标准库定义在名为 `std` 的命名空间（§3.3）中。要使用标准库设施，可以使用 `std::` 前缀：
+标准库定义在名为 `std` 的命名空间（[§3.3](../ch03/3-3-namespace.md)）中。要使用标准库设施，可以使用 `std::` 前缀：
 
 ```cpp
 std::string sheep {"Four legs Good; two legs Baaad!"};
@@ -33,13 +33,13 @@ string s {"C++ is a general-purpose programming language"};   // OK：string 是
 
 标准库提供了 `std` 的几个子命名空间，只能通过显式操作访问：
 
-- `std::chrono`：来自 chrono 的所有设施，包括 `std::literals::chrono_literals`（§16.2）。
-- `std::literals::chrono_literals`：后缀 `y`（年）、`d`（天）、`h`（小时）、`min`（分钟）、`ms`（毫秒）、`ns`（纳秒）、`s`（秒）、`us`（微秒）（§16.2）。
-- `std::literals::complex_literals`：后缀 `i`（虚数 double）、`if`（虚数 float）、`il`（虚数 long double）（§6.6）。
-- `std::literals::string_literals`：后缀 `s`（字符串）（§6.6，§10.2）。
-- `std::literals::string_view_literals`：后缀 `sv`（字符串视图）（§10.3）。
-- `std::numbers`：数学常数（§17.9）。
-- `std::pmr`：多态内存资源（§12.7）。
+- `std::chrono`：来自 chrono 的所有设施，包括 `std::literals::chrono_literals`（[§16.2](../ch16/16-2-time.md)）。
+- `std::literals::chrono_literals`：后缀 `y`（年）、`d`（天）、`h`（小时）、`min`（分钟）、`ms`（毫秒）、`ns`（纳秒）、`s`（秒）、`us`（微秒）（[§16.2](../ch16/16-2-time.md)）。
+- `std::literals::complex_literals`：后缀 `i`（虚数 double）、`if`（虚数 float）、`il`（虚数 long double）（[§6.6](../ch06/6-6-user-defined-literals.md)）。
+- `std::literals::string_literals`：后缀 `s`（字符串）（[§6.6](../ch06/6-6-user-defined-literals.md)，[§10.2](../ch10/10-2-strings.md)）。
+- `std::literals::string_view_literals`：后缀 `sv`（字符串视图）（[§10.3](../ch10/10-3-string-view.md)）。
+- `std::numbers`：数学常数（[§17.9](../ch17/17-9-math-constants.md)）。
+- `std::pmr`：多态内存资源（[§12.7](../ch12/12-7-allocators.md)）。
 
 要使用子命名空间中的后缀，我们必须将其引入到想要使用它的命名空间中。例如：
 
@@ -53,7 +53,7 @@ auto z2 = 2 + 3i;   // OK：z2 是一个 complex<double>
 
 对于子命名空间中应该包含什么，没有统一的理念。然而，后缀不能显式限定，因此我们只能将一组后缀引入一个作用域，而不会引起歧义。因此，旨在与其他库（可能定义自己的后缀）一起使用的库的后缀被放置在子命名空间中。
 
-#### 9.3.2 ranges 命名空间
+## 9.3.2 ranges 命名空间
 
 标准库以两种版本提供算法，例如 `sort()` 和 `copy()`：
 
@@ -89,11 +89,11 @@ void g(vector<int>& v)
 }
 ```
 
-#### 9.3.3 模块
+## 9.3.3 模块
 
 目前还没有任何标准库模块。C++23 很可能会弥补这一遗漏（由于委员会时间不足所致）。目前，我使用模块 `std`，它很可能成为标准，提供来自命名空间 `std` 的所有设施。参见附录 A。
 
-#### 9.3.4 头文件
+## 9.3.4 头文件
 
 以下是标准库头文件的选录，它们都在命名空间 `std` 中提供声明：
 
@@ -102,37 +102,37 @@ void g(vector<int>& v)
 | 头文件 | 提供内容 | 参考章节 |
 |--------|----------|----------|
 | `<algorithm>` | `copy()`, `find()`, `sort()` | 第 13 章 |
-| `<array>` | `array` | §15.3.1 |
-| `<chrono>` | `duration`, `time_point`, `month`, `time_zone` | §16.2 |
-| `<cmath>` | `sqrt()`, `pow()` | §17.2 |
-| `<complex>` | `complex`, `sqrt()`, `pow()` | §17.4 |
-| `<concepts>` | `floating_point`, `copyable`, `predicate`, `invocable` | §14.5 |
-| `<filesystem>` | `path` | §11.9 |
-| `<format>` | `format()` | §11.6.2 |
-| `<fstream>` | `fstream`, `ifstream`, `ofstream` | §11.7.2 |
+| `<array>` | `array` | [§15.3.1](../ch15/15-3-containers.md) |
+| `<chrono>` | `duration`, `time_point`, `month`, `time_zone` | [§16.2](../ch16/16-2-time.md) |
+| `<cmath>` | `sqrt()`, `pow()` | [§17.2](../ch17/17-2-math-functions.md) |
+| `<complex>` | `complex`, `sqrt()`, `pow()` | [§17.4](../ch17/17-4-complex.md) |
+| `<concepts>` | `floating_point`, `copyable`, `predicate`, `invocable` | [§14.5](../ch14/14-5-concept-overview.md) |
+| `<filesystem>` | `path` | [§11.9](../ch11/11-9-file-system.md) |
+| `<format>` | `format()` | [§11.6.2](../ch11/11-6-output-formatting.md) |
+| `<fstream>` | `fstream`, `ifstream`, `ofstream` | [§11.7.2](../ch11/11-7-streams.md) |
 | `<functional>` | `function`, `greater_equal`, `hash`, `range_value_t` | 第 16 章 |
-| `<future>` | `future`, `promise` | §18.5 |
-| `<ios>` | `hex`, `dec`, `scientific`, `fixed`, `defaultfloat` | §11.6.2 |
+| `<future>` | `future`, `promise` | [§18.5](../ch18/18-5-inter-task-communication.md) |
+| `<ios>` | `hex`, `dec`, `scientific`, `fixed`, `defaultfloat` | [§11.6.2](../ch11/11-6-output-formatting.md) |
 | `<iostream>` | `istream`, `ostream`, `cin`, `cout` | 第 11 章 |
-| `<map>` | `map`, `multimap` | §12.6 |
-| `<memory>` | `unique_ptr`, `shared_ptr`, `allocator` | §15.2.1 |
-| `<random>` | `default_random_engine`, `normal_distribution` | §17.5 |
-| `<ranges>` | `sized_range`, `subrange`, `take()`, `split()`, `iterator_t` | §14.1 |
-| `<regex>` | `regex`, `smatch` | §10.4 |
-| `<string>` | `string`, `basic_string` | §10.2 |
-| `<string_view>` | `string_view` | §10.3 |
-| `<set>` | `set`, `multiset` | §12.8 |
-| `<sstream>` | `istringstream`, `ostringstream` | §11.7.3 |
-| `<stdexcept>` | `length_error`, `out_of_range`, `runtime_error` | §4.2 |
-| `<tuple>` | `tuple`, `get<>()`, `tuple_size<>` | §15.3.4 |
-| `<thread>` | `thread` | §18.2 |
-| `<unordered_map>` | `unordered_map`, `unordered_multimap` | §12.6 |
+| `<map>` | `map`, `multimap` | [§12.6](../ch12/12-6-unordered-map.md) |
+| `<memory>` | `unique_ptr`, `shared_ptr`, `allocator` | [§15.2.1](../ch15/15-2-pointers.md) |
+| `<random>` | `default_random_engine`, `normal_distribution` | [§17.5](../ch17/17-5-random-numbers.md) |
+| `<ranges>` | `sized_range`, `subrange`, `take()`, `split()`, `iterator_t` | [§14.1](../ch14/14-1-introduction.md) |
+| `<regex>` | `regex`, `smatch` | [§10.4](../ch10/10-4-regular-expressions.md) |
+| `<string>` | `string`, `basic_string` | [§10.2](../ch10/10-2-strings.md) |
+| `<string_view>` | `string_view` | [§10.3](../ch10/10-3-string-view.md) |
+| `<set>` | `set`, `multiset` | [§12.8](../ch12/12-8-container-overview.md) |
+| `<sstream>` | `istringstream`, `ostringstream` | [§11.7.3](../ch11/11-7-streams.md) |
+| `<stdexcept>` | `length_error`, `out_of_range`, `runtime_error` | [§4.2](../ch04/4-2-exceptions.md) |
+| `<tuple>` | `tuple`, `get<>()`, `tuple_size<>` | [§15.3.4](../ch15/15-3-containers.md) |
+| `<thread>` | `thread` | [§18.2](../ch18/18-2-tasks-and-threads.md) |
+| `<unordered_map>` | `unordered_map`, `unordered_multimap` | [§12.6](../ch12/12-6-unordered-map.md) |
 | `<utility>` | `move()`, `swap()`, `pair` | 第 16 章 |
-| `<variant>` | `variant` | §15.4.1 |
-| `<vector>` | `vector` | §12.2 |
+| `<variant>` | `variant` | [§15.4.1](../ch15/15-4-alternatives.md) |
+| `<vector>` | `vector` | [§12.2](../ch12/12-2-vector.md) |
 
 这个列表远非完整。
 
 C 标准库的头文件（例如 `<stdlib.h>`）也被提供。对于每个这样的头文件，还有一个版本，其名称以 `c` 为前缀并去掉 `.h`。这个版本（例如 `<cstdlib>`）将其声明同时放在 `std` 和全局命名空间中。
 
-这些头文件反映了标准库开发的历史。因此，它们并不总是像我们希望的那样合乎逻辑且易于记忆。这就是为什么使用模块（例如 `std`，§9.3.3）是一个更好的选择。
+这些头文件反映了标准库开发的历史。因此，它们并不总是像我们希望的那样合乎逻辑且易于记忆。这就是为什么使用模块（例如 `std`，[§9.3.3](9-3-standard-library-organization.md)）是一个更好的选择。

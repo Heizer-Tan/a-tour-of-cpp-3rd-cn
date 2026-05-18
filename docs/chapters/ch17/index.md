@@ -5,7 +5,7 @@
 # 数值
 
 <div class="no-float" markdown="1">
-> **C++ 为数值计算提供了坚实的基础。**
+> **计算的目的是洞察，而非数字；但对学生而言，数字往往是通往洞察的最佳途径。**
 >
-> —— Bjarne Stroustrup
+> —— R. W. Hamming / A. Ralston
 </div>

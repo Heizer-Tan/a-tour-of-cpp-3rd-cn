@@ -5,7 +5,7 @@
 # 范围
 
 <div class="no-float" markdown="1">
-> **范围库让 C++ 的数据处理变得优雅而高效。**
+> **最强的论证在结论未经经验验证时什么也证明不了。**
 >
-> —— Bjarne Stroustrup
+> —— Roger Bacon
 </div>

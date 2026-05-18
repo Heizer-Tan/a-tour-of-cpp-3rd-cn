@@ -5,7 +5,7 @@
 # 指针和容器
 
 <div class="no-float" markdown="1">
-> **智能指针让 C++ 的内存管理既安全又高效。**
+> **教育是关于做什么、何时做以及为何做；训练是关于如何做。**
 >
-> —— Bjarne Stroustrup
+> —— Richard Hamming
 </div>

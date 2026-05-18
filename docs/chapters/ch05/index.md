@@ -5,7 +5,7 @@
 # 类
 
 <div class="no-float" markdown="1">
-> **类是 C++ 中最强大的抽象机制。**
+> **这些类型并非“抽象”——它们和 int、float 一样真实。**
 >
-> —— Bjarne Stroustrup
+> —— Doug McIlroy
 </div>

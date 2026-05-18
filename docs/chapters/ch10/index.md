@@ -5,7 +5,7 @@
 # 字符串和正则表达式
 
 <div class="no-float" markdown="1">
-> **文本处理是编程中最常见的任务之一。**
+> **优先标准，而非标新立异。**
 >
-> —— Bjarne Stroustrup
+> —— Strunk & White
 </div>

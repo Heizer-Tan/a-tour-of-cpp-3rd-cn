@@ -1,17 +1,17 @@
-﻿# 7.4 模板机制
+# 7.4 模板机制
 
-为了定义良好的模板，我们需要一些支持性的语言设施：
+为了定义良好的模板，我们需要一些语言层面的配套机制：
 
-- 依赖于类型的值：**变量模板**（§7.4.1）
-- 类型和模板的别名：**别名模板**（§7.4.2）
-- 编译时选择机制：**`if constexpr`**（§7.4.3）
-- 查询类型和表达式属性的编译时机制：**requires 表达式**（§8.2.3）
+- 依赖类型的取值：**变量模板**（[§7.4.1](7-4-template-mechanisms.md)）
+- 为类型与模板起别名：**别名模板**（[§7.4.2](7-4-template-mechanisms.md)）
+- 编译期分支：**`if constexpr`**（[§7.4.3](7-4-template-mechanisms.md)）
+- 在编译期探查类型与表达式是否成立：**requires 表达式**（[§8.2.3](../ch08/8-2-concepts.md)）
 
-此外，`constexpr` 函数（§1.6）和 `static_assert`（§4.5.2）也经常参与模板的设计和使用。
+此外，`constexpr` 函数（[§1.6](../ch01/1-6-constants.md)）和 `static_assert`（[§4.5.2](../ch04/4-5-assertions.md)）也常常参与模板的设计与使用。
 
 这些基本机制主要是用于构建通用、基础抽象的工具。
 
-#### 7.4.1 变量模板
+## 7.4.1 变量模板
 
 当我们使用一个类型时，我们通常需要该类型的常量和值。当我们使用类模板时当然也是如此：当我们定义 `C<T>` 时，我们通常需要类型 `C<T>` 和其他依赖于 `T` 的类型的常量和变量。这里有一个来自流体动力学仿真的例子 [Garcia,2015]：
 
@@ -34,7 +34,7 @@ auto acc = external_acceleration<float>;
 
 ```cpp
 template<typename T, typename T2>
-constexpr bool Assignable = is_assignable<T, T2>::value;   // is_assignable 是一个类型谓词
+constexpr bool Assignable = is_assignable_v<T&, T2>;   // is_assignable_v 是标准类型谓词
 
 template<typename T>
 void testing()
@@ -44,11 +44,11 @@ void testing()
 }
 ```
 
-经过一些重要的演变后，这个想法成为概念定义的核心（§8.2）。
+几经演化，这一思路成为形式化**概念**的核心（[§8.2](../ch08/8-2-concepts.md)）。
 
-标准库使用变量模板来提供数学常数，例如 `pi` 和 `log2e`（§17.9）。
+标准库也通过变量模板提供诸如 `pi`、`log2e` 之类的数学常数（[§17.9](../ch17/17-9-math-constants.md)）。
 
-#### 7.4.2 别名
+## 7.4.2 别名
 
 令人惊讶的是，为类型或模板引入同义词常常很有用。例如，标准头文件 `<cstddef>` 包含了别名 `size_t` 的定义，可能如下：
 
@@ -57,8 +57,6 @@ using size_t = unsigned int;
 ```
 
 名为 `size_t` 的实际类型是实现相关的，因此在另一种实现中 `size_t` 可能是 `unsigned long`。拥有别名 `size_t` 使得程序员能够编写可移植的代码。
-
-===== 第 20 页 =====
 
 参数化类型为其模板参数相关的类型提供别名非常常见。例如：
 
@@ -71,7 +69,7 @@ public:
 };
 ```
 
-事实上，每个标准库容器都提供 `value_type` 作为其元素类型的名称（第 12 章）。这使得我们能够编写适用于遵循此约定的任何容器的代码。例如：
+事实上，每一种标准序列容器都把 `value_type` 用作元素类型的别名（参见[第十二章](../ch12/index.md)）。于是可以编写对所有遵循这一约定的容器都能工作的代码：
 
 ```cpp
 template<typename C>
@@ -85,7 +83,7 @@ void algo(Container& c)
 }
 ```
 
-这个 `Value_type` 是标准库 `range_value_t`（§16.4.4）的简化版本。别名机制可用于通过绑定部分或全部模板参数来定义新的模板。例如：
+这个 `Value_type` 只是标准库中 `range_value_t`（[§16.4.4](../ch16/16-4-type-functions.md)）的极简示意；别名语法还能用来通过绑定若干模板实参得出“缩写模板”。
 
 ```cpp
 template<typename Key, typename Value>
@@ -99,9 +97,7 @@ using String_map = Map<string, Value>;
 String_map<int> m;   // m 是一个 Map<string, int>
 ```
 
-#### 7.4.3 编译时 if
-
-===== 第 21 页 =====
+## 7.4.3 编译时 if
 
 考虑编写一个可以使用两个函数 `slow_and_safe(T)` 或 `simple_and_fast(T)` 之一实现的操作。这类问题在基础代码中比比皆是，在这些代码中，通用性和最佳性能至关重要。如果涉及类层次结构，基类可以提供 `slow_and_safe` 通用操作，派生类可以用 `simple_and_fast` 实现覆盖它。
 
@@ -118,7 +114,7 @@ void update(T& target)
 }
 ```
 
-`is_trivially_copyable_v<T>` 是一个类型谓词（§16.4.1），告诉我们一个类型是否可以平凡拷贝。
+`is_trivially_copyable_v<T>` 是一条类型层面的谓词（[§16.4.1](../ch16/16-4-type-functions.md)），用来说明 `T` 是否可以按“平凡复制”的规则搬运。
 
 编译器只检查 `if constexpr` 中被选中的分支。这个解决方案提供了最佳性能以及优化的局部性。
 
@@ -129,14 +125,14 @@ template<typename T>
 void bad(T arg)
 {
     if constexpr (!is_trivially_copyable_v<T>)
-        try {
+        try {                         // 问题：`if constexpr` 无法覆盖整个 try/catch 结构体
+
             g(arg);
+
     if constexpr (!is_trivially_copyable_v<T>)
-        catch(...) { /* ... */ }   // 语法错误
+        catch (...) { /* ... */ }       // 语法错误
 }
 ```
-
-===== 第 22 页 =====
 
 允许这样的文本操作会严重损害代码的可读性，并为依赖现代程序表示技术（如“抽象语法树”）的工具带来问题。
 
@@ -154,4 +150,3 @@ void good(T arg)
         } catch (...) { /* ... */ }
 }
 ```
-

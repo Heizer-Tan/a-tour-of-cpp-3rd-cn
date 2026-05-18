@@ -1,16 +1,14 @@
-﻿# 7.3 参数化操作
+# 7.3 参数化操作
 
-模板的用途远不止用元素类型参数化容器。特别是，它们广泛用于标准库中类型和算法的参数化（§12.8，§13.5）。
+模板的用途远不止把容器的元素类型参数化；在标准库中，类型与算法都大量使用模板完成参数化（[§12.8](../ch12/12-8-container-overview.md)，[§13.5](../ch13/13-5-algorithm-overview.md)）。
 
 有三种表达由类型或值参数化的操作的方式：
-
-===== 第 10 页 =====
 
 - **函数模板**
 - **函数对象**：一个可以携带数据并像函数一样被调用的对象
 - **Lambda 表达式**：函数对象的简写符号
 
-#### 7.3.1 函数模板
+## 7.3.1 函数模板
 
 我们可以编写一个函数，计算 range-for 可以遍历的任何序列（例如容器）的元素值的和，如下所示：
 
@@ -29,22 +27,20 @@ Value sum(const Sequence& s, Value v)
 ```cpp
 void user(Vector<int>& vi, list<double>& ld, vector<complex<double>>& vc)
 {
-    int x = sum(vi, 0);                       // int 型 vector 的和（加 int）
-    double d = sum(vi, 0.0);                  // int 型 vector 的和（加 double）
-    double d = sum(ld, 0.0);                  // double 型 list 的和
+    int x = sum(vi, 0);                       // int 型 vector 的和（累加器为 int）
+    double d = sum(vi, 0.0);                  // int 型 vector 的和（累加器为 double）
+    double dd = sum(ld, 0.0);                  // double 型 list 的和
     auto z = sum(vc, complex{0.0, 0.0});      // complex<double> 型 vector 的和
 }
 ```
 
 在 `double` 中累加 int 的意义在于优雅地处理大于最大 int 的和。注意 `sum<Sequence, Value>` 的模板参数类型是如何从函数参数推导出来的。幸运的是，我们不需要显式指定这些类型。
 
-这个 `sum()` 是标准库 `accumulate()`（§17.3）的简化版本。
+这个 `sum()` 是标准库 `accumulate()`（[§17.3](../ch17/17-3-numeric-algorithms.md)）的简化版本。
 
-===== 第 11 页 =====
+函数模板可以是成员函数，但不能是虚成员。编译器无法知道程序中此类模板的所有实例化，因此无法生成虚函数表（[§5.4](../ch05/5-4-virtual-functions.md)）。
 
-函数模板可以是成员函数，但不能是虚成员。编译器无法知道程序中此类模板的所有实例化，因此无法生成 vtable（§5.4）。
-
-#### 7.3.2 函数对象
+## 7.3.2 函数对象
 
 一种特别有用的模板是**函数对象**（有时称为 functor），用于定义可以像函数一样被调用的对象。例如：
 
@@ -79,8 +75,6 @@ void fct(int n, const string& s)
 }
 ```
 
-===== 第 12 页 =====
-
 函数对象被广泛用作算法的参数。例如，我们可以计算谓词返回 true 的值的出现次数：
 
 ```cpp
@@ -95,9 +89,9 @@ int count(const C& c, P pred)   // 假设 C 是容器，P 是谓词
 }
 ```
 
-这是标准库 `count_if` 算法（§13.5）的简化版本。
+这是标准库 `count_if` 算法（[§13.5](../ch13/13-5-algorithm-overview.md)）的简化版本。
 
-有了概念（§8.2），我们可以形式化 `count()` 对其参数的假设，并在编译时检查它们。
+有了概念（[§8.2](../ch08/8-2-concepts.md)），我们可以形式化 `count()` 对其参数的假设，并在编译时检查它们。
 
 **谓词**是我们可以调用并返回 true 或 false 的东西。例如：
 
@@ -115,13 +109,11 @@ void f(const Vector<int>& vec, const list<string>& lst, int x, const string& s)
 
 函数对象的美妙之处在于它们携带着要与之比较的值。我们不需要为每个值（和每种类型）编写单独的函数，也不需要引入糟糕的全局变量来保存值。此外，对于像 `Less_than` 这样的简单函数对象，内联很简单，因此调用 `Less_than` 远比间接函数调用高效。携带数据的能力加上它们的效率使得函数对象作为算法的参数特别有用。
 
-===== 第 13 页 =====
-
 用于指定通用算法关键操作含义的函数对象（例如用于 `count()` 的 `Less_than`）有时被称为**策略对象**。
 
-#### 7.3.3 Lambda 表达式
+## 7.3.3 Lambda 表达式
 
-在 §7.3.2 中，我们将 `Less_than` 与其使用分开定义。这可能不方便。因此，有一种用于隐式生成函数对象的表示法：
+在 [§7.3.2](7-3-parameterized-operations.md) 中，我们将 `Less_than` 与其使用分开定义。这可能不方便。因此，有一种用于隐式生成函数对象的表示法：
 
 ```cpp
 void f(const Vector<int>& vec, const list<string>& lst, int x, const string& s)
@@ -137,15 +129,13 @@ void f(const Vector<int>& vec, const list<string>& lst, int x, const string& s)
 
 对于在成员函数内定义的 lambda，`[this]` 通过引用捕获当前对象，以便我们可以引用类成员。如果我们想要当前对象的副本，可以说 `[*this]`。
 
-如果我们想捕获几个特定的对象，可以列出它们。在 `expect()` 的使用中（§4.5）使用了 `[i,this]`，这就是一个例子。
+如果我们想捕获几个特定的对象，可以列出它们。在 `expect()` 的使用中（[§4.5](../ch04/4-5-assertions.md)）使用了 `[i,this]`，这就是一个例子。
 
-#### 7.3.3.1 Lambda 作为函数参数
+## 7.3.3.1 Lambda 作为函数参数
 
 使用 lambda 可以方便且简洁，但也可能晦涩难懂。对于非平凡的操作（比如超过一个简单表达式），我更喜欢命名该操作，以便更清楚地说明其目的，并使其在程序中的多个地方可用。
 
-===== 第 14 页 =====
-
-在 §5.5.3 中，我们注意到必须编写许多函数（如 `draw_all()` 和 `rotate_all()`）来对指针和 `unique_ptr` 向量的元素执行操作，这很烦人。函数对象（特别是 lambda）可以通过允许我们将容器的遍历与对每个元素执行的操作 specification 分离开来提供帮助。
+在 [§5.5.3](../ch05/5-5-hierarchies.md) 中，我们注意到必须编写许多函数（如 `draw_all()` 和 `rotate_all()`）来对指针和 `unique_ptr` 向量的元素执行操作，这很烦人。函数对象（特别是 lambda）可以将容器的遍历与对每个元素要执行的动作分离开来，从而提供帮助。
 
 首先，我们需要一个函数，将操作应用于容器元素所指向的每个对象：
 
@@ -158,9 +148,9 @@ void for_each(C& c, Oper op)   // 假设 C 是指针容器
 }
 ```
 
-这是标准库 `for_each` 算法（§13.5）的简化版本。
+这是标准库 `for_each` 算法（[§13.5](../ch13/13-5-algorithm-overview.md)）的简化版本。
 
-现在，我们可以编写 §5.5 中的 `user()` 版本，而无需编写全套函数：
+现在，我们可以编写 [§5.5](../ch05/5-5-hierarchies.md) 中的 `user()` 版本，而无需编写一整套 `_all` 函数：
 
 ```cpp
 void user()
@@ -185,7 +175,7 @@ void rotate_and_draw(vector<S>& v, int r)
 }
 ```
 
-这里，就像在变量声明中一样，`auto` 表示接受任何类型的值作为初始化器（参数被视为在调用中初始化形式参数）。这使得带有 `auto` 参数的 lambda 成为一个模板，即**泛型 lambda**。需要时，我们可以用概念约束参数（§8.1）。例如，我们可以定义 `Pointer_to_class` 来要求 `*` 和 `->`，并写：
+这里，就像在变量声明中一样，`auto` 表示接受任何类型的值作为初始化器（参数被视为在调用中初始化形式参数）。这使得带有 `auto` 参数的 lambda 成为一个模板，即**泛型 lambda**。需要时，我们可以用概念约束参数（[§8.2](../ch08/8-2-concepts.md)）。例如，我们可以定义 `Pointer_to_class` 来要求 `*` 和 `->`，并写：
 
 ```cpp
 for_each(v, [](Pointer_to_class auto& s) { s->rotate(r); s->draw(); });
@@ -206,7 +196,7 @@ void user()
 
 为了更严格的检查，我们可以定义一个 `Pointer_to_Shape` 概念，指定一个类型要能够作为 shape 所需的属性。这将允许我们使用并非派生自 `Shape` 类的 shape。
 
-#### 7.3.3.2 用于初始化的 Lambda
+## 7.3.3.2 用于初始化的 Lambda
 
 使用 lambda，我们可以将任何语句转换为表达式。这主要用于提供一个操作来计算一个值作为参数值，但这种能力是通用的。考虑一个复杂的初始化：
 
@@ -236,7 +226,7 @@ void user(Init_mode m, int n, vector<int>& arg, Iterator p, Iterator q)
 - 变量可能在获得其预期值之前就被使用。
 - “初始化代码”可能与其他代码混合，使其难以理解。
 - 当“初始化代码”与其他代码混合时，更容易忘记一种情况。
-- 这不是初始化，而是赋值（§1.9.2）。
+- 这不是初始化，而是赋值（[§1.9.2](../ch01/1-9-hardware.md)）。
 
 相反，我们可以将其转换为用作初始化的 lambda：
 
@@ -256,9 +246,9 @@ void user(Init_mode m, int n, vector<int>& arg, Iterator p, Iterator q)
 
 我仍然“忘记”了一种情况，但现在更容易发现。在许多情况下，编译器会发现该问题并发出警告。
 
-#### 7.3.3.3 Finally
+## 7.3.3.3 Finally
 
-析构函数提供了一种在对象使用后进行清理的通用隐式机制（RAII；§6.3），但如果我们需要进行一些与单个对象无关、或与没有析构函数的对象（例如，因为它是一个与 C 程序共享的类型）相关联的清理，该怎么办？我们可以定义一个 `finally()` 函数，它接受一个在作用域退出时执行的动作：
+析构函数提供了一种在对象使用后进行清理的通用隐式机制（RAII；[§6.3](../ch06/6-3-resource-mgmt.md)），但如果我们需要进行一些与单个对象无关、或与没有析构函数的对象（例如与 C 程序共享的类型）相关联的清理，该怎么办？我们可以定义一个 `finally()` 函数，它接受一个在作用域退出时执行的动作：
 
 ```cpp
 void old_style(int n)
@@ -295,4 +285,3 @@ struct Final_action {
 ```
 
 在核心指南支持库（GSL）中有一个 `finally()`，并且有一个为标准库提供更精细的 `scope_exit` 机制的提案。
-

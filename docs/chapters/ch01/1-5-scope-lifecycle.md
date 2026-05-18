@@ -12,7 +12,6 @@
 
 此外，某些对象可以不具名，例如临时变量，以及通过`new` (§5.2.2)创建的对象。例如：
 
-
 ```cpp
 vector<int> vec;      // vec is global (a global vector of integers) 
 

@@ -1,6 +1,6 @@
 # 8.2 概念
 
-考虑 [§7.3.1](../ch07/7-3-parameterized-operations.md) 中的 `sum()`：
+考虑 [§7.3.1](../ch07/7-3-parameterized-operations.md#7.3.1) 中的 `sum()`：
 
 ```cpp
 template<typename Seq, typename Value>
@@ -28,7 +28,7 @@ Value sum(Seq s, Value v)
 
 ## 8.2.1 概念的使用
 
-大多数模板实参都必须满足一整套前提，生成的代码才可期待正确行为。这也意味着绝大多数模板应当是**带约束模板**（[§7.2.1](../ch07/7-2-parameterized-types.md)）。仅仅写下 `typename` 是最宽松的约束——它只说明“此地需要某种类型”，往往还能更进一步。再看一次 `sum()`：
+大多数模板实参都必须满足一整套前提，生成的代码才可期待正确行为。这也意味着绝大多数模板应当是**带约束模板**（[§7.2.1](../ch07/7-2-parameterized-types.md#7.2.1)）。仅仅写下 `typename` 是最宽松的约束——它只说明“此地需要某种类型”，往往还能更进一步。再看一次 `sum()`：
 
 ```cpp
 template<Sequence Seq, Number Num>
@@ -50,7 +50,7 @@ template<Sequence Seq, Number Num>
 Num sum(Seq s, Num n);
 ```
 
-`range_value_t` 给出了序列元素的类型——标准库里正是用它描述 range 值的类别（[§14.1](../ch14/14-1-introduction.md)，亦见 [§16.4.4](../ch16/16-4-type-functions.md)）。`Arithmetic<X, Y>` 则声明：能够以 `X`、`Y` 参与常规算术而不会撞墙。有了这层约束，就不会误把 `vector<string>`、`vector<int*>` 当作可求和的序列；`vector<int>`、`vector<complex<double>>` 之类却仍然畅通无阻。一般说来，当一个算法同时使用多种类型参数时，最好明确指出它们之间的关系。
+`range_value_t` 给出了序列元素的类型——标准库里正是用它描述 range 值的类别（[§14.1](../ch14/14-1-introduction.md)，亦见 [§16.4.4](../ch16/16-4-type-functions.md#16.4.4)）。`Arithmetic<X, Y>` 则声明：能够以 `X`、`Y` 参与常规算术而不会撞墙。有了这层约束，就不会误把 `vector<string>`、`vector<int*>` 当作可求和的序列；`vector<int>`、`vector<complex<double>>` 之类却仍然畅通无阻。一般说来，当一个算法同时使用多种类型参数时，最好明确指出它们之间的关系。
 
 在这个例子中，我们只需要 `+=`，但为了简单和灵活，我们不应该过于严格地约束模板参数。特别地，有一天我们可能希望用 `+` 和 `=` 而不是 `+=` 来表达 `sum()`，那时我们会很高兴我们使用了一个通用的概念（此处为 `Arithmetic`），而不是一个狭隘的“拥有 `+=`”的要求。
 
@@ -79,7 +79,7 @@ template<typename Sequence, typename Number>
 Number sum(Sequence s, Number n);
 ```
 
-无论采用哪种记号，请务必让模板参数的语义约束清晰可追踪（参见 [§8.2.4](8-2-concepts.md)）。
+无论采用哪种记号，请务必让模板参数的语义约束清晰可追踪（参见 [§8.2.4](8-2-concepts.md#8.2.4)）。
 
 ## 8.2.2 基于概念的重载
 
@@ -158,7 +158,7 @@ void advance(Iter p, int n)   // 将 p 向前移动 n 个元素
 }
 ```
 
-应优先采纳语义完备的命名概念（[§8.2.4](8-2-concepts.md)），而把 requires 表达式藏在概念定义的内部。
+应优先采纳语义完备的命名概念（[§8.2.4](8-2-concepts.md#8.2.4)），而把 requires 表达式藏在概念定义的内部。
 
 ## 8.2.4 概念的定义
 
@@ -232,7 +232,7 @@ concept Number = requires(T x, U y) {
 };
 ```
 
-有了 `Number`，就能组合出本节开头用到的 `Arithmetic`（[§8.2.1](8-2-concepts.md)）：
+有了 `Number`，就能组合出本节开头用到的 `Arithmetic`（[§8.2.1](8-2-concepts.md#8.2.1)）：
 
 ```cpp
 template<typename T, typename U = T>
@@ -253,7 +253,7 @@ concept Sequence = requires(S a) {
 };
 ```
 
-若想让 `S` 表示 Sequence，它需要公布元素类型（值类型）与迭代器类型；标准库分别以 `range_value_t<S>`、`iterator_t<S>` 来描述（参见 [§16.4.4](../ch16/16-4-type-functions.md)，亦与 [§13.1](../ch13/13-1-introduction.md) 的讨论呼应）。同时还要存在返回上述迭代器的 `begin()`、`end()`，这也是容器惯用法（[§12.3](../ch12/12-3-list.md)）。最后，`S` 自带的迭代器至少应是 **input**，且迭代器解引用得到的值类型必须与 range 的元素类型一致。
+若想让 `S` 表示 Sequence，它需要公布元素类型（值类型）与迭代器类型；标准库分别以 `range_value_t<S>`、`iterator_t<S>` 来描述（参见 [§16.4.4](../ch16/16-4-type-functions.md#16.4.4)，亦与 [§13.1](../ch13/13-1-introduction.md) 的讨论呼应）。同时还要存在返回上述迭代器的 `begin()`、`end()`，这也是容器惯用法（[§12.3](../ch12/12-3-list.md)）。最后，`S` 自带的迭代器至少应是 **input**，且迭代器解引用得到的值类型必须与 range 的元素类型一致。
 
 最棘手的概念是那些试图刻画语言基本面的概念——与其闭门造车，不如直接复用库里的套件（可参考 [§14.5](../ch14/14-5-concept-overview.md)）。若想跳过上一段那样逐条罗列细节，可采用标准库的 `input_range` 一步到位：
 
@@ -299,7 +299,7 @@ bool b2 = cmp(2+3i, 3+4i);   // 错误：complex<double> 不支持 <
 
 ## 8.2.5 概念与 auto
 
-`auto` 告诉编译器：“此处类型请向初始化式看齐”（[§1.4.2](../ch01/1-4-types-variables.md)）。
+`auto` 告诉编译器：“此处类型请向初始化式看齐”（[§1.4.2](../ch01/1-4-types-variables.md#1.4.2)）。
 
 ```cpp
 auto x = 1;                   // x 是 int

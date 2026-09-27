@@ -36,4 +36,4 @@ static_assert(sizeof(int) >= 4, "int must be at least 4 bytes");
 void f() noexcept;   // f 保证不抛出异常
 ```
 
-如果 `noexcept` 函数实际抛出了异常，程序将调用 `std::terminate()`。`noexcept` 对于性能优化和编写异常安全的代码非常重要（[§6.2.2](../ch06/6-2-copy-move.md)）。
+如果 `noexcept` 函数实际抛出了异常，程序将调用 `std::terminate()`。`noexcept` 对于性能优化和编写异常安全的代码非常重要（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)）。

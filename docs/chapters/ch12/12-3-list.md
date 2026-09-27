@@ -54,4 +54,4 @@ void f(const Entry& ee, list<Entry>::iterator p, list<Entry>::iterator q)
 
 对于 `list`，`insert(p, elem)` 在 `p` 指向的元素之前插入一个值为 `elem` 的副本。这里，`p` 可以是一个指向 `list` 末尾之后位置的迭代器。相反，`erase(p)` 删除 `p` 指向的元素并销毁它。
 
-这些 `list` 的例子可以完全类似地用 `vector` 编写，并且（除非你了解计算机体系结构，否则会令人惊讶地）通常使用 `vector` 比使用 `list` 性能更好。当我们只需要一个元素序列时，我们可以在 `vector` 和 `list` 之间选择。除非你有理由不这样做，否则请使用 `vector`。`vector` 在遍历（例如 `find()` 和 `count()`）以及排序和搜索（例如 `sort()` 和 `equal_range()`；[§13.5](../ch13/13-5-algorithm-overview.md)，[§15.3.3](../ch15/15-3-containers.md)）方面表现更好。
+这些 `list` 的例子可以完全类似地用 `vector` 编写，并且（除非你了解计算机体系结构，否则会令人惊讶地）通常使用 `vector` 比使用 `list` 性能更好。当我们只需要一个元素序列时，我们可以在 `vector` 和 `list` 之间选择。除非你有理由不这样做，否则请使用 `vector`。`vector` 在遍历（例如 `find()` 和 `count()`）以及排序和搜索（例如 `sort()` 和 `equal_range()`；[§13.5](../ch13/13-5-algorithm-overview.md)，[§15.3.3](../ch15/15-3-containers.md#15.3.3)）方面表现更好。

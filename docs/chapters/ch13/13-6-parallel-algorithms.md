@@ -32,8 +32,8 @@ void sort(auto pol, random_access_range auto& r)
 }
 ```
 
-绝大多数标准库算法（§13.5 表格中的算法除 `equal_range` 之外）都可以像上面这样对 `sort()` 那样指定 `par` / `par_unseq`。为何暂时没有并行版 `equal_range()`？因为迄今仍未找到足够有意义的并行算法。
+绝大多数标准库算法（[§13.5](13-5-algorithm-overview.md) 表格中的算法除 `equal_range` 之外）都可以像上面这样对 `sort()` 那样指定 `par` / `par_unseq`。为何暂时没有并行版 `equal_range()`？因为迄今仍未找到足够有意义的并行算法。
 
-许多并行算法主要服务于数值计算场景（§17.3.1）。
+许多并行算法主要服务于数值计算场景（[§17.3.1](../ch17/17-3-numeric-algorithms.md#17.3.1)）。
 
-请求并行执行时，务必避免数据竞争（§18.2）与死锁（§18.3）。
+请求并行执行时，务必避免数据竞争（[§18.2](../ch18/18-2-tasks-and-threads.md)）与死锁（[§18.3](../ch18/18-3-shared-data.md)）。

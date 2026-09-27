@@ -34,7 +34,7 @@ double square(double);       // 返回参数的平方
 double get(const vector<double>& vec, int index);   // 类型：double(const vector<double>&, int)
 ```
 
-函数可以是类的成员（[§2.3](../ch02/2-3-class.md)、[§5.2.1](../ch05/5-2-concrete-types.md)）。对于这种*成员函数*，其类名也是函数类型的一部分。例如：
+函数可以是类的成员（[§2.3](../ch02/2-3-class.md)、[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)）。对于这种*成员函数*，其类名也是函数类型的一部分。例如：
 
 ```cpp
 char& String::operator[](int index);                // 类型：char& String::(int)
@@ -71,4 +71,4 @@ void user2()
 }
 ```
 
-定义多个同名函数被称为**函数重载**，是泛型编程[（§8.2）](../ch08/8-2-concepts.md)的核心部分之一。当一个函数被重载时，每个同名函数应该实现相同的语义。`print()` 函数就是这样的例子：每个 `print()` 都打印它的参数。
+定义多个同名函数被称为**函数重载**，是泛型编程（[§8.2](../ch08/8-2-concepts.md)）的核心部分之一。当一个函数被重载时，每个同名函数应该实现相同的语义。`print()` 函数就是这样的例子：每个 `print()` 都打印它的参数。

@@ -1,6 +1,6 @@
 # 7.2 参数化类型
 
-我们可以将 [§5.2.2](../ch05/5-2-concrete-types.md) 中的“元素为 `double` 的向量”类型，推广成“任意元素类型 `T` 的向量”：做法是把它写成模板，并把原先的 `double` 换成类型参数。例如：
+我们可以将 [§5.2.2](../ch05/5-2-concrete-types.md#5.2.2) 中的“元素为 `double` 的向量”类型，推广成“任意元素类型 `T` 的向量”：做法是把它写成模板，并把原先的 `double` 换成类型参数。例如：
 
 ```cpp
 template<typename T>
@@ -13,12 +13,12 @@ public:
     ~Vector() { delete[] elem; }           // 析构函数：释放资源
     // ... 拷贝和移动操作 ...
     T& operator[](int i);                  // 用于非 const Vector
-    const T& operator[](int i) const;      // 用于 const Vector（[§5.2.1](../ch05/5-2-concrete-types.md)）
+    const T& operator[](int i) const;      // 用于 const Vector（[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)）
     int size() const { return sz; }
 };
 ```
 
-`template<typename T>` 前缀使得 `T` 成为其后面声明的类型参数。这是 C++ 对数学中“对于所有 T”或更准确地说“对于所有类型 T”的表示。如果你想要数学意义上的“对所有满足约束 P(T) 的 T”，应使用概念（[§7.2.1](7-2-parameterized-types.md)、[§8.2](../ch08/8-2-concepts.md)）。使用 `class` 来引入类型参数等价于使用 `typename`，在旧代码中我们经常看到 `template<class T>` 作为前缀。
+`template<typename T>` 前缀使得 `T` 成为其后面声明的类型参数。这是 C++ 对数学中“对于所有 T”或更准确地说“对于所有类型 T”的表示。如果你想要数学意义上的“对所有满足约束 P(T) 的 T”，应使用概念（[§7.2.1](7-2-parameterized-types.md#7.2.1)、[§8.2](../ch08/8-2-concepts.md)）。使用 `class` 来引入类型参数等价于使用 `typename`，在旧代码中我们经常看到 `template<class T>` 作为前缀。
 
 成员函数可以类似地定义：
 
@@ -201,7 +201,7 @@ Vector vs3 {"Hello"s, "World"};              // 错误：初始化列表的类�
 Vector<string> vs4 {"Hello"s, "World"};      // OK：元素类型是显式指定的
 ```
 
-C 风格字符串字面量的类型是 `const char*`（[§1.7.1](../ch01/1-7-pointers-arrays.md)）。若这并非 `vs1` 的设计意图，要么显式写出元素类型，要么使用 `s` 后缀得到真正的 `string`（[§10.2](../ch10/10-2-strings.md)）。
+C 风格字符串字面量的类型是 `const char*`（[§1.7.1](../ch01/1-7-pointers-arrays.md#1.7.1)）。若这并非 `vs1` 的设计意图，要么显式写出元素类型，要么使用 `s` 后缀得到真正的 `string`（[§10.2](../ch10/10-2-strings.md)）。
 
 如果初始化列表中的元素具有不同的类型，我们无法推导出唯一的元素类型，因此会出现歧义错误。
 

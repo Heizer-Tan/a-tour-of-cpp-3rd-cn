@@ -102,37 +102,37 @@ void g(vector<int>& v)
 | 头文件 | 提供内容 | 参考章节 |
 |--------|----------|----------|
 | `<algorithm>` | `copy()`, `find()`, `sort()` | 第 13 章 |
-| `<array>` | `array` | [§15.3.1](../ch15/15-3-containers.md) |
+| `<array>` | `array` | [§15.3.1](../ch15/15-3-containers.md#15.3.1) |
 | `<chrono>` | `duration`, `time_point`, `month`, `time_zone` | [§16.2](../ch16/16-2-time.md) |
 | `<cmath>` | `sqrt()`, `pow()` | [§17.2](../ch17/17-2-math-functions.md) |
 | `<complex>` | `complex`, `sqrt()`, `pow()` | [§17.4](../ch17/17-4-complex.md) |
 | `<concepts>` | `floating_point`, `copyable`, `predicate`, `invocable` | [§14.5](../ch14/14-5-concept-overview.md) |
 | `<filesystem>` | `path` | [§11.9](../ch11/11-9-file-system.md) |
-| `<format>` | `format()` | [§11.6.2](../ch11/11-6-output-formatting.md) |
-| `<fstream>` | `fstream`, `ifstream`, `ofstream` | [§11.7.2](../ch11/11-7-streams.md) |
+| `<format>` | `format()` | [§11.6.2](../ch11/11-6-output-formatting.md#11.6.2) |
+| `<fstream>` | `fstream`, `ifstream`, `ofstream` | [§11.7.2](../ch11/11-7-streams.md#11.7.2) |
 | `<functional>` | `function`, `greater_equal`, `hash`, `range_value_t` | 第 16 章 |
 | `<future>` | `future`, `promise` | [§18.5](../ch18/18-5-inter-task-communication.md) |
-| `<ios>` | `hex`, `dec`, `scientific`, `fixed`, `defaultfloat` | [§11.6.2](../ch11/11-6-output-formatting.md) |
+| `<ios>` | `hex`, `dec`, `scientific`, `fixed`, `defaultfloat` | [§11.6.2](../ch11/11-6-output-formatting.md#11.6.2) |
 | `<iostream>` | `istream`, `ostream`, `cin`, `cout` | 第 11 章 |
 | `<map>` | `map`, `multimap` | [§12.6](../ch12/12-6-unordered-map.md) |
-| `<memory>` | `unique_ptr`, `shared_ptr`, `allocator` | [§15.2.1](../ch15/15-2-pointers.md) |
+| `<memory>` | `unique_ptr`, `shared_ptr`, `allocator` | [§15.2.1](../ch15/15-2-pointers.md#15.2.1) |
 | `<random>` | `default_random_engine`, `normal_distribution` | [§17.5](../ch17/17-5-random-numbers.md) |
 | `<ranges>` | `sized_range`, `subrange`, `take()`, `split()`, `iterator_t` | [§14.1](../ch14/14-1-introduction.md) |
 | `<regex>` | `regex`, `smatch` | [§10.4](../ch10/10-4-regular-expressions.md) |
 | `<string>` | `string`, `basic_string` | [§10.2](../ch10/10-2-strings.md) |
 | `<string_view>` | `string_view` | [§10.3](../ch10/10-3-string-view.md) |
 | `<set>` | `set`, `multiset` | [§12.8](../ch12/12-8-container-overview.md) |
-| `<sstream>` | `istringstream`, `ostringstream` | [§11.7.3](../ch11/11-7-streams.md) |
+| `<sstream>` | `istringstream`, `ostringstream` | [§11.7.3](../ch11/11-7-streams.md#11.7.3) |
 | `<stdexcept>` | `length_error`, `out_of_range`, `runtime_error` | [§4.2](../ch04/4-2-exceptions.md) |
-| `<tuple>` | `tuple`, `get<>()`, `tuple_size<>` | [§15.3.4](../ch15/15-3-containers.md) |
+| `<tuple>` | `tuple`, `get<>()`, `tuple_size<>` | [§15.3.4](../ch15/15-3-containers.md#15.3.4) |
 | `<thread>` | `thread` | [§18.2](../ch18/18-2-tasks-and-threads.md) |
 | `<unordered_map>` | `unordered_map`, `unordered_multimap` | [§12.6](../ch12/12-6-unordered-map.md) |
 | `<utility>` | `move()`, `swap()`, `pair` | 第 16 章 |
-| `<variant>` | `variant` | [§15.4.1](../ch15/15-4-alternatives.md) |
+| `<variant>` | `variant` | [§15.4.1](../ch15/15-4-alternatives.md#15.4.1) |
 | `<vector>` | `vector` | [§12.2](../ch12/12-2-vector.md) |
 
 这个列表远非完整。
 
 C 标准库的头文件（例如 `<stdlib.h>`）也被提供。对于每个这样的头文件，还有一个版本，其名称以 `c` 为前缀并去掉 `.h`。这个版本（例如 `<cstdlib>`）将其声明同时放在 `std` 和全局命名空间中。
 
-这些头文件反映了标准库开发的历史。因此，它们并不总是像我们希望的那样合乎逻辑且易于记忆。这就是为什么使用模块（例如 `std`，[§9.3.3](9-3-standard-library-organization.md)）是一个更好的选择。
+这些头文件反映了标准库开发的历史。因此，它们并不总是像我们希望的那样合乎逻辑且易于记忆。这就是为什么使用模块（例如 `std`，[§9.3.3](9-3-standard-library-organization.md#9.3.3)）是一个更好的选择。

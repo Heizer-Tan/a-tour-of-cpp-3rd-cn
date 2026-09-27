@@ -122,35 +122,35 @@
 
 **[1]** The ISO C++ standard [C++,2020] defines C++.
 
-**[2]** When choosing a style for a new project or when modernizing a code base, rely on the C++ Core Guidelines; §19.1.4.
+**[2]** When choosing a style for a new project or when modernizing a code base, rely on the C++ Core Guidelines; [§19.1.4](19-1-history.md#19.1.4).
 
-**[3]** When learning C++, don’t focus on language features in isolation; §19.2.1.
+**[3]** When learning C++, don’t focus on language features in isolation; [§19.2.1](19-2-cpp-evolution.md#19.2.1).
 
-**[4]** Don’t get stuck with decades-old language-feature sets and design techniques; §19.1.4.
+**[4]** Don’t get stuck with decades-old language-feature sets and design techniques; [§19.1.4](19-1-history.md#19.1.4).
 
 **[5]** Before using a new feature in production code, try it out by writing small programs to test the standards conformance and performance of the implementations you plan to use.
 
 **[6]** For learning C++, use the most up-to-date and complete implementation of Standard C++ that you can get access to.
 
-**[7]** The common subset of C and C++ is not the best initial subset of C++ to learn; §19.3.2.1.
+**[7]** The common subset of C and C++ is not the best initial subset of C++ to learn; [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1).
 
-**[8]** Avoid casts; §19.3.2.1; [CG: ES.48].
+**[8]** Avoid casts; [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1); [CG: ES.48].
 
-**[9]** Prefer named casts, such as static_cast over C-style casts; §5.2.3; [CG: ES.49].
+**[9]** Prefer named casts, such as static_cast over C-style casts; [§5.2.3](../ch05/5-2-concrete-types.md#5.2.3); [CG: ES.49].
 
-**[10]** When converting a C program to C++, rename variables that are C++ keywords; §19.3.2.
+**[10]** When converting a C program to C++, rename variables that are C++ keywords; [§19.3.2](19-3-c-cpp-compatibility.md#19.3.2).
 
-**[11]** For portability and type safety, if you must use C, write in the common subset of C and C++; §19.3.2.1; [CG: CPL.2].
+**[11]** For portability and type safety, if you must use C, write in the common subset of C and C++; [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1); [CG: CPL.2].
 
-**[12]** When converting a C program to C++, cast the result of malloc() to the proper type or change all uses of malloc() to uses of new; §19.3.2.2.
+**[12]** When converting a C program to C++, cast the result of malloc() to the proper type or change all uses of malloc() to uses of new; [§19.3.2.2](19-3-c-cpp-compatibility.md#19.3.2.2).
 
-**[13]** When converting from malloc() and free() to new and delete, consider using vector, push_back(), and reserve() instead of realloc(); §19.3.2.1.
+**[13]** When converting from malloc() and free() to new and delete, consider using vector, push_back(), and reserve() instead of realloc(); [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1).
 
 **[14]** In C++, there are no implicit conversions from ints to enumerations; use explicit type conversion where necessary.
 
 **[15]** For each standard C header <X.h> that places names in the global namespace, the header <cX> places the names in namespace std.
 
-**[16]** Use extern "C" when declaring C functions; §19.3.2.3.
+**[16]** Use extern "C" when declaring C functions; [§19.3.2.3](19-3-c-cpp-compatibility.md#19.3.2.3).
 
 **[17]** Prefer string over C-style strings (direct manipulation of zero-terminated arrays of char); [CG: SL.str.1].
 

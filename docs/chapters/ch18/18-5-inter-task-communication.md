@@ -69,9 +69,9 @@ void g(future<X>& fx)
 
 ## 18.5.2
 
-如何把 `future` 放进需要结果的任务里，同时把对应的 `promise` 放进应该产出结果的线程？为此提供了 `packaged_task`，用于简化要在线程上运行、并与 future/promise 相关联的任务设置。`packaged_task` 提供包装代码，把任务的返回值或异常写入 `promise`（性质类似 §18.5.1 所示）。若调用 `get_future()`，`packaged_task` 会给你与其 `promise` 相对应的 `future`。
+如何把 `future` 放进需要结果的任务里，同时把对应的 `promise` 放进应该产出结果的线程？为此提供了 `packaged_task`，用于简化要在线程上运行、并与 future/promise 相关联的任务设置。`packaged_task` 提供包装代码，把任务的返回值或异常写入 `promise`（性质类似 [§18.5.1](18-5-inter-task-communication.md#18.5.1) 所示）。若调用 `get_future()`，`packaged_task` 会给你与其 `promise` 相对应的 `future`。
 
-例如，我们可以设置两个任务，各自用标准库的 `accumulate()`（§17.3）累加 `vector<double>` 的一半元素：
+例如，我们可以设置两个任务，各自用标准库的 `accumulate()`（[§17.3](../ch17/17-3-numeric-algorithms.md)）累加 `vector<double>` 的一半元素：
 
 ```cpp
 double accum(double* beg, double* end, double init)
@@ -130,9 +130,9 @@ double comp4(vector<double>& v)
 
 根据诸如 `v.size() < 10'000` 之类启发式来猜测计算成本相对于线程启动成本——极其粗糙，也容易在性能上大错特错。不过此处不适合展开如何管理线程的讨论；别把这类估计当成靠谱的准则。
 
-也很少有必要手工并行化诸如 `accumulate()` 这类标准库算法，因为并行算法（例如 `reduce(par_unseq, /*...*/)`）通常做得更好（§17.3.1）。不过上述技巧具有一般性。
+也很少有必要手工并行化诸如 `accumulate()` 这类标准库算法，因为并行算法（例如 `reduce(par_unseq, /*...*/)`）通常做得更好（[§17.3.1](../ch17/17-3-numeric-algorithms.md#17.3.1)）。不过上述技巧具有一般性。
 
-还要注意：`async()` 并非只做并行提速——例如也可以用它启动任务向用户索取信息，而让「主程序」同时做别的事（§18.5.3）。
+还要注意：`async()` 并非只做并行提速——例如也可以用它启动任务向用户索取信息，而让「主程序」同时做别的事（[§18.5.3](18-5-inter-task-communication.md#18.5.3)）。
 
 ## 18.5.4
 
@@ -187,6 +187,6 @@ void find_all(vector<string>& vs, const string& key)
 
 `stop_source` 产生 `stop_token`，藉此把停止请求传达给线程。
 
-同步与返回结果我用了最简单的想法之一：把结果放进原子变量（§18.3.2），并对其自旋等待。
+同步与返回结果我用了最简单的想法之一：把结果放进原子变量（[§18.3.2](18-3-shared-data.md#18.3.2)），并对其自旋等待。
 
 当然可以把示例扩展成更多搜索线程、更一般的结果返回、以及不同元素类型——但那会掩盖 `stop_source` 与 `stop_token` 的基本角色。

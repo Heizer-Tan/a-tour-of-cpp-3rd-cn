@@ -197,7 +197,7 @@ void user(int x)
 
 除非 `x` 是正数，否则这将泄漏。将 `new` 的结果赋给“裸露的指针”是在自找麻烦。
 
-解决此类问题的一个简单方案是：在需要删除时使用标准库的 `unique_ptr`（§15.2.1），而不是“裸露的指针”：
+解决此类问题的一个简单方案是：在需要删除时使用标准库的 `unique_ptr`（[§15.2.1](../ch15/15-2-pointers.md#15.2.1)），而不是“裸露的指针”：
 
 ```cpp
 class Smiley : public Circle {
@@ -208,9 +208,9 @@ private:
 };
 ```
 
-这是一个简单、通用且高效的资源管理技术示例（§6.3）。
+这是一个简单、通用且高效的资源管理技术示例（[§6.3](../ch06/6-3-resource-mgmt.md)）。
 
-作为这一改变的一个令人愉快的副作用，我们不再需要为 `Smiley` 定义析构函数。编译器将隐式生成一个析构函数，它会在 `vector` 中执行所需的 `unique_ptr` 销毁（§6.3）。使用 `unique_ptr` 的代码将与正确使用原始指针的代码一样高效。
+作为这一改变的一个令人愉快的副作用，我们不再需要为 `Smiley` 定义析构函数。编译器将隐式生成一个析构函数，它会在 `vector` 中执行所需的 `unique_ptr` 销毁（[§6.3](../ch06/6-3-resource-mgmt.md)）。使用 `unique_ptr` 的代码将与正确使用原始指针的代码一样高效。
 
 现在考虑 `read_shape()` 的用户：
 
@@ -221,7 +221,7 @@ unique_ptr<Shape> read_shape(istream& is)   // 从输入流 is 读取形状描�
     switch (k) {
     case Kind::circle:
         // ... 将圆数据 {Point,int} 读入 p 和 r ...
-        return unique_ptr<Shape>{new Circle{p, r}};   // [§15.2.1](../ch15/15-2-pointers.md)
+        return unique_ptr<Shape>{new Circle{p, r}};   // [§15.2.1](../ch15/15-2-pointers.md#15.2.1)
     // ...
     }
 }
@@ -240,4 +240,4 @@ void user()
 
 现在每个对象都由一个 `unique_ptr` 拥有，当不再需要时（即当其 `unique_ptr` 超出作用域时），`unique_ptr` 会删除该对象。
 
-为了使 `user()` 的 `unique_ptr` 版本工作，我们需要接受 `vector<unique_ptr<Shape>>` 的 `draw_all()` 和 `rotate_all()` 版本。编写许多这样的 `_all()` 函数可能会变得乏味，因此 [§7.3.2](../ch07/7-3-parameterized-operations.md) 展示了另一种方法。
+为了使 `user()` 的 `unique_ptr` 版本工作，我们需要接受 `vector<unique_ptr<Shape>>` 的 `draw_all()` 和 `rotate_all()` 版本。编写许多这样的 `_all()` 函数可能会变得乏味，因此 [§7.3.2](../ch07/7-3-parameterized-operations.md#7.3.2) 展示了另一种方法。

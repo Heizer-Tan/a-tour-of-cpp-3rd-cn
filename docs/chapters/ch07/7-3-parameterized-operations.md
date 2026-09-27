@@ -113,7 +113,7 @@ void f(const Vector<int>& vec, const list<string>& lst, int x, const string& s)
 
 ## 7.3.3 Lambda 表达式
 
-在 [§7.3.2](7-3-parameterized-operations.md) 中，我们将 `Less_than` 与其使用分开定义。这可能不方便。因此，有一种用于隐式生成函数对象的表示法：
+在 [§7.3.2](7-3-parameterized-operations.md#7.3.2) 中，我们将 `Less_than` 与其使用分开定义。这可能不方便。因此，有一种用于隐式生成函数对象的表示法：
 
 ```cpp
 void f(const Vector<int>& vec, const list<string>& lst, int x, const string& s)
@@ -135,7 +135,7 @@ void f(const Vector<int>& vec, const list<string>& lst, int x, const string& s)
 
 使用 lambda 可以方便且简洁，但也可能晦涩难懂。对于非平凡的操作（比如超过一个简单表达式），我更喜欢命名该操作，以便更清楚地说明其目的，并使其在程序中的多个地方可用。
 
-在 [§5.5.3](../ch05/5-5-hierarchies.md) 中，我们注意到必须编写许多函数（如 `draw_all()` 和 `rotate_all()`）来对指针和 `unique_ptr` 向量的元素执行操作，这很烦人。函数对象（特别是 lambda）可以将容器的遍历与对每个元素要执行的动作分离开来，从而提供帮助。
+在 [§5.5.3](../ch05/5-5-hierarchies.md#5.5.3) 中，我们注意到必须编写许多函数（如 `draw_all()` 和 `rotate_all()`）来对指针和 `unique_ptr` 向量的元素执行操作，这很烦人。函数对象（特别是 lambda）可以将容器的遍历与对每个元素要执行的动作分离开来，从而提供帮助。
 
 首先，我们需要一个函数，将操作应用于容器元素所指向的每个对象：
 
@@ -226,7 +226,7 @@ void user(Init_mode m, int n, vector<int>& arg, Iterator p, Iterator q)
 - 变量可能在获得其预期值之前就被使用。
 - “初始化代码”可能与其他代码混合，使其难以理解。
 - 当“初始化代码”与其他代码混合时，更容易忘记一种情况。
-- 这不是初始化，而是赋值（[§1.9.2](../ch01/1-9-hardware.md)）。
+- 这不是初始化，而是赋值（[§1.9.2](../ch01/1-9-hardware.md#1.9.2)）。
 
 相反，我们可以将其转换为用作初始化的 lambda：
 

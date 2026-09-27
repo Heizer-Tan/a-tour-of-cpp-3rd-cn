@@ -43,7 +43,7 @@ string compose(const string& name, const string& domain)
 string addr = compose("greeting", "example.com");
 ```
 
-现代 C++ 编译器会通过*返回值优化*（Return Value Optimization，RVO）和*移动语义*（move semantics，[§6.2.2](../ch06/6-2-copy-move.md)）来避免不必要的拷贝，因此按值返回通常非常高效。
+现代 C++ 编译器会通过*返回值优化*（Return Value Optimization，RVO）和*移动语义*（move semantics，[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)）来避免不必要的拷贝，因此按值返回通常非常高效。
 
 ### 3.4.3 结构化绑定
 

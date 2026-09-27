@@ -6,7 +6,7 @@
 
 - 一对迭代器 `{begin, end}`；
 - `{begin, n}`，其中 `begin` 是迭代器，`n` 是元素个数；
-- `{begin, pred}`，其中 `begin` 是迭代器，`pred` 是谓词；若对某个迭代器 `p` 有 `pred(p)` 为真，则表示到达范围末尾。这允许存在无限范围，以及按需生成的范围（§14.3）。
+- `{begin, pred}`，其中 `begin` 是迭代器，`pred` 是谓词；若对某个迭代器 `p` 有 `pred(p)` 为真，则表示到达范围末尾。这允许存在无限范围，以及按需生成的范围（[§14.3](14-3-generators.md)）。
 
 正是 range 概念让我们可以写 `sort(v)`，而不必像自 1994 年以来使用 STL 那样写 `sort(v.begin(), v.end())`。对自己的算法也能做类似处理：
 
@@ -21,4 +21,4 @@ void my_sort(R& r) // 现代的、带概念约束的 my_sort 版本
 
 Ranges 让我们能更直接地表达大约 99% 的日常算法用法。除了记法上的好处，ranges 还能带来某些优化机会，并消灭一整类低级错误——例如 `sort(v1.begin(), v2.end())`、`sort(v.end(), v.begin())` 这种组合；现实中确实见过。
 
-自然，也存在不同“种类”的范围，对应不同种类的迭代器。尤其地，`input_range`、`forward_range`、`bidirectional_range`、`random_access_range` 与 `contiguous_range` 都以概念的形式给出（§14.5）。
+自然，也存在不同“种类”的范围，对应不同种类的迭代器。尤其地，`input_range`、`forward_range`、`bidirectional_range`、`random_access_range` 与 `contiguous_range` 都以概念的形式给出（[§14.5](14-5-concept-overview.md)）。

@@ -1,6 +1,6 @@
 # 17.4 复数
 
-标准库支持一族复数类型，其思路与 §5.2.1 描述的 `complex` 类一脉相承。为了支持标量为单精度浮点数（`float`）、双精度浮点数（`double`）等情形的复数，标准库的 `complex` 是一个模板：
+标准库支持一族复数类型，其思路与 [§5.2.1](../ch05/5-2-concrete-types.md#5.2.1) 描述的 `complex` 类一脉相承。为了支持标量为单精度浮点数（`float`）、双精度浮点数（`double`）等情形的复数，标准库的 `complex` 是一个模板：
 
 ```cpp
 template<typename Scalar>
@@ -23,4 +23,4 @@ void f(complex<float> fl, complex<double> db)
 }
 ```
 
-`<complex>` 中也定义了常见的数学函数，`sqrt()` 与 `pow()`（幂运算）即在其中（§17.2）。
+`<complex>` 中也定义了常见的数学函数，`sqrt()` 与 `pow()`（幂运算）即在其中（[§17.2](17-2-math-functions.md)）。

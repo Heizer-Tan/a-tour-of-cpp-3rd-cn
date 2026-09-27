@@ -120,7 +120,7 @@ vector<Entry> book2 = phone_book;
 
 ```cpp
 vector<Shape> vs;                     // 不，不要这样做 - 没有空间存放 Circle 或 Smiley
-vector<Shape*> vps;                   // 更好，但见 [§5.5.3](../ch05/5-5-hierarchies.md)（不要泄漏）
+vector<Shape*> vps;                   // 更好，但见 [§5.5.3](../ch05/5-5-hierarchies.md#5.5.3)（不要泄漏）
 vector<unique_ptr<Shape>> vups;       // OK
 ```
 

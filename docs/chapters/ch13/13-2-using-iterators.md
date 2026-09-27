@@ -30,7 +30,7 @@ bool has_c(const string& s, char c) // s 是否包含字符 c？
 }
 ```
 
-更有趣的练习是在字符串中找到某个字符出现的所有位置。可以把每次出现的位置作为一组指针返回；由于 `vector` 提供了移动语义（§6.2.1），返回 `vector` 本身是高效的。若希望对找到的位置进行修改，则传入非常量的 `string`：
+更有趣的练习是在字符串中找到某个字符出现的所有位置。可以把每次出现的位置作为一组指针返回；由于 `vector` 提供了移动语义（[§6.2.1](../ch06/6-2-copy-move.md#6.2.1)），返回 `vector` 本身是高效的。若希望对找到的位置进行修改，则传入非常量的 `string`：
 
 ```cpp
 vector<string::iterator> find_all(string& s, char c) // 找出 s 中所有为 c 的位置
@@ -87,7 +87,7 @@ auto find_all(C& c, V v)
 }
 ```
 
-这里顺带把遍历改成了范围 `for`，并用标准库的 `range_value_t`（§16.4.4）命名元素的类型。`range_value_t` 的一种极简等价写法可以是：
+这里顺带把遍历改成了范围 `for`，并用标准库的 `range_value_t`（[§16.4.4](../ch16/16-4-type-functions.md#16.4.4)）命名元素的类型。`range_value_t` 的一种极简等价写法可以是：
 
 ```cpp
 template<typename T>

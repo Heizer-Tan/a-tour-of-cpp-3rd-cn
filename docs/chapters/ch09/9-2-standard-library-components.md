@@ -7,22 +7,22 @@
 - C 标准库（经过非常小的修改以最小化类型系统违规）。
 - 字符串，支持国际字符集、本地化和子字符串的只读视图（[§10.2](../ch10/10-2-strings.md)）。
 - 正则表达式匹配支持（[§10.4](../ch10/10-4-regular-expressions.md)）。
-- I/O 流是一个可扩展的输入输出框架，用户可以向其中添加自己的类型、流、缓冲策略、本地环境和字符集（第 11 章）。它还提供灵活的输出格式化设施（[§11.6.2](../ch11/11-6-output-formatting.md)）。
+- I/O 流是一个可扩展的输入输出框架，用户可以向其中添加自己的类型、流、缓冲策略、本地环境和字符集（第 11 章）。它还提供灵活的输出格式化设施（[§11.6.2](../ch11/11-6-output-formatting.md#11.6.2)）。
 - 以可移植方式操作文件系统的库（[§11.9](../ch11/11-9-file-system.md)）。
 - 容器（如 `vector` 和 `map`；第 12 章）和算法（如 `find()`、`sort()` 和 `merge()`；第 13 章）的框架。这个框架通常称为 STL [Stepanov,1994]，是可扩展的，因此用户可以添加自己的容器和算法。
 - 范围（[§14.1](../ch14/14-1-introduction.md)），包括视图（[§14.2](../ch14/14-2-views.md)）、生成器（[§14.3](../ch14/14-3-generators.md)）和管道（[§14.4](../ch14/14-4-pipes.md)）。
 - 用于基本类型和范围的概念（[§14.5](../ch14/14-5-concept-overview.md)）。
-- 数值计算支持，例如标准数学函数、复数、带有算术运算的向量、数学常数和随机数生成器（[§5.2.1](../ch05/5-2-concrete-types.md) 和第 16 章）。
+- 数值计算支持，例如标准数学函数、复数、带有算术运算的向量、数学常数和随机数生成器（[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1) 和第 16 章）。
 - 并发编程支持，包括线程和锁（第 18 章）。并发支持是基础性的，以便用户可以作为库添加对新并发模型的支持。
 - 同步和异步协程（[§18.6](../ch18/18-6-coroutines.md)）。
-- 大多数 STL 算法和一些数值算法的并行版本，例如 `sort()`（[§13.6](../ch13/13-6-parallel-algorithms.md)）和 `reduce()`（[§17.3.1](../ch17/17-3-numeric-algorithms.md)）。
-- 支持元编程（例如类型函数；[§16.4](../ch16/16-4-type-functions.md)）、STL 风格泛型编程（例如 `pair`；[§15.3.3](../ch15/15-3-containers.md)）和通用编程（例如 `variant` 和 `optional`；[§15.4.1](../ch15/15-4-alternatives.md)，[§15.4.2](../ch15/15-4-alternatives.md)）的工具。
-- 用于资源管理的“智能指针”（例如 `unique_ptr` 和 `shared_ptr`；[§15.2.1](../ch15/15-2-pointers.md)）。
-- 特殊用途容器，例如 `array`（[§15.3.1](../ch15/15-3-containers.md)）、`bitset`（[§15.3.2](../ch15/15-3-containers.md)）和 `tuple`（[§15.3.4](../ch15/15-3-containers.md)）。
-- 绝对时间与时长，例如 `time_point` 与 `system_clock`（[§16.2.1](../ch16/16-2-time.md)）。
-- 日历与时间区域，例如 `month` 与 `time_zone`（[§16.2.2](../ch16/16-2-time.md)，[§16.2.3](../ch16/16-2-time.md)）。
+- 大多数 STL 算法和一些数值算法的并行版本，例如 `sort()`（[§13.6](../ch13/13-6-parallel-algorithms.md)）和 `reduce()`（[§17.3.1](../ch17/17-3-numeric-algorithms.md#17.3.1)）。
+- 支持元编程（例如类型函数；[§16.4](../ch16/16-4-type-functions.md)）、STL 风格泛型编程（例如 `pair`；[§15.3.3](../ch15/15-3-containers.md#15.3.3)）和通用编程（例如 `variant` 和 `optional`；[§15.4.1](../ch15/15-4-alternatives.md#15.4.1)，[§15.4.2](../ch15/15-4-alternatives.md#15.4.2)）的工具。
+- 用于资源管理的“智能指针”（例如 `unique_ptr` 和 `shared_ptr`；[§15.2.1](../ch15/15-2-pointers.md#15.2.1)）。
+- 特殊用途容器，例如 `array`（[§15.3.1](../ch15/15-3-containers.md#15.3.1)）、`bitset`（[§15.3.2](../ch15/15-3-containers.md#15.3.2)）和 `tuple`（[§15.3.4](../ch15/15-3-containers.md#15.3.4)）。
+- 绝对时间与时长，例如 `time_point` 与 `system_clock`（[§16.2.1](../ch16/16-2-time.md#16.2.1)）。
+- 日历与时间区域，例如 `month` 与 `time_zone`（[§16.2.2](../ch16/16-2-time.md#16.2.2)，[§16.2.3](../ch16/16-2-time.md#16.2.3)）。
 - 常用单位的后缀，例如 `ms` 表示毫秒，`i` 表示虚数单位（[§6.6](../ch06/6-6-user-defined-literals.md)）。
-- 操作元素序列的方式，例如视图（[§14.2](../ch14/14-2-views.md)）、`string_view`（[§10.3](../ch10/10-3-string-view.md)）和 `span`（[§15.2.2](../ch15/15-2-pointers.md)）。
+- 操作元素序列的方式，例如视图（[§14.2](../ch14/14-2-views.md)）、`string_view`（[§10.3](../ch10/10-3-string-view.md)）和 `span`（[§15.2.2](../ch15/15-2-pointers.md#15.2.2)）。
 
 将某个类包含到库中的主要标准是：
 

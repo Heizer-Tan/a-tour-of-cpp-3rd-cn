@@ -7,6 +7,6 @@ static_assert(numeric_limits<char>::is_signed, "unsigned characters!");
 static_assert(100000 < numeric_limits<int>::max(), "small ints!");
 ```
 
-第二个断言之所以可行，是因为 `numeric_limits<int>::max()` 是 `constexpr` 函数（§1.6）。
+第二个断言之所以可行，是因为 `numeric_limits<int>::max()` 是 `constexpr` 函数（[§1.6](../ch01/1-6-constants.md)）。
 
 我们也可以为自己的用户定义类型定义 `numeric_limits`。

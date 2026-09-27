@@ -43,7 +43,7 @@ Color y {6};        // 同样可行
 int x = int(Color::red);
 ```
 
-默认情况下，枚举类（`enum class`）具有赋值、初始化以及比较操作的功能（比如`==`和`<`运算符；§1.4节）。不过，枚举是一种用户自定义类型，因此我们可以为其定义额外的运算符（参见§6.4节）。
+默认情况下，枚举类（`enum class`）具有赋值、初始化以及比较操作的功能（比如`==`和`<`运算符；[§1.4](../ch01/1-4-types-variables.md)节）。不过，枚举是一种用户自定义类型，因此我们可以为其定义额外的运算符（参见[§6.4](../ch06/6-4-operator-overloading.md)节）。
 
 ```cpp
 Traffic_light& operator++(Traffic_light& t)

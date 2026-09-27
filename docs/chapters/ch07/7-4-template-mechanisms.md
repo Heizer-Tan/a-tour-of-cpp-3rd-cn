@@ -2,12 +2,12 @@
 
 为了定义良好的模板，我们需要一些语言层面的配套机制：
 
-- 依赖类型的取值：**变量模板**（[§7.4.1](7-4-template-mechanisms.md)）
-- 为类型与模板起别名：**别名模板**（[§7.4.2](7-4-template-mechanisms.md)）
-- 编译期分支：**`if constexpr`**（[§7.4.3](7-4-template-mechanisms.md)）
-- 在编译期探查类型与表达式是否成立：**requires 表达式**（[§8.2.3](../ch08/8-2-concepts.md)）
+- 依赖类型的取值：**变量模板**（[§7.4.1](7-4-template-mechanisms.md#7.4.1)）
+- 为类型与模板起别名：**别名模板**（[§7.4.2](7-4-template-mechanisms.md#7.4.2)）
+- 编译期分支：**`if constexpr`**（[§7.4.3](7-4-template-mechanisms.md#7.4.3)）
+- 在编译期探查类型与表达式是否成立：**requires 表达式**（[§8.2.3](../ch08/8-2-concepts.md#8.2.3)）
 
-此外，`constexpr` 函数（[§1.6](../ch01/1-6-constants.md)）和 `static_assert`（[§4.5.2](../ch04/4-5-assertions.md)）也常常参与模板的设计与使用。
+此外，`constexpr` 函数（[§1.6](../ch01/1-6-constants.md)）和 `static_assert`（[§4.5.2](../ch04/4-5-assertions.md#4.5.2)）也常常参与模板的设计与使用。
 
 这些基本机制主要是用于构建通用、基础抽象的工具。
 
@@ -83,7 +83,7 @@ void algo(Container& c)
 }
 ```
 
-这个 `Value_type` 只是标准库中 `range_value_t`（[§16.4.4](../ch16/16-4-type-functions.md)）的极简示意；别名语法还能用来通过绑定若干模板实参得出“缩写模板”。
+这个 `Value_type` 只是标准库中 `range_value_t`（[§16.4.4](../ch16/16-4-type-functions.md#16.4.4)）的极简示意；别名语法还能用来通过绑定若干模板实参得出“缩写模板”。
 
 ```cpp
 template<typename Key, typename Value>
@@ -114,7 +114,7 @@ void update(T& target)
 }
 ```
 
-`is_trivially_copyable_v<T>` 是一条类型层面的谓词（[§16.4.1](../ch16/16-4-type-functions.md)），用来说明 `T` 是否可以按“平凡复制”的规则搬运。
+`is_trivially_copyable_v<T>` 是一条类型层面的谓词（[§16.4.1](../ch16/16-4-type-functions.md#16.4.1)），用来说明 `T` 是否可以按“平凡复制”的规则搬运。
 
 编译器只检查 `if constexpr` 中被选中的分支。这个解决方案提供了最佳性能以及优化的局部性。
 

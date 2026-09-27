@@ -1,8 +1,8 @@
 # 9.3 标准库的组织
 
-标准库的各个组件都隶属于命名空间 `std`，并通过模块或带头的翻译单元提供给用户程序。
+标准库的各个组件都隶属于命名空间 `std`，并通过模块或头文件提供给用户程序。
 
-## 9.3.1 命名空间与头文件
+## 9.3.1 命名空间
 
 每个标准库设施都通过某个标准头文件提供。例如：
 
@@ -44,10 +44,10 @@ string s {"C++ is a general-purpose programming language"};   // OK：string 是
 要使用子命名空间中的后缀，我们必须将其引入到想要使用它的命名空间中。例如：
 
 ```cpp
-// 没有提到复数文字
-auto z1 = 2 + 3i;   // 错误：没有后缀 i'
+// 没有提到 complex_literals
+auto z1 = 2 + 3i;   // 错误：没有后缀 'i'
 
-using namespace std::literals::complex_literals;   // 使复数文字可见
+using namespace literals::complex_literals;   // 使复数字面量可见
 auto z2 = 2 + 3i;   // OK：z2 是一个 complex<double>
 ```
 
@@ -77,7 +77,6 @@ void f(vector<int>& v)
 
 ```cpp
 using namespace std;
-using namespace ranges;
 
 void g(vector<int>& v)
 {
@@ -101,7 +100,7 @@ void g(vector<int>& v)
 
 | 头文件 | 提供内容 | 参考章节 |
 |--------|----------|----------|
-| `<algorithm>` | `copy()`, `find()`, `sort()` | 第 13 章 |
+| `<algorithm>` | `copy()`, `find()`, `sort()` | [第 13 章](../ch13/index.md) |
 | `<array>` | `array` | [§15.3.1](../ch15/15-3-containers.md#15.3.1) |
 | `<chrono>` | `duration`, `time_point`, `month`, `time_zone` | [§16.2](../ch16/16-2-time.md) |
 | `<cmath>` | `sqrt()`, `pow()` | [§17.2](../ch17/17-2-math-functions.md) |
@@ -110,11 +109,11 @@ void g(vector<int>& v)
 | `<filesystem>` | `path` | [§11.9](../ch11/11-9-file-system.md) |
 | `<format>` | `format()` | [§11.6.2](../ch11/11-6-output-formatting.md#11.6.2) |
 | `<fstream>` | `fstream`, `ifstream`, `ofstream` | [§11.7.2](../ch11/11-7-streams.md#11.7.2) |
-| `<functional>` | `function`, `greater_equal`, `hash`, `range_value_t` | 第 16 章 |
+| `<functional>` | `function`, `greater_equal`, `hash`, `range_value_t` | [第 16 章](../ch16/index.md) |
 | `<future>` | `future`, `promise` | [§18.5](../ch18/18-5-inter-task-communication.md) |
 | `<ios>` | `hex`, `dec`, `scientific`, `fixed`, `defaultfloat` | [§11.6.2](../ch11/11-6-output-formatting.md#11.6.2) |
-| `<iostream>` | `istream`, `ostream`, `cin`, `cout` | 第 11 章 |
-| `<map>` | `map`, `multimap` | [§12.6](../ch12/12-6-unordered-map.md) |
+| `<iostream>` | `istream`, `ostream`, `cin`, `cout` | [第 11 章](../ch11/index.md) |
+| `<map>` | `map`, `multimap` | [§12.5](../ch12/12-5-map.md) |
 | `<memory>` | `unique_ptr`, `shared_ptr`, `allocator` | [§15.2.1](../ch15/15-2-pointers.md#15.2.1) |
 | `<random>` | `default_random_engine`, `normal_distribution` | [§17.5](../ch17/17-5-random-numbers.md) |
 | `<ranges>` | `sized_range`, `subrange`, `take()`, `split()`, `iterator_t` | [§14.1](../ch14/14-1-introduction.md) |
@@ -127,7 +126,7 @@ void g(vector<int>& v)
 | `<tuple>` | `tuple`, `get<>()`, `tuple_size<>` | [§15.3.4](../ch15/15-3-containers.md#15.3.4) |
 | `<thread>` | `thread` | [§18.2](../ch18/18-2-tasks-and-threads.md) |
 | `<unordered_map>` | `unordered_map`, `unordered_multimap` | [§12.6](../ch12/12-6-unordered-map.md) |
-| `<utility>` | `move()`, `swap()`, `pair` | 第 16 章 |
+| `<utility>` | `move()`, `swap()`, `pair` | [第 16 章](../ch16/index.md) |
 | `<variant>` | `variant` | [§15.4.1](../ch15/15-4-alternatives.md#15.4.1) |
 | `<vector>` | `vector` | [§12.2](../ch12/12-2-vector.md) |
 

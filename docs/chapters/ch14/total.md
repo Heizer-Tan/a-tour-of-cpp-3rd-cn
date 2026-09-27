@@ -6,13 +6,13 @@
 
 # 14.1 引言
 
-标准库同时提供两类算法：一类用概念（第 8 章）加以约束，另一类保持无约束以兼容旧代码。受约束（基于概念）的版本位于 `<ranges>`，命名空间为 `ranges`。自然，我更偏好使用概念的版本。
+标准库同时提供两类算法：一类用概念（[第 8 章](../ch08/index.md)）加以约束，另一类保持无约束以兼容旧代码。受约束（基于概念）的版本位于 `<ranges>`，命名空间为 `ranges`。自然，我更偏好使用概念的版本。
 
 **范围**（range）是对 C++98 时代那种由 `{begin(), end()}` 迭代器对所刻画序列的推广：它说明“要成为一串元素序列需要具备什么”。一个范围可以由以下形式给出：
 
 - 一对迭代器 `{begin, end}`；
 - `{begin, n}`，其中 `begin` 是迭代器，`n` 是元素个数；
-- `{begin, pred}`，其中 `begin` 是迭代器，`pred` 是谓词；若对某个迭代器 `p` 有 `pred(p)` 为真，则表示到达范围末尾。这允许存在无限范围，以及按需生成的范围（§14.3）。
+- `{begin, pred}`，其中 `begin` 是迭代器，`pred` 是谓词；若对某个迭代器 `p` 有 `pred(p)` 为真，则表示到达范围末尾。这允许存在无限范围，以及按需生成的范围（[§14.3](14-3-generators.md)）。
 
 正是 range 概念让我们可以写 `sort(v)`，而不必像自 1994 年以来使用 STL 那样写 `sort(v.begin(), v.end())`。对自己的算法也能做类似处理：
 
@@ -21,13 +21,13 @@ template<forward_range R>
     requires sortable<iterator_t<R>>
 void my_sort(R& r) // 现代的、带概念约束的 my_sort 版本
 {
-    my_sort(r.begin(), r.end()); // 委托给（假定存在的）迭代器版本
+    return my_sort(r.begin(), r.end()); // 使用 1994 风格的 sort
 }
 ```
 
 Ranges 让我们能更直接地表达大约 99% 的日常算法用法。除了记法上的好处，ranges 还能带来某些优化机会，并消灭一整类低级错误——例如 `sort(v1.begin(), v2.end())`、`sort(v.end(), v.begin())` 这种组合；现实中确实见过。
 
-自然，也存在不同“种类”的范围，对应不同种类的迭代器。尤其地，`input_range`、`forward_range`、`bidirectional_range`、`random_access_range` 与 `contiguous_range` 都以概念的形式给出（§14.5）。
+自然，也存在不同“种类”的范围，对应不同种类的迭代器。尤其地，`input_range`、`forward_range`、`bidirectional_range`、`random_access_range` 与 `contiguous_range` 都以概念的形式给出（[§14.5](14-5-concept-overview.md)）。
 
 # 14.2 视图
 
@@ -73,7 +73,7 @@ for (int x : take_view{filter_view{r, [](int x) { return x % 2; }}, 3})
     cout << x << ' ';
 ```
 
-这种层层嵌套的视图很快就会晦涩难懂，因此还有另一条路可走：**管道**（§14.4）。
+这种层层嵌套的视图很快就会晦涩难懂，因此还有另一条路可走：**管道**（[§14.4](14-4-pipes.md)）。
 
 标准库提供了很多视图（也常被称为范围适配器）：
 
@@ -103,7 +103,7 @@ for (int x : take_view{filter_view{r, [](int x) { return x % 2; }}, 3})
 auto bad()
 {
     vector v = {1, 2, 3, 4};
-    return filter_view{v, [](int x) { return x % 2; }}; // 危险：`v` 会先被销毁
+    return filter_view{v, odd}; // `v` 会在视图之前被销毁
 }
 ```
 
@@ -139,20 +139,20 @@ int average_temp(vector<Reading> readings)
 
 | 工厂 | 说明 |
 |------|------|
-| `v = empty_view<T>{}` | `v` 是一个类型为 `T` 的空范围 |
+| `v = empty_view<T>{}` | `v` 是元素类型为 `T` 的空范围（即便原本“会有”元素） |
 | `v = single_view{x}` | `v` 只包含元素 `x` |
-| `v = iota_view{x}` | `v` 是无限序列 `x, x+1, x+2, ...`（用 `++` 递增） |
-| `v = iota_view{x, y}` | `v` 包含 `x, x+1, ..., y-1`（仍用 `++` 递增） |
+| `v = iota_view{x}` | `v` 是无限序列：`x, x+1, x+2, ...`（用 `++` 递增） |
+| `v = iota_view{x, y}` | `v` 是含 `n` 个元素的序列：`x, x+1, ..., y-1`（用 `++` 递增） |
 | `v = istream_view<T>{is}` | `v` 通过对 `is` 反复执行 `>>`（读取 `T`）得到 |
 
 `iota_view` 很适合构造简单序列：
 
 ```cpp
-for (int x : iota_view(42, 52)) // 输出 42 43 ... 51
+for (int x : iota_view(42, 52)) // 42 43 44 45 46 47 48 49 50 51
     cout << x << ' ';
 ```
 
-`istream_view` 让我们能在范围 `for` 里直接用输入流：
+`istream_view` 让我们能在范围 `for` 里方便地使用输入流：
 
 ```cpp
 for (auto x : istream_view<complex<double>>(cin))
@@ -172,7 +172,7 @@ for (auto x : transform_view(cplx, [](auto z) { return z * z; }))
 
 # 14.4 管道
 
-对每个标准库视图（§14.2），标准库还提供相应的“过滤器工厂函数”，产出的对象可作为 `|`（管道）运算符的操作数。例如 `views::filter` 最终会给出类似 `filter_view` 的行为。于是可以把一连串过滤器横向串起来，而不必写成层层嵌套的函数调用：
+对每个标准库视图（[§14.2](14-2-views.md)），标准库还提供一个产出“过滤器”的函数；也就是说，产出的对象可作为过滤器运算符 `|` 的操作数。例如，`filter()` 会给出一个 `filter_view`。于是可以把过滤器串成序列，而不必写成层层嵌套的函数调用：
 
 ```cpp
 void user(forward_range auto& r)
@@ -184,9 +184,9 @@ void user(forward_range auto& r)
 }
 ```
 
-管道风格（沿用 Unix shell 里熟悉的 `|`）普遍被认为比嵌套调用更易读。管道从左向右结合：`r | f | g` 表示先把 `r` 送入 `f`，再把结果送入 `g`。
+管道风格（沿用 Unix 管道运算符 `|`）普遍被认为比嵌套调用更易读。管道从左向右工作：对 `f|g` 而言，`f` 的结果被传给 `g`，因此 `r|f|g` 表示 `(g_filter(f_filter(r)))`。最初的 `r` 必须是一个范围或生成器。
 
-这些过滤器函数位于 `ranges::views`：
+这些过滤器函数位于命名空间 `ranges::views`：
 
 ```cpp
 void user(forward_range auto& r)
@@ -210,7 +210,7 @@ void user(forward_range auto& r)
 }
 ```
 
-视图与管道的实现依赖相当精巧的模板元编程；若你关心性能，请务必实测你的实现是否满足预期。否则总还有传统写法兜底：
+视图与管道的实现涉及相当令人咋舌的模板元编程；若你关心性能，请务必实测你的实现是否满足预期。否则总还有传统写法兜底：
 
 ```cpp
 void user(forward_range auto& r)
@@ -231,9 +231,9 @@ void user(forward_range auto& r)
 
 标准库提供了大量有用的概念，大体可以分为三类：
 
-- 描述类型性质的概念（§14.5.1）
-- 描述迭代器的概念（§14.5.2）
-- 描述范围的概念（§14.5.3）
+- 描述类型性质的概念（[§14.5.1](14-5-concept-overview.md#14.5.1)）
+- 描述迭代器的概念（[§14.5.2](14-5-concept-overview.md#14.5.2)）
+- 描述范围的概念（[§14.5.3](14-5-concept-overview.md#14.5.3)）
 
 ## 14.5.1 描述类型性质的概念
 
@@ -267,7 +267,13 @@ if (s1 < s2) {
 }
 ```
 
-要为一对类型指定公共类型，可以为 `common_type`（进而影响 `common_type_t`）做特化。幸运的是，除非想在某些尚未由库覆盖的类型组合上使用混合运算，我们通常并不需要自定义这种特化。
+要为一对类型指定公共类型，可以为 `common_type`（进而影响 `common_type_t`）做特化。例如：
+
+```cpp
+using common_type_t<Bigint, long> = Bigint; // 假定已有合适的 Bigint 定义
+```
+
+幸运的是，除非想在某些尚未由库覆盖的类型组合上使用混合运算，我们通常并不需要自定义这种特化。
 
 比较相关的概念深受 [Stepanov, 2009] 的影响。
 
@@ -315,7 +321,7 @@ concept Boolean =
 | `semiregular<T>` | `copyable<T>` 且 `default_initializable<T>` |
 | `regular<T>` | `semiregular<T>` 且 `equality_comparable<T>` |
 
-类型的理想形态是 **regular**：行为大致像 `int`，能显著简化我们对用法的一切推理（§8.2）。由于类默认不提供 `==`，多数类一开始往往只是 `semiregular`，尽管其中许多完全可以、也应当演进成 `regular`。
+类型的理想形态是 **regular**：行为大致像 `int`，能显著简化我们对用法的一切推理（[§8.2](../ch08/8-2-concepts.md)）。由于类默认不提供 `==`，多数类一开始往往只是 `semiregular`，尽管其中许多完全可以、也应当演进成 `regular`。
 
 每当我们把某个“运算”作为带约束的模板实参传入时，都需要说明它如何被调用，有时还要说明我们对其语义所做假设。
 
@@ -356,9 +362,9 @@ concept Boolean =
 
 这里的 `mergeable`、`sortable` 相对 C++20 正式定义做了简化。
 
-不同类别的迭代器用于为给定实参选择最合适的算法实现；参见 §8.2.2、§16.4.1。输入迭代器的例子可见 §13.3.1。
+不同类别的迭代器用于为给定实参选择最合适的算法实现；参见 [§8.2.2](../ch08/8-2-concepts.md#8.2.2)、[§16.4.1](../ch16/16-4-type-functions.md#16.4.1)。输入迭代器的例子可见 [§13.3.1](../ch13/13-3-iterator-types.md#13.3.1)。
 
-哨兵的基本思想是：从某个迭代器出发前进，直到谓词对当前元素成立为止，因此迭代器 `p` 与哨兵 `s` 刻画范围 `[p:s(*p))`。举例来说，可以定义遍历以 `\n` 结尾的 C 风格字符串段的哨兵。为避免与普通迭代器混淆，这需要少量样板代码：
+哨兵的基本思想是：从某个迭代器出发前进，直到谓词对当前元素成立为止，因此迭代器 `p` 与哨兵 `s` 刻画范围 `[p:s(*p))`。举例来说，可以用指针作迭代器，为遍历 C 风格字符串定义哨兵谓词。遗憾的是，这需要一些样板代码：意图是把谓词呈现为“不会与普通迭代器混淆、却又能与用于遍历该范围的迭代器相比较”的东西：
 
 ```cpp
 template<class Iter>
@@ -374,12 +380,12 @@ private:
 };
 ```
 
-在类作用域内用友元声明 `==`、`!=`，就能把“迭代器与哨兵比较”的二元运算符定义清楚。
+在类作用域内用友元声明，就能定义用于比较迭代器与哨兵的二元函数 `==`、`!=`。
 
 可以静态断言该哨兵满足要求：
 
 ```cpp
-static_assert(sentinel_for<Sentinel<const char*>, const char*>);
+static_assert(sentinel_for<Sentinel<const char*>, const char*>); // 检查 Sentinel
 ```
 
 最后可以得到一个颇为特别的 “Hello, World!” 程序：
@@ -411,24 +417,24 @@ ranges::for_each(aa, Sentinel<const char*>('\n'), [](const char x) { cout << x; 
 | `random_access_range<R>` | `R` 的迭代器满足 `random_access_iterator` |
 | `contiguous_range<R>` | `R` 的迭代器满足 `contiguous_iterator` |
 
-`<ranges>` 里还有更多概念，但上面这组已经足够入门。它们最主要的用途，是让实现能够依据输入类型的性质来选择重载（§8.2.2）。
+`<ranges>` 里还有更多概念，但上面这组已经足够入门。它们最主要的用途，是让实现能够依据输入类型的性质来选择重载（[§8.2.2](../ch08/8-2-concepts.md#8.2.2)）。
 
 # 14.6 建议
 
-[1] 当“迭代器对”风格显得累赘时，改用范围算法；§13.1；§14.1。
+[1] 当“迭代器对”风格显得累赘时，改用范围算法；[§13.1](../ch13/13-1-introduction.md)；[§14.1](14-1-introduction.md)。
 
-[2] 使用范围算法时，记得显式引入所需的名字；§13.3.1。
+[2] 使用范围算法时，记得显式引入所需的名字；[§13.3.1](../ch13/13-3-iterator-types.md#13.3.1)。
 
-[3] 对范围施加的一连串操作可以用视图、生成器与过滤器组成的管道来表达；§14.2，§14.3，§14.4。
+[3] 对范围施加的一连串操作可以用视图、生成器与过滤器组成的管道来表达；[§14.2](14-2-views.md)，[§14.3](14-3-generators.md)，[§14.4](14-4-pipes.md)。
 
-[4] 若要用谓词结束一个范围，需要定义哨兵；§14.5。
+[4] 若要用谓词结束一个范围，需要定义哨兵；[§14.5](14-5-concept-overview.md)。
 
-[5] 借助 `static_assert`，可以检查某个具体类型是否满足概念的语法要求；§8.2.4。
+[5] 借助 `static_assert`，可以检查某个具体类型是否满足概念的语法要求；[§8.2.4](../ch08/8-2-concepts.md#8.2.4)。
 
-[6] 若你需要某个范围算法而标准库尚未提供，不妨自己写一个；§13.6。
+[6] 若你需要某个范围算法而标准库尚未提供，不妨自己写一个；[§13.6](../ch13/13-6-parallel-algorithms.md)。
 
-[7] 类型的理想目标是 regular；§14.5。
+[7] 类型的理想目标是 regular；[§14.5](14-5-concept-overview.md)。
 
-[8] 在适用之处优先使用标准库概念；§14.5。
+[8] 在适用之处优先使用标准库概念；[§14.5](14-5-concept-overview.md)。
 
-[9] 请求并行执行时务必避免数据竞争（§18.2）与死锁（§18.3）；§13.6。
+[9] 请求并行执行时务必避免数据竞争（[§18.2](../ch18/18-2-tasks-and-threads.md)）与死锁（[§18.3](../ch18/18-3-shared-data.md)）；[§13.6](../ch13/13-6-parallel-algorithms.md)。

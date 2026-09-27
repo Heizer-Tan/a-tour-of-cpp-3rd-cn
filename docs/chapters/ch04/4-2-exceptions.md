@@ -1,79 +1,45 @@
 # 4.2 异常
 
-异常（exception）是 C++ 中处理运行时错误的主要机制。它的核心思想是将错误的*检测*（detection）与错误的*处理*（handling）分离开来。
+再考虑一下 `Vector` 例子。当我们试图访问对 [§2.3](../ch02/2-3-class.md) 中那个向量而言越界的元素时，该怎么办？
 
-## 4.2.1 抛出和捕获
+`Vector` 的作者并不知道用户在这种情况下希望做什么（`Vector` 的作者通常甚至不知道这个向量会在哪个程序里运行）。
 
-当函数检测到一个无法自行处理的问题时，它可以*抛出*（throw）一个异常：
+`Vector` 的用户又无法一致地检测出这个问题（若用户能检测，越界访问一开始就不会发生）。
+
+假定越界访问是一种我们希望从中恢复的错误，那么解决办法就是：由 `Vector` 的实现者检测出试图越界的访问，并告知用户。用户再采取适当行动。例如，`Vector::operator[]()` 可以检测试图越界的访问并抛出一个 `out_of_range` 异常：
 
 ```cpp
-class Vector {
-public:
-    Vector(int s) {
-        if (s < 0)
-            throw std::length_error{"Vector size must be non-negative"};
-        elem = new double[s];
-        sz = s;
+double& Vector::operator[](int i)
+{
+    if (!(0<=i && i<size()))
+        throw out_of_range{"Vector::operator[]"};
+    return elem[i];
+}
+```
+
+`throw` 会把控制权转移到某个直接或间接调用了 `Vector::operator[]()` 的函数中、针对 `out_of_range` 类型异常的处理程序。为此，实现会按需展开函数调用栈，回到那个调用者的上下文。也就是说，异常处理机制会按需退出作用域和函数，回到已表示有意处理该类异常的调用者，并在此过程中按需调用析构函数（[§5.2.2](../ch05/5-2-concrete-types.md#5.2.2)）。例如：
+
+```cpp
+void f(Vector& v)
+{
+    // ...
+    try { // 在此块中抛出的 out_of_range 异常由下方处理程序处理
+        compute1(v);                // 可能试图访问 v 末尾之外
+        Vector v2 = compute2(v);    // 可能试图访问 v 末尾之外
+        compute3(v2);               // 可能试图访问 v2 末尾之外
+    }
+    catch (const out_of_range& err) {   // 糟糕：越界错误
+        // ... 处理范围错误 ...
+        cerr << err.what() << '\n';
     }
     // ...
-private:
-    double* elem;
-    int sz;
-};
-```
-
-调用方可以使用 `try`-`catch` 块来*捕获*（catch）并处理异常：
-
-```cpp
-void test()
-{
-    try {
-        Vector v(-27);
-    }
-    catch (std::length_error& e) {
-        std::cerr << "Error: " << e.what() << '\n';
-        // 处理负大小的问题
-    }
-    catch (std::bad_alloc& e) {
-        std::cerr << "Memory exhausted\n";
-        // 处理内存耗尽的问题
-    }
 }
 ```
 
-异常处理机制会沿着调用栈向上查找匹配的 `catch` 子句。这个过程称为*栈展开*（stack unwinding）——在展开过程中，局部对象的析构函数会被正确调用，确保资源得到释放。
+我们把关心异常处理的代码放进 `try` 块。对 `compute1()`、`compute2()` 和 `compute3()` 的调用，意在代表那些事先不易判断是否会发生范围错误的代码。`catch` 子句用来处理 `out_of_range` 类型的异常。若 `f()` 并不是处理这类异常的合适位置，我们就不会使用 `try` 块，而是让异常隐式地传给 `f()` 的调用者。
 
-## 4.2.2 标准异常层次结构
+`out_of_range` 类型定义在标准库中（在 `<stdexcept>` 里），事实上也被一些标准库容器的访问函数所使用。
 
-标准库定义了一套异常层次结构，以 `std::exception` 为根：
+我按引用捕获异常以避免拷贝，并用 `what()` 打印在抛出点放入其中的错误消息。
 
-```
-std::exception
-├── std::logic_error          // 逻辑错误（可预防的）
-│   ├── std::length_error
-│   ├── std::domain_error
-│   ├── std::invalid_argument
-│   └── std::out_of_range
-└── std::runtime_error        // 运行时错误（难以预防的）
-    ├── std::range_error
-    ├── std::overflow_error
-    └── std::underflow_error
-```
-
-- `logic_error` 及其子类用于表示可以通过更仔细的编程来避免的错误
-- `runtime_error` 及其子类用于表示依赖于运行时条件的错误
-
-## 4.2.3 资源管理
-
-异常安全（exception safety）是 C++ 资源管理的核心概念。基本保证是：当异常被抛出时，程序不会泄漏资源。这通常通过 RAII（Resource Acquisition Is Initialization，资源获取即初始化）技术来实现（[§6.3](../ch06/6-3-resource-mgmt.md)）。
-
-```cpp
-void f(const string& name)
-{
-    std::ifstream file {name};  // 打开文件
-    // 使用文件...
-    // 当 file 离开作用域时，文件自动关闭——即使发生异常
-}
-```
-
-`std::ifstream` 的析构函数会自动关闭文件，因此无论函数是正常返回还是因异常退出，资源都会被正确释放。
+使用异常处理机制可以使错误处理更简单、更系统、更可读。要做到这一点，不要过度使用 `try` 语句。在许多程序中，从一次 `throw` 到某个能合理处理该异常的函数之间，通常隔着几十次函数调用。因此，大多数函数应只是让异常沿调用栈向上传播。使错误处理简单而系统的主要技术（称为*资源获取即初始化*，Resource Acquisition Is Initialization；RAII）在 [§5.2.2](../ch05/5-2-concrete-types.md#5.2.2) 中说明。RAII 的基本思想是：由构造函数获取类运行所需的资源，并由析构函数释放全部资源，从而使资源释放得到保证且是隐式的。

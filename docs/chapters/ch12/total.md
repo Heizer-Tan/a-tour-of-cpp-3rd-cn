@@ -14,7 +14,7 @@
 
 最有用的标准库容器是 `vector`。`vector` 是给定类型元素的一个序列。元素在内存中连续存储。`vector` 的一个典型实现（[§5.2.2](../ch05/5-2-concrete-types.md#522-容器)，[§6.2](../ch06/6-2-copy-move.md)）将包含一个句柄，其中持有指向第一个元素、最后一个元素之后位置以及最后分配空间之后位置的指针（[§13.1](../ch13/13-1-introduction.md)）（或表示为指针加偏移量的等效信息）：
 
-[图片描述：vector 结构示意图]
+![vector 句柄与元素/额外空间布局](../../assets/images/ch12/vector-layout.png)
 
 此外，它还持有一个分配器（此处为 `alloc`），`vector` 可以从该分配器获取其元素所需的内存。默认分配器使用 `new` 和 `delete` 来获取和释放内存（[§12.7](12-7-allocators.md)）。使用稍微高级的实现技术，我们可以避免在 `vector` 对象中为简单的分配器存储任何数据。
 
@@ -76,7 +76,7 @@ void input()
 
 这从标准输入读取 `Entry` 到 `phone_book` 中，直到到达输入末尾（例如文件结束）或输入操作遇到格式错误。
 
-标准库 `vector` 的实现使得通过重复 `push_back()` 来增长 `vector` 是高效的。为了说明这一点，考虑使用上面图中指示的表示法对第 5 章和第 7 章中的简单 `Vector` 进行细化：
+标准库 `vector` 的实现使得通过重复 `push_back()` 来增长 `vector` 是高效的。为了说明这一点，考虑使用上面图中指示的表示法对[第 5 章](../ch05/index.md)和[第 7 章](../ch07/index.md)中的简单 `Vector` 进行细化：
 
 ```cpp
 template<typename T>
@@ -128,11 +128,11 @@ vector<Entry> book2 = phone_book;
 
 与所有标准库容器一样，`vector` 是某种类型 `T` 的元素的容器，即 `vector<T>`。几乎任何类型都可以作为元素类型：内置数值类型（如 `char`、`int` 和 `double`）、用户定义类型（如 `string`、`Entry`、`list<int>` 和 `Matrix<double,2>`）以及指针（如 `const char*`、`Shape*` 和 `double*`）。当你插入一个新元素时，它的值会被拷贝到容器中。例如，当你将一个值为 `7` 的整数放入容器时，结果元素的值就是 `7`。该元素不是对某个包含 `7` 的对象的引用或指针。这使得容器很好、很紧凑，并且访问速度快。对于那些关心内存大小和运行时性能的人来说，这一点至关重要。
 
-如果你有一个依赖于虚函数来实现多态行为的类层次结构（[§5.5](../ch05/5-5-hierarchies.md)），不要直接将对象存储在容器中。而是存储指针（或智能指针；[§15.2.1](../ch15/15-2-pointers.md#1521-unique_ptr-和-shared_ptr)）。例如：
+如果你有一个依赖于虚函数来实现多态行为的类层次结构（[§5.5](../ch05/5-5-hierarchies.md)），不要直接将对象存储在容器中。而是存储指针（或智能指针；[§15.2.1](../ch15/15-2-pointers.md#15.2.1)）。例如：
 
 ```cpp
-vector<Shape> vs;                     // 不，不要这样做 - 没有空间存放 Circle 或 Smiley
-vector<Shape*> vps;                   // 更好，但见 [§5.5.3](../ch05/5-5-hierarchies.md)（不要泄漏）
+vector<Shape> vs;                     // 不，不要这样做——没有空间存放 Circle 或 Smiley（[§5.5](../ch05/5-5-hierarchies.md)）
+vector<Shape*> vps;                   // 更好，但见 [§5.5.3](../ch05/5-5-hierarchies.md#5.5.3)（不要泄漏）
 vector<unique_ptr<Shape>> vups;       // OK
 ```
 
@@ -153,10 +153,10 @@ void silly(vector<Entry>& book)
 ```cpp
 template<typename T>
 struct Vec : std::vector<T> {
-    using vector<T>::vector;   // 使用来自 vector 的构造函数
+    using vector<T>::vector;   // 使用来自 vector 的构造函数（以 Vec 之名）
 
     T& operator[](int i) { return vector<T>::at(i); }               // 范围检查
-    const T& operator[](int i) const { return vector<T>::at(i); }   // 范围检查（const）
+    const T& operator[](int i) const { return vector<T>::at(i); }   // 范围检查 const 对象；[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)
 
     auto begin() { return Checked_iter<vector<T>>{*this}; }         // 见 [§13.1](../ch13/13-1-introduction.md)
     auto end()   { return Checked_iter<vector<T>>{*this, vector<T>::end()}; }
@@ -207,7 +207,7 @@ catch (...) {
 
 标准库提供了一个称为 `list` 的双向链表：
 
-[图片描述：list 结构示意图]
+![list 双向链表布局](../../assets/images/ch12/list-layout.png)
 
 当我们希望在不移动其他元素的情况下插入和删除元素时，我们使用 `list`。电话簿条目的插入和删除可能很常见，因此 `list` 可能适合表示一个简单的电话簿。例如：
 
@@ -241,7 +241,7 @@ int get_number(const string& s)
     for (auto p = phone_book.begin(); p != phone_book.end(); ++p)
         if (p->name == s)
             return p->number;
-    return 0;
+    return 0;   // 用 0 表示“未找到号码”
 }
 ```
 
@@ -259,13 +259,13 @@ void f(const Entry& ee, list<Entry>::iterator p, list<Entry>::iterator q)
 
 对于 `list`，`insert(p, elem)` 在 `p` 指向的元素之前插入一个值为 `elem` 的副本。这里，`p` 可以是一个指向 `list` 末尾之后位置的迭代器。相反，`erase(p)` 删除 `p` 指向的元素并销毁它。
 
-这些 `list` 的例子可以完全类似地用 `vector` 编写，并且（除非你了解计算机体系结构，否则会令人惊讶地）通常使用 `vector` 比使用 `list` 性能更好。当我们只需要一个元素序列时，我们可以在 `vector` 和 `list` 之间选择。除非你有理由不这样做，否则请使用 `vector`。`vector` 在遍历（例如 `find()` 和 `count()`）以及排序和搜索（例如 `sort()` 和 `equal_range()`；[§13.5](../ch13/13-5-algorithm-overview.md)，[§15.3.3](../ch15/15-3-containers.md)）方面表现更好。
+这些 `list` 的例子可以完全相同地用 `vector` 编写，并且（除非你了解计算机体系结构，否则会令人惊讶地）通常使用 `vector` 比使用 `list` 性能更好。当我们只需要一个元素序列时，我们可以在 `vector` 和 `list` 之间选择。除非你有理由不这样做，否则请使用 `vector`。`vector` 在遍历（例如 `find()` 和 `count()`）以及排序和搜索（例如 `sort()` 和 `equal_range()`；[§13.5](../ch13/13-5-algorithm-overview.md)，[§15.3.3](../ch15/15-3-containers.md#15.3.3)）方面表现更好。
 
 # 12.4 forward_list
 
 标准库还提供了一个称为 `forward_list` 的单向链表：
 
-[图片描述：forward_list 结构示意图]
+![forward_list 单向链表布局](../../assets/images/ch12/forward-list-layout.png)
 
 `forward_list` 与（双向）`list` 的不同之处在于它只允许前向迭代。这样做的目的是节省空间。不需要在每个链接中保留前驱指针，并且一个空的 `forward_list` 的大小只有一个指针。`forward_list` 甚至不保存其元素个数。如果你需要元素个数，请自行计数。如果你负担不起计数的代价，那么你可能不应该使用 `forward_list`。
 
@@ -273,7 +273,7 @@ void f(const Entry& ee, list<Entry>::iterator p, list<Entry>::iterator q)
 
 在（姓名，号码）对列表中查找姓名的代码编写起来相当繁琐。此外，除了最短的列表外，线性搜索效率低下。标准库提供了一个平衡二叉搜索树（通常是红黑树），称为 `map`：
 
-[图片描述：map 结构示意图]
+![map 平衡二叉搜索树布局](../../assets/images/ch12/map-layout.png)
 
 在其他上下文中，`map` 被称为关联数组或字典。
 
@@ -304,7 +304,7 @@ int get_number(const string& s)
 
 `map` 查找的成本是 O(log(n))，其中 `n` 是 `map` 中元素的数量。这相当不错。例如，对于一个包含 1,000,000 个元素的 `map`，我们只需大约 20 次比较和间接寻址就能找到一个元素。然而，在许多情况下，我们可以使用哈希查找而不是使用排序函数（如 `<`）进行比较，从而做得更好。标准库的哈希容器被称为“无序的”，因为它们不需要排序函数：
 
-[图片描述：unordered_map 结构示意图]
+![unordered_map 哈希表布局](../../assets/images/ch12/unordered-map-layout.png)
 
 例如，我们可以使用 `<unordered_map>` 中的 `unordered_map` 来实现我们的电话簿：
 
@@ -325,7 +325,7 @@ int get_number(const string& s)
 }
 ```
 
-标准库为字符串以及其他内置类型和标准库类型提供了默认的哈希函数。如有必要，我们可以提供自己的哈希函数。可能最常见的需要自定义哈希函数的情况是当我们需要一个包含我们自己类型的无序容器时。哈希函数通常实现为函数对象（[§7.3.2](../ch07/7-3-parameterized-operations.md)）。例如：
+标准库为字符串以及其他内置类型和标准库类型提供了默认的哈希函数。如有必要，我们可以提供自己的哈希函数。可能最常见的需要自定义哈希函数的情况是当我们需要一个包含我们自己类型的无序容器时。哈希函数通常实现为函数对象（[§7.3.2](../ch07/7-3-parameterized-operations.md#7.3.2)）。例如：
 
 ```cpp
 struct Record {
@@ -337,7 +337,7 @@ struct Record {
 struct Rhash {   // 为 Record 定义的哈希函数
     size_t operator()(const Record& r) const
     {
-        return hash<string>{}(r.name) ^ hash<int>{}(r.product_code);
+        return hash<string>()(r.name) ^ hash<int>()(r.product_code);
     }
 };
 
@@ -356,7 +356,7 @@ namespace std {   // 为 Record 创建一个哈希函数
 
         result_type operator()(const Record& r) const
         {
-            return hash<string>{}(r.name) ^ hash<int>{}(r.product_code);
+            return hash<string>()(r.name) ^ hash<int>()(r.product_code);
         }
     };
 }
@@ -420,7 +420,7 @@ void producer()
 这类技术从 C++ 的早期就被应用并取得了良好的效果，但通常需要重写代码以使用专门的容器。现在，标准容器可以选择性地接受分配器参数。默认情况下，容器使用 `new` 和 `delete`。其他多态内存资源包括：
 
 - `unsynchronized_pool_resource`：与 `synchronized_pool_resource` 类似，但只能由一个线程使用。
-- `monotonic_buffer_resource`：一种快速分配器，仅在销毁自身时释放内存，并且通常供单线程使用。
+- `monotonic_buffer_resource`：一种快速分配器，仅在销毁自身时释放内存，并且只能由一个线程使用。
 
 多态资源必须派生自 `memory_resource` 并定义成员 `allocate()`、`deallocate()` 和 `is_equal()`。其理念是让用户构建自己的资源来调整代码。
 
@@ -475,7 +475,7 @@ void producer()
 
 这种表示法和语义的统一性使得程序员能够提供与标准容器使用方式非常相似的新容器类型。范围检查的向量（[§4.3](../ch04/4-3-invariants.md)，[第 5 章](../ch05/index.md)）中的 `Vector` 就是这样一个例子。容器接口的统一性使我们能够独立于单个容器类型来指定算法。然而，每种容器都有自己的优缺点。例如，对 `vector` 进行下标和遍历是廉价且容易的。另一方面，当我们插入或删除元素时，`vector` 的元素会被移动到不同的位置；`list` 则正好有相反的特性。请注意，对于包含小元素的短序列（即使对于 `insert()` 和 `erase()`），`vector` 通常比 `list` 更高效。我推荐使用标准库 `vector` 作为元素序列的默认类型：你需要一个理由才会选择其他容器。
 
-考虑单向链表 `forward_list`，这是一个针对空序列进行优化的容器（[§12.3](12-3-list.md)）。一个空的 `forward_list` 只占用一个单词，而一个空的 `vector` 占用三个。空序列以及仅有一两个元素的序列出人意料地常见且有用。
+考虑单向链表 `forward_list`，这是一个针对空序列进行优化的容器（[§12.4](12-4-forward-list.md)）。一个空的 `forward_list` 只占用一个单词，而一个空的 `vector` 占用三个。空序列以及仅有一两个元素的序列出人意料地常见且有用。
 
 **安置操作**（如 `emplace_back()`）接受元素构造函数的参数，并在容器中新分配的空间中构造对象，而不是将对象拷贝到容器中。例如，对于 `vector<pair<int,string>>`，我们可以写：
 
@@ -500,9 +500,9 @@ v.emplace_back(1, "build in place");    // 在 v 中就地构建一个 pair
 [10] 当你需要保证范围检查时，使用 `at()`；[§12.2](12-2-vector.md)；[CG: SL.con.3]。
 [11] 使用范围 `for` 和标准库算法，以零额外成本避免范围错误；[§12.2.2](12-2-vector.md#1222-范围检查)。
 [12] 元素会被拷贝进容器；[§12.2.1](12-2-vector.md#1221-元素)。
-[13] 为保留元素的多态行为，应存储指针（语言内置或智能指针）；[§12.2.1](12-2-vector.md#1221-元素)。
+[13] 为保留元素的多态行为，应存储指针（内置或用户定义）；[§12.2.1](12-2-vector.md#1221-元素)。
 [14] 插入操作（如 `insert()` 和 `push_back()`）在 `vector` 上往往出奇地高效；[§12.3](12-3-list.md)。
-[15] 对于通常为空的很短序列，可使用 `forward_list`；[§12.8](12-8-container-overview.md)。
+[15] 对于通常为空的序列，可使用 `forward_list`；[§12.8](12-8-container-overview.md)。
 [16] 涉及性能时不要轻信直觉：要测量；[§12.2](12-2-vector.md)。
 [17] `map` 通常实现为红黑树；[§12.5](12-5-map.md)。
 [18] `unordered_map` 是哈希表；[§12.6](12-6-unordered-map.md)。

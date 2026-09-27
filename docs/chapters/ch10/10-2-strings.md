@@ -66,7 +66,7 @@ void respond(const string& answer)
 ```cpp
 void print(const string& s)
 {
-    printf("For people who like printf: %s\n", s.c_str());
+    printf("For people who like printf: %s\n", s.c_str());  // s.c_str() 返回指向 s 中字符的指针
     cout << "For people who like streams: " << s << '\n';
 }
 ```
@@ -91,7 +91,7 @@ string s2 {"Annemarie Stroustrup"};   // 长字符串
 
 内存布局大致如下：
 
-[图片描述]
+![短字符串优化下的 s1 与 s2 布局](../../assets/images/ch10/short-string.png)
 
 当字符串的值从短变为长（反之亦然）时，其表示会相应地调整。一个“短”字符串能有多少个字符？这是实现定义的，但“大约 14 个字符”是一个不错的猜测。
 

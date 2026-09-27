@@ -6,20 +6,20 @@
 
 | 工厂 | 说明 |
 |------|------|
-| `v = empty_view<T>{}` | `v` 是一个类型为 `T` 的空范围 |
+| `v = empty_view<T>{}` | `v` 是元素类型为 `T` 的空范围（即便原本“会有”元素） |
 | `v = single_view{x}` | `v` 只包含元素 `x` |
-| `v = iota_view{x}` | `v` 是无限序列 `x, x+1, x+2, ...`（用 `++` 递增） |
-| `v = iota_view{x, y}` | `v` 包含 `x, x+1, ..., y-1`（仍用 `++` 递增） |
+| `v = iota_view{x}` | `v` 是无限序列：`x, x+1, x+2, ...`（用 `++` 递增） |
+| `v = iota_view{x, y}` | `v` 是含 `n` 个元素的序列：`x, x+1, ..., y-1`（用 `++` 递增） |
 | `v = istream_view<T>{is}` | `v` 通过对 `is` 反复执行 `>>`（读取 `T`）得到 |
 
 `iota_view` 很适合构造简单序列：
 
 ```cpp
-for (int x : iota_view(42, 52)) // 输出 42 43 ... 51
+for (int x : iota_view(42, 52)) // 42 43 44 45 46 47 48 49 50 51
     cout << x << ' ';
 ```
 
-`istream_view` 让我们能在范围 `for` 里直接用输入流：
+`istream_view` 让我们能在范围 `for` 里方便地使用输入流：
 
 ```cpp
 for (auto x : istream_view<complex<double>>(cin))

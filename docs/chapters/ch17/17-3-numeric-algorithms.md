@@ -1,6 +1,6 @@
 # 17.3 数值算法
 
-在 `<numeric>` 中可以找到一组泛化的数值算法，例如 `accumulate()`。
+在 `<numeric>` 中可以找到一小套泛化的数值算法，例如 `accumulate()`。
 
 **数值算法**
 
@@ -23,12 +23,12 @@
 
 ```cpp
 list<double> lst{1, 2, 3, 4, 5, 9999.99999};
-auto s = accumulate(lst.begin(), lst.end(), 0.0);   // 求和：约 10014.9999
+auto s = accumulate(lst.begin(), lst.end(), 0.0);   // 求和：10014.9999
 ```
 
 这些算法适用于每一种标准库序列，并且能把运算作为实参传入（[§17.3](17-3-numeric-algorithms.md)）。
 
-## 17.3.1
+## 17.3.1 并行数值算法 {#17.3.1}
 
 在 `<numeric>` 中，数值算法（[§17.3](17-3-numeric-algorithms.md)）还有并行版本，与顺序版本略有不同。特别是，并行版本允许按未指明顺序对元素进行操作。并行数值算法可以接受执行策略实参（[§13.6](../ch13/13-6-parallel-algorithms.md)）：`seq`、`unseq`、`par`、`par_unseq`。
 

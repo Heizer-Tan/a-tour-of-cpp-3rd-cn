@@ -1,8 +1,14 @@
+<div class="chapter-number"></div>
+<p class="chapter-number">19</p>
+<div class="chapter-number-bottom"></div>
+
 # 历史和兼容性
 
-> **了解过去，才能更好地把握未来。**
+<div class="no-float" markdown="1">
+> **慢慢赶路（festina lente）。**
 >
-> —— Bjarne Stroustrup
+> —— 屋大维（Octavius），奥古斯都（Caesar Augustus）
+</div>
 
 # 19.1 历史
 
@@ -41,21 +47,21 @@ C++ 的演进始终在其使用背景中进行。我花了很多时间倾听用�
 
 在开发过程中，C++11 被称为 C++0x。在大项目中并不少见，我们对完成日期过于乐观。到最后，我们开玩笑说 C++0x 中的 ’x’ 是十六进制的，所以 C++0x 变成了 C++0B。另一方面，委员会按时发布了 C++14、C++17 和 C++20，主要编译器供应商也是如此。
 
-## 19.1.2 早期岁月
+### 19.1.2 早期岁月
 
-我最初设计和实现这门语言是因为我想将 UNIX 内核的服务分布到多处理器和局域网上（即现在的多核和集群）。为此，我需要精确指定系统的各个部分以及它们如何通信。Simula [Dahl,1970] 对此是理想的，但考虑到性能因素。我还需要直接处理硬件并提供高性能并发编程机制，而 C 在这方面是理想的，但它在模块化和类型检查方面的支持较弱。将 Simula 风格的类添加到 C（经典 C；§19.3.1）的结果是“C with Classes”，它被用于一些重大项目，在这些项目中，其编写使用最少时间和空间的程序的能力受到了严峻考验。它缺少运算符重载、引用、虚函数、模板、异常和许多、许多细节 [Stroustrup,1982]。C++ 在研究机构之外的首次使用始于 1983 年 7 月。
+我最初设计和实现这门语言是因为我想将 UNIX 内核的服务分布到多处理器和局域网上（即现在的多核和集群）。为此，我需要精确指定系统的各个部分以及它们如何通信。Simula [Dahl,1970] 对此是理想的，但考虑到性能因素。我还需要直接处理硬件并提供高性能并发编程机制，而 C 在这方面是理想的，但它在模块化和类型检查方面的支持较弱。将 Simula 风格的类添加到 C（经典 C；[§19.3.1](19-3-c-cpp-compatibility.md#19.3.1)）的结果是“C with Classes”，它被用于一些重大项目，在这些项目中，其编写使用最少时间和空间的程序的能力受到了严峻考验。它缺少运算符重载、引用、虚函数、模板、异常和许多、许多细节 [Stroustrup,1982]。C++ 在研究机构之外的首次使用始于 1983 年 7 月。
 
 C++ 这个名称（发音为“see plus plus”）由 Rick Mascitti 在 1983 年夏天创造，并由我选为“C with Classes”的替代名称。该名称表示从 C 演变的本质；“++”是 C 的自增运算符。稍短的名称“C+”是一个语法错误；它也曾被用作一个不相关语言的名称。C 语义的鉴赏家认为 C++ 不如 ++C。这门语言没有被命名为 D，因为它是 C 的扩展，因为它不试图通过移除特性来解决问题，并且因为已经有几个名为 D 的 C 后继者。关于 C++ 名称的另一种解释，请参阅 [Orwell,1949] 的附录。
 
 C++ 的主要设计目的是让我和我的朋友们不必再用汇编器、C 或各种当时流行的高级语言编程。其主要目的是使编写优秀程序对单个程序员来说更容易、更愉快。在早期，没有 C++ 的纸上设计；设计、文档和实现是同时进行的。也没有“C++ 项目”或“C++ 设计委员会”。自始至终，C++ 的演进都是为了应对用户遇到的问题以及在我和我的朋友、同事之间的讨论结果。
 
-C++ 的第一个设计包括了带有参数类型检查和隐式转换的函数声明、具有接口与实现之间 public/private 区分的类、派生类以及构造函数和析构函数。我使用宏提供了原始的参数化 [Stroustrup,1982]。到 1985 年中期，这已在非实验性中使用。那年年底，我能够展示一组支持连贯编程风格的语言设施。回想起来，我认为构造函数和析构函数的引入是最重要的。用当时的术语 [Stroustrup,1979]：
+C++ 的第一个设计包括了带有参数类型检查和隐式转换的函数声明、具有接口与实现之间 public/private 区分的类、派生类以及构造函数和析构函数。我使用宏提供了原始的参数化 [Stroustrup,1982]。到 1980 年中期，这已进入非实验性使用。那年晚些时候，我能够展示一组支持连贯编程风格的语言设施。回想起来，我认为构造函数和析构函数的引入是最重要的。用当时的术语 [Stroustrup,1979]：
 
 - “new 函数”为成员函数创建执行环境；“delete 函数”撤销之。
 
-不久之后，“new 函数”和“delete 函数”被重命名为“构造函数”和“析构函数”。这是 C++ 资源管理策略的根源（引发了对异常的需求），也是使应用程序代码简短清晰的许多技术的关键。如果当时有其他语言支持能够执行通用代码的多重构造函数，我不知道。析构函数是 C++ 中新出现的。
+不久之后，“new 函数”和“delete 函数”被重命名为“构造函数”和“析构函数”。这是 C++ 资源管理策略的根源（引发了对异常的需求），也是使应用程序代码简短清晰的许多技术的关键。如果当时有其他语言支持能够执行通用代码的多重构造函数，我当时不知道（现在也不知道）。析构函数是 C++ 中新出现的。
 
-C++ 于 1985 年 10 月商业发布。到那时，我已经添加了内联（§1.3，§5.2.1）、`const`（§1.6）、函数重载（§1.3）、引用（§1.7）、运算符重载（§5.2.1，§6.4）和虚函数（§5.4）。在这些特性中，以虚函数形式提供的运行时多态性支持是最具争议的。我从 Simula 中知道它的价值，但发现不可能说服系统编程世界中的大多数人们相信它的价值。系统程序员倾向于怀疑间接函数调用，而熟悉其他支持面向对象编程语言的人们很难相信虚函数能够足够快以用于系统代码。相反，许多具有面向对象背景的程序员（现在仍有许多）很难接受你只应在表达必须在运行时做出的选择时才使用虚函数调用这一想法。对虚函数的抵制可能与对通过编程语言支持的更规则代码结构可以获得更好系统这一想法的抵制有关。许多 C 程序员似乎相信真正重要的是完全的灵活性和对程序每个细节的精心手工打造。我的观点是（现在仍然是）我们需要从语言和工具中获得每一点帮助：我们试图构建的系统的内在复杂性始终处于我们表达能力边缘。
+C++ 于 1985 年 10 月商业发布。到那时，我已经添加了内联（[§1.3](../ch01/1-3-functions.md)，[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)）、`const`（[§1.6](../ch01/1-6-constants.md)）、函数重载（[§1.3](../ch01/1-3-functions.md)）、引用（[§1.7](../ch01/1-7-pointers-arrays.md)）、运算符重载（[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)，[§6.4](../ch06/6-4-operator-overloading.md)）和虚函数（[§5.4](../ch05/5-4-virtual-functions.md)）。在这些特性中，以虚函数形式提供的运行时多态性支持是最具争议的。我从 Simula 中知道它的价值，但发现不可能说服系统编程世界中的大多数人们相信它的价值。系统程序员倾向于怀疑间接函数调用，而熟悉其他支持面向对象编程语言的人们很难相信虚函数能够足够快以用于系统代码。相反，许多具有面向对象背景的程序员（现在仍有许多）很难接受你只应在表达必须在运行时做出的选择时才使用虚函数调用这一想法。对虚函数的抵制可能与对通过编程语言支持的更规则代码结构可以获得更好系统这一想法的抵制有关。许多 C 程序员似乎相信真正重要的是完全的灵活性和对程序每个细节的精心手工打造。我的观点是（现在仍然是）我们需要从语言和工具中获得每一点帮助：我们试图构建的系统的内在复杂性始终处于我们表达能力边缘。
 
 早期文档（例如 [Stroustrup,1985] 和 [Stroustrup,1994]）这样描述 C++：C++ 是一种通用编程语言，它
 
@@ -67,19 +73,19 @@ C++ 于 1985 年 10 月商业发布。到那时，我已经添加了内联（§1
 
 C++ 的大部分设计是在我同事的黑板上完成的。在早期，Stu Feldman、Alexander Fraser、Steve Johnson、Brian Kernighan、Doug McIlroy 和 Dennis Ritchie 的反馈是无价的。
 
-在 1980 年代后半期，我根据用户的评论并在我对 C++ 的总体目标指导下继续添加语言特性。其中最重要的是模板 [Stroustrup,1988] 和异常处理 [Koenig,1990]，它们在标准工作开始时被认为是实验性的。在设计模板时，我被迫在灵活性、效率和早期类型检查之间做出选择。当时，没有人知道如何同时获得这三者。为了与 C 风格代码在要求苛刻的系统应用程序中竞争，我觉得必须选择前两个属性。回想起来，我认为这个选择是正确的，而对模板更好类型检查的持续探索 [DosReis,2006] [Gregor,2006] [Sutton,2011] [Stroustrup,2012a] [Stroustrup,2017] 导致了 C++20 概念（第 8 章）。异常的设计集中在
+在 1980 年代后半期，我根据用户的评论并在我对 C++ 的总体目标指导下继续添加语言特性。其中最重要的是模板 [Stroustrup,1988] 和异常处理 [Koenig,1990]，它们在标准工作开始时被认为是实验性的。在设计模板时，我被迫在灵活性、效率和早期类型检查之间做出选择。当时，没有人知道如何同时获得这三者。为了与 C 风格代码在要求苛刻的系统应用程序中竞争，我觉得必须选择前两个属性。回想起来，我认为这个选择是正确的，而对模板更好类型检查的持续探索 [DosReis,2006] [Gregor,2006] [Sutton,2011] [Stroustrup,2012a] [Stroustrup,2017] 导致了 C++20 概念（[第 8 章](../ch08/index.md)）。异常的设计集中在
 
-异常的多级传播、将任意信息传递给错误处理程序，以及通过使用带有析构函数的局部对象表示和释放资源来实现异常与资源管理的集成。我笨拙地将这一关键技术命名为 Resource Acquisition Is Initialization，其他人很快将其缩写为 RAII（§6.3）。
+异常的多级传播、将任意信息传递给错误处理程序，以及通过使用带有析构函数的局部对象表示和释放资源来实现异常与资源管理的集成。我笨拙地将这一关键技术命名为 Resource Acquisition Is Initialization，其他人很快将其缩写为 RAII（[§6.3](../ch06/6-3-resource-mgmt.md)）。
 
 我将 C++ 的继承机制泛化以支持多基类 [Stroustrup,1987]。这被称为多重继承，被认为是困难和有争议的。我认为它远不如模板或异常重要。抽象类（通常称为接口）的多重继承现在在支持静态类型检查和面向对象编程的语言中已普遍存在。
 
-C++ 语言与一些关键的库设施一起演进。例如，我设计了 `complex` [Stroustrup,1984]、`vector`、`stack` 和 I/O 流类 [Stroustrup,1985] 以及运算符重载机制。第一个 `string` 和 `list` 类是由 Jonathan Shopiro 和我作为同一项工作的一部分开发的。Jonathan 的 `string` 和 `list` 类是第一个作为库的一部分被广泛使用的。标准 C++ 库中的 `string` 类就起源于这些早期工作。[Stroustrup,1987b] 中描述的任务库是 1980 年编写的第一个“C with Classes”程序的一部分。它提供了协程和调度器。我编写它及其相关类是为了支持 Simula 风格的仿真。它对 C++ 在 1980 年代的成功和广泛采用至关重要。不幸的是，我们不得不等到 2011 年（30 年！）才使并发支持标准化并普遍可用（§18.6）。协程是 C++20 的一部分（§18.6）。Andrew Koenig、Alex Stepanov、我以及其他人的各种 `vector`、`map`、`list` 和 `sort` 模板影响了模板设施的发展。
+C++ 语言与一些关键的库设施一起演进。例如，我设计了 `complex` [Stroustrup,1984]、`vector`、`stack` 和 I/O 流类 [Stroustrup,1985] 以及运算符重载机制。第一个 `string` 和 `list` 类是由 Jonathan Shopiro 和我作为同一项工作的一部分开发的。Jonathan 的 `string` 和 `list` 类是第一个作为库的一部分被广泛使用的。标准 C++ 库中的 `string` 类就起源于这些早期工作。[Stroustrup,1987b] 中描述的任务库是 1980 年编写的第一个“C with Classes”程序的一部分。它提供了协程和调度器。我编写它及其相关类是为了支持 Simula 风格的仿真。它对 C++ 在 1980 年代的成功和广泛采用至关重要。不幸的是，我们不得不等到 2011 年（30 年！）才使并发支持标准化并普遍可用（[§18.6](../ch18/18-6-coroutines.md)）。协程是 C++20 的一部分（[§18.6](../ch18/18-6-coroutines.md)）。Andrew Koenig、Alex Stepanov、我以及其他人的各种 `vector`、`map`、`list` 和 `sort` 模板影响了模板设施的发展。
 
-1998 年标准库中最重要的创新是 STL，一个算法和容器框架（第 12 章，第 13 章）。它是 Alex Stepanov（与 Dave Musser、Meng Lee 等人）的工作，基于十多年的泛型编程研究。STL 在 C++ 社区内外都产生了巨大的影响。
+1998 年标准库中最重要的创新是 STL，一个算法和容器框架（[第 12 章](../ch12/index.md)，[第 13 章](../ch13/index.md)）。它是 Alex Stepanov（与 Dave Musser、Meng Lee 等人）的工作，基于十多年的泛型编程研究。STL 在 C++ 社区内外都产生了巨大的影响。
 
 C++ 在一个有许多成熟和实验性编程语言（例如 Ada [Ichbiah,1979]、Algol 68 [Woodward,1974]、ML [Paulson,1996]）的环境中成长。那时，我熟悉大约 25 种语言，它们对 C++ 的影响记录在 [Stroustrup,1994] 和 [Stroustrup,2007] 中。然而，决定性的影响始终来自我遇到的应用程序。我的刻意策略是让 C++ 的演进是“问题驱动”的，而不是模仿性的。
 
-## 19.1.3 ISO C++ 标准
+### 19.1.3 ISO C++ 标准
 
 C++ 使用的爆炸性增长带来了一些变化。在 1987 年的某个时候，C++ 的正式标准化变得不可避免，我们需要为标准化工作奠定基础 [Stroustrup,1994]。结果是，我们有意识地努力保持 C++ 编译器实现者与其主要用户之间的联系。这是通过纸质邮件和电子邮件以及 C++ 会议等场合的面对面会议来完成的。
 
@@ -98,7 +104,7 @@ C++11 努力的总体目标是：
 
 这些目标在 [Stroustrup,2007] 中有详细记录。
 
-我们做出了巨大努力，使并发系统编程类型安全且可移植。这涉及到内存模型（§18.1）和对无锁编程的支持。这是 Hans Boehm、Brian McKnight 以及并发工作组中其他人的工作。在此之上，我们添加了线程库。
+我们做出了巨大努力，使并发系统编程类型安全且可移植。这涉及到内存模型（[§18.1](../ch18/18-1-introduction.md)）和对无锁编程的支持。这是 Hans Boehm、Brian McKnight 以及并发工作组中其他人的工作。在此之上，我们添加了线程库。
 
 在 C++11 之后，大家普遍认为 13 年的标准间隔太长了。Herb Sutter 提议委员会采用在固定时间间隔按时发布的政策，即“火车模型”。我强烈主张标准之间的间隔短一些，以最大程度地减少因有人坚持要额外时间以包含“另一个必要特性”而导致的延迟风险。我们同意了一个雄心勃勃的 3 年计划，并认为应该在次要版本和主要版本之间交替。
 
@@ -108,40 +114,38 @@ C++17 本应是一个主要版本。我所说的“主要”是指包含将改�
 
 C++17 充其量只是一个中等级别的版本。它包含了许多小的扩展，但那些本会带来巨大变化的特性（例如概念、模块和协程）要么尚未准备好，要么陷入了争议和缺乏设计方向的泥潭。结果是，C++17 为每个人都提供了少许东西，但对于已经吸收了 C++11 和 C++14 经验的 C++ 程序员来说，没有什么能显著改变其编程生活。
 
-C++20 提供了长期承诺且急需的主要特性，例如模块（§3.2.2）、概念（§8.2）、协程（§18.6）、范围（§14.5）以及许多小特性。它与 C++11 一样是 C++ 的重大升级。它在 2021 年底广泛可用。
+C++20 提供了长期承诺且急需的主要特性，例如模块（[§3.2.2](../ch03/3-2-separate-compilation.md#3.2.2)）、概念（[§8.2](../ch08/8-2-concepts.md)）、协程（[§18.6](../ch18/18-6-coroutines.md)）、范围（[§14.5](../ch14/14-5-concept-overview.md)）以及许多小特性。它与 C++11 一样是 C++ 的重大升级。它在 2021 年底广泛可用。
 
 ISO C++ 标准委员会 SC22/WG21 目前约有 350 名成员，其中约 250 人出席了在布拉格举行的上一次大流行前的面对面会议，会议上 C++20 以 79-0 的一致投票通过，随后以 22-0 的国家机构投票批准。在如此庞大且多样化的群体中达成这种程度的共识非常困难。危险包括“委员会设计”、特性膨胀、缺乏一致风格以及短视的决策。朝着更易于使用和更连贯的语言取得进展非常困难。委员会意识到这一点并试图加以应对；参见 [Wong,2020]。有时，我们会成功，但很难避免复杂性来自“有用的小特性”、时尚以及专家希望直接服务于罕见特殊情况的愿望。
 
-## 19.1.4 标准与风格
+### 19.1.4 标准与风格
 
 标准说明了什么有效，以及如何有效。它没有说明什么是良好和有效的使用。理解编程语言特性的技术细节与有效地将它们与其他特性、库和工具结合使用以产生更好的软件之间存在显著差异。我所说的“更好”是指“更可维护、更不易出错、更快”。我们需要开发、推广和支持连贯的编程风格。此外，我们必须支持旧代码向这些更现代、更有效、更连贯的风格的演进。
 
-随着语言及其标准库的增长，推广有效编程风格的问题变得至关重要。让庞大的程序员群体脱离有效的东西去追求更好的东西极其困难。仍然有人将 C++ 视为对 C 的一些微小补充，也有人认为基于庞大类层次的 1980 年代面向对象编程风格是发展的顶峰。许多人仍在努力在大量旧 C++ 代码的环境中使用好现代 C++。另一方面，也有许多人热情地过度使用新奇的设施。例如，一些程序员确信，只有使用大量模板元编程的代码才是真正的 C++。
+随着语言及其标准库的增长，推广有效编程风格的问题变得至关重要。让庞大的程序员群体脱离有效的东西去追求更好的东西极其困难。仍然有人将 C++ 视为对 C 的一些微小补充，也有人认为基于庞大类层次的 1980 年代面向对象编程风格是发展的顶峰。许多人仍在努力在大量旧 C++ 代码的环境中很好地使用现代 C++。另一方面，也有许多人热情地过度使用新奇的设施。例如，一些程序员确信，只有使用大量模板元编程的代码才是真正的 C++。
 
 什么是现代 C++？2015 年，我开始通过制定一套有明确理由支持的编码指南来回答这个问题。我很快发现自己并非唯一在努力解决这个问题的人，并与来自世界许多地方的人们（特别是来自微软、Red Hat 和 Facebook）一起启动了“C++ 核心指南”项目 [Stroustrup,2015]。这是一个雄心勃勃的项目，旨在实现完全的类型安全和完整的资源安全，作为更简单、更快、更安全和更易维护代码的基础 [Stroustrup,2015b] [Stroustrup,2021]。除了带有理由的具体编码规则，我们还用静态分析工具和一个小的支持库来支持这些指南。我认为类似的东西对于推动整个 C++ 社区前进以受益于语言特性、库和支持工具的改进是必要的。
 
-## 19.1.5 C++ 的使用
+### 19.1.5 C++ 的使用
 
 C++ 现在是一种使用非常广泛的编程语言。其用户数量从 1979 年的 1 人快速增长到 1991 年的约 400,000 人；也就是说，超过十年的时间里，用户数量大约每 7.5 个月翻一番。自然，在最初的快速增长之后，增长速度放缓，但我最好的估计是，2018 年约有 450 万 C++ 程序员 [Kazakova,2015]，今天（2022 年）可能又增加了约一百万。大部分增长发生在 2005 年之后，当时处理器速度的指数级爆炸停止，因此语言性能的重要性增加了。这种增长是在没有正式营销或有组织的用户社区的情况下实现的 [Stroustrup,2020]。
 
 C++ 主要是一种工业语言；也就是说，它在工业界比在教育或编程语言研究领域更突出。它在贝尔实验室成长，受到电信和系统编程（包括设备驱动程序、网络和嵌入式系统）的各种严格需求的启发。从那里，C++ 的使用已经扩展到几乎每个行业：微电子、Web 应用和基础设施、操作系统、金融、医疗、汽车、航空航天、高能物理、生物学、能源生产、机器学习、视频游戏、图形、动画、虚拟现实等等。它主要用于那些需要 C++ 结合有效使用硬件和管理复杂性的问题。这似乎是一个不断扩大的应用领域 [Stroustrup,1993] [Stroustrup,2014] [Stroustrup,2020]。
 
-## 19.1.6 C++ 模型
+### 19.1.6 C++ 模型
 
 C++ 语言可以总结为一组相互支持的特性：
 
-- 对内置类型和用户定义类型提供同等支持的静态类型系统（第 1 章，第 5 章，第 6 章）
-- 值和引用语义（§1.7，§5.2，§6.2，第 12 章，§15.2）
-- 系统化和通用的资源管理（RAII）（§6.3）
-- 支持高效的面向对象编程（§5.3，class.virtual，§5.5）
-- 支持灵活高效的泛型编程（第 7 章，第 18 章）
-- 支持编译时编程（§1.6，第 7 章，第 8 章）
-- 直接使用机器和操作系统资源（§1.4，第 18 章）
-- 通过库支持并发（通常使用内部函数实现）（第 18 章）
+- 对内置类型和用户定义类型提供同等支持的静态类型系统（[第 1 章](../ch01/index.md)，[第 5 章](../ch05/index.md)，[第 6 章](../ch06/index.md)）
+- 值和引用语义（[§1.7](../ch01/1-7-pointers-arrays.md)，[§5.2](../ch05/5-2-concrete-types.md)，[§6.2](../ch06/6-2-copy-move.md)，[第 12 章](../ch12/index.md)，[§15.2](../ch15/15-2-pointers.md)）
+- 系统化和通用的资源管理（RAII）（[§6.3](../ch06/6-3-resource-mgmt.md)）
+- 支持高效的面向对象编程（[§5.3](../ch05/5-3-abstract-types.md)，[§5.4](../ch05/5-4-virtual-functions.md)，[§5.5](../ch05/5-5-hierarchies.md)）
+- 支持灵活高效的泛型编程（[第 7 章](../ch07/index.md)，[第 18 章](../ch18/index.md)）
+- 支持编译时编程（[§1.6](../ch01/1-6-constants.md)，[第 7 章](../ch07/index.md)，[第 8 章](../ch08/index.md)）
+- 直接使用机器和操作系统资源（[§1.4](../ch01/1-4-types-variables.md)，[第 18 章](../ch18/index.md)）
+- 通过库支持并发（通常使用内部函数实现）（[第 18 章](../ch18/index.md)）
 
 标准库组件为这些高层次目标进一步提供了必要的支持。
-
-## 19.2 C++ 特性演进
 
 # 19.2 C++ 特性演变
 
@@ -151,162 +155,162 @@ C++ 语言可以总结为一组相互支持的特性：
 
 看着一列语言特性可能会令人相当困惑。请记住，语言特性不是为了孤立地使用。特别是，C++11 中的大多数新特性在脱离旧特性提供的框架时是没有意义的。
 
-[1] 使用 `{}` 列表的统一和通用初始化（§1.4.2，§5.2.3）
-[2] 从初始化器推导类型：`auto`（§1.4.2）
-[3] 防止窄化转换（§1.4.2）
-[4] 泛化且保证的常量表达式：`constexpr`（§1.6）
-[5] 范围 `for` 语句（§1.7）
-[6] 空指针关键字：`nullptr`（§1.7.1）
-[7] 作用域和强类型枚举：`enum class`（§2.4）
-[8] 编译时断言：`static_assert`（§4.5.2）
-[9] 语言将 `{}` 列表映射到 `std::initializer_list`（§5.2.3）
-[10] 右值引用，启用移动语义（§6.2.2）
-[11] Lambda 表达式（§7.3.3）
-[12] 变参模板（§7.4.1）
-[13] 类型和模板别名（§7.4.2）
+[1] 使用 `{}` 列表的统一和通用初始化（[§1.4.2](../ch01/1-4-types-variables.md#1.4.2)，[§5.2.3](../ch05/5-2-concrete-types.md#5.2.3)）
+[2] 从初始化器推导类型：`auto`（[§1.4.2](../ch01/1-4-types-variables.md#1.4.2)）
+[3] 防止窄化转换（[§1.4.2](../ch01/1-4-types-variables.md#1.4.2)）
+[4] 泛化且保证的常量表达式：`constexpr`（[§1.6](../ch01/1-6-constants.md)）
+[5] 范围 `for` 语句（[§1.7](../ch01/1-7-pointers-arrays.md)）
+[6] 空指针关键字：`nullptr`（[§1.7.1](../ch01/1-7-pointers-arrays.md#1.7.1)）
+[7] 作用域和强类型枚举：`enum class`（[§2.4](../ch02/2-4-enum.md)）
+[8] 编译时断言：`static_assert`（[§4.5.2](../ch04/4-5-assertions.md#4.5.2)）
+[9] 语言将 `{}` 列表映射到 `std::initializer_list`（[§5.2.3](../ch05/5-2-concrete-types.md#5.2.3)）
+[10] 右值引用，启用移动语义（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)）
+[11] Lambda 表达式（[§7.3.3](../ch07/7-3-parameterized-operations.md#7.3.3)）
+[12] 变参模板（[§7.4.1](../ch07/7-4-template-mechanisms.md#7.4.1)）
+[13] 类型和模板别名（[§7.4.2](../ch07/7-4-template-mechanisms.md#7.4.2)）
 [14] Unicode 字符
 [15] `long long` 整数类型
 [16] 对齐控制：`alignas` 和 `alignof`
 [17] 使用表达式的类型作为声明中的类型的能力：`decltype`
-[18] 原始字符串字面量（§10.4）
-[19] 后缀返回类型语法（§3.4.4）
+[18] 原始字符串字面量（[§10.4](../ch10/10-4-regular-expressions.md)）
+[19] 后缀返回类型语法（[§3.4.4](../ch03/3-4-parameters.md#3.4.4)）
 [20] 属性的语法和两个标准属性：`[[carries_dependency]]` 和 `[[noreturn]]`
-[21] 阻止异常传播的方式：`noexcept` 说明符（§4.4）
+[21] 阻止异常传播的方式：`noexcept` 说明符（[§4.4](../ch04/4-4-alternatives.md)）
 [22] 测试表达式中可能抛出异常：`noexcept` 运算符
 [23] C99 特性：扩展整数类型；窄/宽字符串的连接；`__STDC_HOSTED__`；`_Pragma(X)`；变参宏和空宏参数
 [24] `__func__` 作为保存当前函数名称的字符串的名称
 [25] 内联命名空间
 [26] 委托构造函数
-[27] 类内成员初始化器（§6.1.3）
-[28] 控制默认：`default` 和 `delete`（§6.1.1）
+[27] 类内成员初始化器（[§6.1.3](../ch06/6-1-introduction.md#6.1.3)）
+[28] 控制默认：`default` 和 `delete`（[§6.1.1](../ch06/6-1-introduction.md#6.1.1)）
 [29] 显式转换运算符
-[30] 用户定义字面量（§6.6）
+[30] 用户定义字面量（[§6.6](../ch06/6-6-user-defined-literals.md)）
 [31] 对模板实例化的更显式控制：`extern` 模板
 [32] 函数模板的默认模板参数
-[33] 继承构造函数（§12.2.2）
-[34] 重写控制：`override`（§5.5）和 `final`
+[33] 继承构造函数（[§12.2.2](../ch12/12-2-vector.md#12.2.2)）
+[34] 重写控制：`override`（[§5.5](../ch05/5-5-hierarchies.md)）和 `final`
 [35] 更简单、更通用的 SFINAE（替换失败不是错误）规则
-[36] 内存模型（§18.1）
+[36] 内存模型（[§18.1](../ch18/18-1-introduction.md)）
 [37] 线程局部存储：`thread_local`
 
 关于 C++98 在 C++11 中的变化的更完整描述，请参见 [Stroustrup,2013]。
 
 ## 19.2.2 C++14 语言特性
 
-[1] 函数返回类型推导（§3.4.3）
-[2] 改进的 `constexpr` 函数，例如允许 `for` 循环（§1.6）
-[3] 变量模板（§7.4.1）
-[4] 二进制字面量（§1.4）
-[5] 数字分隔符（§1.4）
-[6] 泛型 lambda（§7.3.3.1）
+[1] 函数返回类型推导（[§3.4.3](../ch03/3-4-parameters.md#3.4.3)）
+[2] 改进的 `constexpr` 函数，例如允许 `for` 循环（[§1.6](../ch01/1-6-constants.md)）
+[3] 变量模板（[§7.4.1](../ch07/7-4-template-mechanisms.md#7.4.1)）
+[4] 二进制字面量（[§1.4](../ch01/1-4-types-variables.md)）
+[5] 数字分隔符（[§1.4](../ch01/1-4-types-variables.md)）
+[6] 泛型 lambda（[§7.3.3.1](../ch07/7-3-parameterized-operations.md#7.3.3.1)）
 [7] 更一般的 lambda 捕获
 [8] `[[deprecated]]` 属性
 [9] 一些其他的小扩展
 
 ## 19.2.3 C++17 语言特性
 
-[1] 保证的拷贝省略（§6.2.2）
+[1] 保证的拷贝省略（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)）
 [2] 过度对齐类型的动态分配
-[3] 更严格的求值顺序（§1.4.1）
+[3] 更严格的求值顺序（[§1.4.1](../ch01/1-4-types-variables.md#1.4.1)）
 [4] UTF-8 字面量（`u8`）
-[5] 十六进制浮点字面量（§11.6.1）
-[6] 折叠表达式（§8.4.1）
-[7] 泛型值模板参数（`auto` 模板参数；§8.2.5）
-[8] 类模板参数类型推导（§7.2.3）
-[9] 编译时 `if`（§7.4.3）
-[10] 带有初始化器的选择语句（§1.8）
+[5] 十六进制浮点字面量（[§11.6.1](../ch11/11-6-output-formatting.md#11.6.1)）
+[6] 折叠表达式（[§8.4.1](../ch08/8-4-variadic-templates.md#8.4.1)）
+[7] 泛型值模板参数（`auto` 模板参数；[§8.2.5](../ch08/8-2-concepts.md#8.2.5)）
+[8] 类模板参数类型推导（[§7.2.3](../ch07/7-2-parameterized-types.md#7.2.3)）
+[9] 编译时 `if`（[§7.4.3](../ch07/7-4-template-mechanisms.md#7.4.3)）
+[10] 带有初始化器的选择语句（[§1.8](../ch01/1-8-testing.md)）
 [11] `constexpr` lambda
 [12] 内联变量
-[13] 结构化绑定（§3.4.5）
+[13] 结构化绑定（[§3.4.5](../ch03/3-4-parameters.md#3.4.5)）
 [14] 新标准属性：`[[fallthrough]]`、`[[nodiscard]]` 和 `[[maybe_unused]]`
-[15] `std::byte` 类型（§16.7）
-[16] 用其底层类型的值初始化枚举（§2.4）
+[15] `std::byte` 类型（[§16.7](../ch16/16-7-bitwise.md)）
+[16] 用其底层类型的值初始化枚举（[§2.4](../ch02/2-4-enum.md)）
 [17] 一些其他的小扩展
 
 ## 19.2.4 C++20 语言特性
 
-[1] 模块（§3.2.2）
-[2] 概念（§8.2）
-[3] 协程（§18.6）
+[1] 模块（[§3.2.2](../ch03/3-2-separate-compilation.md#3.2.2)）
+[2] 概念（[§8.2](../ch08/8-2-concepts.md)）
+[3] 协程（[§18.6](../ch18/18-6-coroutines.md)）
 [4] 指定初始化器（C99 特性的略微受限版本）
-[5] `<=>`（“宇宙飞船运算符”）三路比较（§6.5.1）
-[6] `[*this]` 按值捕获当前对象（§7.3.3）
+[5] `<=>`（“宇宙飞船运算符”）三路比较（[§6.5.1](../ch06/6-5-conventional-operations.md#6.5.1)）
+[6] `[*this]` 按值捕获当前对象（[§7.3.3](../ch07/7-3-parameterized-operations.md#7.3.3)）
 [7] 标准属性 `[[no_unique_address]]`、`[[likely]]` 和 `[[unlikely]]`
 [8] 在 `constexpr` 函数中允许更多设施，包括 `new`、`union`、`try-catch`、`dynamic_cast` 和 `typeid`。
-[9] 保证编译时求值的 `consteval` 函数（§1.6）
-[10] 保证静态（而非运行时）初始化的 `constinit` 变量（§1.6）
-[11] 使用作用域枚举（§2.4）
+[9] 保证编译时求值的 `consteval` 函数（[§1.6](../ch01/1-6-constants.md)）
+[10] 保证静态（而非运行时）初始化的 `constinit` 变量（[§1.6](../ch01/1-6-constants.md)）
+[11] 使用作用域枚举（[§2.4](../ch02/2-4-enum.md)）
 [12] 一些其他的小扩展
 
 ## 19.2.5 C++11 标准库组件
 
 C++11 对标准库的增补有两种形式：新组件（例如正则表达式匹配库）和对 C++98 组件的改进（例如容器的移动构造函数）。
 
-[1] 容器的 `initializer_list` 构造函数（§5.2.3）
-[2] 容器的移动语义（§6.2.2，§13.2）
-[3] 单向链表：`forward_list`（§12.3）
-[4] 哈希容器：`unordered_map`、`unordered_multimap`、`unordered_set` 和 `unordered_multiset`（§12.6，§12.8）
-[5] 资源管理指针：`unique_ptr`、`shared_ptr` 和 `weak_ptr`（§15.2.1）
-[6] 并发支持：`thread`（§18.2）、互斥量和锁（§18.3）、条件变量（§18.4）
-[7] 更高级的并发支持：`packaged_task`、`future`、`promise` 和 `async()`（§18.5）
-[8] `tuple`（§15.3.4）
-[9] 正则表达式：`regex`（§10.4）
-[10] 随机数：分布和引擎（§17.5）
-[11] 整数类型名称，如 `int16_t`、`uint32_t` 和 `int_fast64_t`（§17.8）
-[12] 固定大小的连续序列容器：`array`（§15.3）
-[13] 拷贝和重新抛出异常（§18.5.1）
+[1] 容器的 `initializer_list` 构造函数（[§5.2.3](../ch05/5-2-concrete-types.md#5.2.3)）
+[2] 容器的移动语义（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)，[§13.2](../ch13/13-2-using-iterators.md)）
+[3] 单向链表：`forward_list`（[§12.3](../ch12/12-3-list.md)）
+[4] 哈希容器：`unordered_map`、`unordered_multimap`、`unordered_set` 和 `unordered_multiset`（[§12.6](../ch12/12-6-unordered-map.md)，[§12.8](../ch12/12-8-container-overview.md)）
+[5] 资源管理指针：`unique_ptr`、`shared_ptr` 和 `weak_ptr`（[§15.2.1](../ch15/15-2-pointers.md#15.2.1)）
+[6] 并发支持：`thread`（[§18.2](../ch18/18-2-tasks-and-threads.md)）、互斥量和锁（[§18.3](../ch18/18-3-shared-data.md)）、条件变量（[§18.4](../ch18/18-4-waiting-for-events.md)）
+[7] 更高级的并发支持：`packaged_task`、`future`、`promise` 和 `async()`（[§18.5](../ch18/18-5-inter-task-communication.md)）
+[8] `tuple`（[§15.3.4](../ch15/15-3-containers.md#15.3.4)）
+[9] 正则表达式：`regex`（[§10.4](../ch10/10-4-regular-expressions.md)）
+[10] 随机数：分布和引擎（[§17.5](../ch17/17-5-random-numbers.md)）
+[11] 整数类型名称，如 `int16_t`、`uint32_t` 和 `int_fast64_t`（[§17.8](../ch17/17-8-type-aliases.md)）
+[12] 固定大小的连续序列容器：`array`（[§15.3](../ch15/15-3-containers.md)）
+[13] 拷贝和重新抛出异常（[§18.5.1](../ch18/18-5-inter-task-communication.md#18.5.1)）
 [14] 使用错误码报告错误：`system_error`
-[15] 容器的 `emplace()` 操作（§12.8）
+[15] 容器的 `emplace()` 操作（[§12.8](../ch12/12-8-container-overview.md)）
 [16] 广泛使用 `constexpr` 函数
 [17] 系统化使用 `noexcept` 函数
-[18] 改进的函数适配器：`function` 和 `bind()`（§16.3）
+[18] 改进的函数适配器：`function` 和 `bind()`（[§16.3](../ch16/16-3-function-adapters.md)）
 [19] 字符串到数值的转换
 [20] 作用域分配器
-[21] 类型特征，如 `is_integral` 和 `is_base_of`（§16.4.1）
-[22] 时间工具：`duration` 和 `time_point`（§16.2.1）
+[21] 类型特征，如 `is_integral` 和 `is_base_of`（[§16.4.1](../ch16/16-4-type-functions.md#16.4.1)）
+[22] 时间工具：`duration` 和 `time_point`（[§16.2.1](../ch16/16-2-time.md#16.2.1)）
 [23] 编译时有理数算术：`ratio`
-[24] 放弃进程：`quick_exit`（§16.8）
-[25] 更多算法，如 `move()`、`copy_if()` 和 `is_sorted()`（第 13 章）
-[26] 垃圾回收 API；后来被废弃（§19.2.9）
-[27] 低级并发支持：原子操作（§18.3.2）
+[24] 放弃进程：`quick_exit`（[§16.8](../ch16/16-8-program-exit.md)）
+[25] 更多算法，如 `move()`、`copy_if()` 和 `is_sorted()`（[第 13 章](../ch13/index.md)）
+[26] 垃圾回收 API；后来被废弃（[§19.2.9](19-2-cpp-evolution.md#19.2.9)）
+[27] 低级并发支持：原子操作（[§18.3.2](../ch18/18-3-shared-data.md#18.3.2)）
 [28] 一些其他的小扩展
 
 ## 19.2.6 C++14 标准库组件
 
-[1] `shared_mutex` 和 `shared_lock`（§18.3）
-[2] 用户定义字面量（§6.6）
-[3] 按类型的元组寻址（§15.3.4）
+[1] `shared_mutex` 和 `shared_lock`（[§18.3](../ch18/18-3-shared-data.md)）
+[2] 用户定义字面量（[§6.6](../ch06/6-6-user-defined-literals.md)）
+[3] 按类型的元组寻址（[§15.3.4](../ch15/15-3-containers.md#15.3.4)）
 [4] 关联容器异构查找
 [5] 一些其他的小扩展
 
 ## 19.2.7 C++17 标准库组件
 
-[1] 文件系统（§11.9）
-[2] 并行算法（§13.6，§17.3.1）
-[3] 数学特殊函数（§17.2）
-[4] `string_view`（§10.3）
-[5] `any`（§15.4.3）
-[6] `variant`（§15.4.1）
-[7] `optional`（§15.4.2）
+[1] 文件系统（[§11.9](../ch11/11-9-file-system.md)）
+[2] 并行算法（[§13.6](../ch13/13-6-parallel-algorithms.md)，[§17.3.1](../ch17/17-3-numeric-algorithms.md#17.3.1)）
+[3] 数学特殊函数（[§17.2](../ch17/17-2-math-functions.md)）
+[4] `string_view`（[§10.3](../ch10/10-3-string-view.md)）
+[5] `any`（[§15.4.3](../ch15/15-4-alternatives.md#15.4.3)）
+[6] `variant`（[§15.4.1](../ch15/15-4-alternatives.md#15.4.1)）
+[7] `optional`（[§15.4.2](../ch15/15-4-alternatives.md#15.4.2)）
 [8] 一种调用任何对于给定参数集可调用对象的方式：`invoke()`
 [9] 基本字符串转换：`to_chars()` 和 `from_chars()`
-[10] 多态分配器（§12.7）
-[11] `scoped_lock`（§18.3）
+[10] 多态分配器（[§12.7](../ch12/12-7-allocators.md)）
+[11] `scoped_lock`（[§18.3](../ch18/18-3-shared-data.md)）
 [12] 一些其他的小扩展
 
 ## 19.2.8 C++20 标准库组件
 
-[1] 范围、视图和管道（§14.1）
-[2] `printf` 风格格式化：`format()` 和 `vformat()`（§11.6.2）
-[3] 日历（§16.2.2）和时区（§16.2.3）
-[4] 用于对连续数组进行读写访问的 `span`（§15.2.2）
-[5] `source_location`（§16.5）
-[6] 数学常数，例如 `pi` 和 `ln10e`（§17.9）
-[7] 对原子操作的许多扩展（§18.3.2）
+[1] 范围、视图和管道（[§14.1](../ch14/14-1-introduction.md)）
+[2] `printf` 风格格式化：`format()` 和 `vformat()`（[§11.6.2](../ch11/11-6-output-formatting.md#11.6.2)）
+[3] 日历（[§16.2.2](../ch16/16-2-time.md#16.2.2)）和时区（[§16.2.3](../ch16/16-2-time.md#16.2.3)）
+[4] 用于对连续数组进行读写访问的 `span`（[§15.2.2](../ch15/15-2-pointers.md#15.2.2)）
+[5] `source_location`（[§16.5](../ch16/16-5-source-location.md)）
+[6] 数学常数，例如 `pi` 和 `ln10e`（[§17.9](../ch17/17-9-math-constants.md)）
+[7] 对原子操作的许多扩展（[§18.3.2](../ch18/18-3-shared-data.md#18.3.2)）
 [8] 等待多个线程的方式：`barrier` 和 `latch`。
 [9] 特性测试宏
-[10] `bit_cast<>`（§16.7）
-[11] 位操作（§16.7）
+[10] `bit_cast<>`（[§16.7](../ch16/16-7-bitwise.md)）
+[11] 位操作（[§16.7](../ch16/16-7-bitwise.md)）
 [12] 更多标准库函数变为 `constexpr`
 [13] 标准库中许多使用 `<=>` 的地方
 [14] 许多其他小扩展
@@ -318,21 +322,21 @@ C++11 对标准库的增补有两种形式：新组件（例如正则表达式�
 通过废弃一个特性，标准委员会表达了希望该特性消失的意愿。然而，委员会无权立即移除一个广泛使用的特性——无论它多么冗余或危险。因此，废弃是一个强烈提示，要避免使用该特性。它可能会在未来消失。废弃特性的列表在标准 [C++,2020] 的附录 D 中。编译器很可能会对废弃特性的使用发出警告。然而，废弃特性是标准的一部分，历史表明，由于兼容性原因，它们往往会“永远”得到支持。即使最终被移除的特性，由于用户对实现者的压力，往往也会在实现中继续存在。
 
 - **已移除**：异常规范：`void f() throw(X, Y);` // C++98；现在是一个错误
-- **已移除**：异常规范的支持设施：`unexpected_handler`、`set_unexpected()`、`get_unexpected()` 和 `unexpected()`。改用 `noexcept`（§4.2）。
+- **已移除**：异常规范的支持设施：`unexpected_handler`、`set_unexpected()`、`get_unexpected()` 和 `unexpected()`。改用 `noexcept`（[§4.2](../ch04/4-2-exceptions.md)）。
 - **已移除**：三字符组（Trigraphs）。
-- **已移除**：`auto_ptr`。改用 `unique_ptr`（§15.2.1）。
+- **已移除**：`auto_ptr`。改用 `unique_ptr`（[§15.2.1](../ch15/15-2-pointers.md#15.2.1)）。
 - **已移除**：存储说明符 `register` 的使用。
 - **已移除**：对 `bool` 使用 `++`。
-- **已移除**：C++98 的 `export` 特性。它很复杂并且没有被主要供应商提供。取而代之，`export` 被用作模块的关键字（§3.2.2）。
-- **已废弃**：为带有析构函数的类生成拷贝操作（§6.2.1）。
+- **已移除**：C++98 的 `export` 特性。它很复杂并且没有被主要供应商提供。取而代之，`export` 被用作模块的关键字（[§3.2.2](../ch03/3-2-separate-compilation.md#3.2.2)）。
+- **已废弃**：为带有析构函数的类生成拷贝操作（[§6.2.1](../ch06/6-2-copy-move.md#6.2.1)）。
 - **已移除**：将字符串字面量赋值给 `char*`。改用 `const char*` 或 `auto`。
-- **已移除**：一些 C++ 标准库函数对象和相关函数。大多与参数绑定有关。改用 lambda 和 `function`（§16.3）。
+- **已移除**：一些 C++ 标准库函数对象和相关函数。大多与参数绑定有关。改用 lambda 和 `function`（[§16.3](../ch16/16-3-function-adapters.md)）。
 - **已废弃**：枚举值与来自不同枚举或浮点值的比较。
 - **已废弃**：两个数组之间的比较。
 - **已废弃**：下标中的逗号操作（例如 `[a,b]`）。为允许用户定义带多个参数的 `operator[]` 腾出空间。
-- **已废弃**：lambda 表达式中的隐式 `*this` 捕获。改用 `[=, this]`（§7.3.3）。
+- **已废弃**：lambda 表达式中的隐式 `*this` 捕获。改用 `[=, this]`（[§7.3.3](../ch07/7-3-parameterized-operations.md#7.3.3)）。
 - **已移除**：垃圾回收器的标准库接口。C++ 垃圾回收器不使用该接口。
-- **已废弃**：`strstream`；改用 `spanstream`（§11.7.4）。
+- **已废弃**：`strstream`；改用 `spanstream`（[§11.7.4](../ch11/11-7-streams.md#11.7.4)）。
 
 # 19.3 C/C++ 兼容性
 
@@ -342,7 +346,7 @@ C++11 对标准库的增补有两种形式：新组件（例如正则表达式�
 
 我怎么能说 C 和 C++ 是兄弟呢？请看一个简化的族谱：
 
-[图片描述：从 Simula、BCPL 到 K&R C、经典 C、C with Classes、早期 C++、ARM C++、C++98、C99、C++11、C11、C++14、C++17、C++20 的演进图]
+![C 与 C++ 的简化谱系：从 Simula、BCPL 到 ISO C 与 ISO C++](../../assets/images/ch19/c-cpp-family-tree.png)
 
 经典 C 有两个主要后裔：ISO C 和 ISO C++。多年来，这些语言以不同的速度向不同的方向演进。一个结果是，每种语言以略有不同的方式支持传统的 C 风格编程。由此产生的不兼容性可能给同时使用 C 和 C++ 的人、用一种语言编写并使用另一种语言实现的库的人，以及 C 和 C++ 的库和工具的实现者带来麻烦。
 
@@ -352,7 +356,7 @@ C++11 对标准库的增补有两种形式：新组件（例如正则表达式�
 
 请注意，C 和 C++ 之间的差异不一定是由于在 C++ 中进行的对 C 的更改造成的。在几种情况下，不兼容性源于在 C++ 中普遍存在很久之后才以不兼容的方式被 C 采纳的特性。例如，将 `T*` 赋值给 `void*` 的能力以及全局 `const` 的链接。
 
-## 19.3.2 兼容性问题
+### 19.3.2 兼容性问题
 
 C 和 C++ 之间存在许多小的不兼容性。它们都可能给程序员带来问题，但在 C++ 的背景下，所有问题都可以应对。至少，C 代码片段可以编译为 C 并使用 `extern "C"` 机制链接。
 
@@ -369,17 +373,17 @@ C 和 C++ 之间存在许多小的不兼容性。它们都可能给程序员带�
 
 [1] 不要将 C++ 视为 C 加上一些特性。C++ 可以那样使用，但效果不佳。要获得 C++ 相对于 C 的真正主要优势，你需要应用不同的设计和实现风格。
 [2] 使用 C++ 标准库作为新技术和编程风格的老师。注意与 C 标准库的差异（例如，使用 `=` 而不是 `strcpy()` 进行拷贝）。
-[3] 在 C++ 中几乎从不需要宏替换。使用 `const`（§1.6）、`constexpr`（§1.6）、`enum` 或 `enum class`（§2.4）定义清单常量；使用 `constexpr`（§1.6）、`consteval`（§1.6）和 `inline`（§5.2.1）避免函数调用开销；使用模板（第 7 章）指定函数和类型族；使用命名空间（§3.3）避免名称冲突。
-[4] 在需要之前不要声明变量，并立即初始化它。声明可以出现在任何语句可以出现的地方（§1.8），例如在 `for` 语句的初始化器和条件中（§1.8）。
-[5] 不要使用 `malloc()`。`new` 运算符（§5.2.2）做得更好，而不是使用 `realloc()`，尝试 `vector`（§6.3，§12.2）。不要仅仅用“裸露的” `new` 和 `delete`（§5.2.2）替换 `malloc()` 和 `free()`。
+[3] 在 C++ 中几乎从不需要宏替换。使用 `const`（[§1.6](../ch01/1-6-constants.md)）、`constexpr`（[§1.6](../ch01/1-6-constants.md)）、`enum` 或 `enum class`（[§2.4](../ch02/2-4-enum.md)）定义清单常量；使用 `constexpr`（[§1.6](../ch01/1-6-constants.md)）、`consteval`（[§1.6](../ch01/1-6-constants.md)）和 `inline`（[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)）避免函数调用开销；使用模板（[第 7 章](../ch07/index.md)）指定函数和类型族；使用命名空间（[§3.3](../ch03/3-3-namespace.md)）避免名称冲突。
+[4] 在需要之前不要声明变量，并立即初始化它。声明可以出现在任何语句可以出现的地方（[§1.8](../ch01/1-8-testing.md)），例如在 `for` 语句的初始化器和条件中（[§1.8](../ch01/1-8-testing.md)）。
+[5] 不要使用 `malloc()`。`new` 运算符（[§5.2.2](../ch05/5-2-concrete-types.md#5.2.2)）做得更好，而不是使用 `realloc()`，尝试 `vector`（[§6.3](../ch06/6-3-resource-mgmt.md)，[§12.2](../ch12/12-2-vector.md)）。不要仅仅用“裸露的” `new` 和 `delete`（[§5.2.2](../ch05/5-2-concrete-types.md#5.2.2)）替换 `malloc()` 和 `free()`。
 [6] 避免使用 `void*`、`union` 和强制转换，除非在某个函数或类的实现深处。它们的使用限制了你能从类型系统获得的支持，并可能损害性能。在大多数情况下，强制转换表明存在设计错误。
-[7] 如果你必须使用显式类型转换，请使用适当的命名强制转换（例如 `static_cast`；§5.2.3）以更精确地说明你试图做什么。
+[7] 如果你必须使用显式类型转换，请使用适当的命名强制转换（例如 `static_cast`；[§5.2.3](../ch05/5-2-concrete-types.md#5.2.3)）以更精确地说明你试图做什么。
 
-[8] 最小化数组和 C 风格字符串的使用。与传统的 C 风格相比，C++ 标准库字符串（§10.2）、数组（§15.3.1）和向量（§12.2）通常可以用于编写更简单、更易维护的代码。总的来说，尽量不要自己构建标准库已经提供的东西。
+[8] 最小化数组和 C 风格字符串的使用。与传统的 C 风格相比，C++ 标准库字符串（[§10.2](../ch10/10-2-strings.md)）、数组（[§15.3.1](../ch15/15-3-containers.md#15.3.1)）和向量（[§12.2](../ch12/12-2-vector.md)）通常可以用于编写更简单、更易维护的代码。总的来说，尽量不要自己构建标准库已经提供的东西。
 [9] 避免指针算术，除非在非常专门的代码中（例如内存管理器）。
-[10] 将连续序列（例如数组）作为 `span`（§15.2.2）传递。这是无需额外测试即可避免范围错误（“缓冲区溢出”）的好方法。
-[11] 对于简单的数组遍历，使用范围 `for`（§1.7）。它比传统的 C 循环更容易编写、一样快且更安全。
-[12] 使用 `nullptr`（§1.7.1）而不是 `0` 或 `NULL`。
+[10] 将连续序列（例如数组）作为 `span`（[§15.2.2](../ch15/15-2-pointers.md#15.2.2)）传递。这是无需额外测试即可避免范围错误（“缓冲区溢出”）的好方法。
+[11] 对于简单的数组遍历，使用范围 `for`（[§1.7](../ch01/1-7-pointers-arrays.md)）。它比传统的 C 循环更容易编写、一样快且更安全。
+[12] 使用 `nullptr`（[§1.7.1](../ch01/1-7-pointers-arrays.md#1.7.1)）而不是 `0` 或 `NULL`。
 [13] 不要认为使用 C 风格（避免使用 C++ 特性如类、模板和异常）辛苦编写的代码一定比更短的替代方案（例如使用标准库设施）更高效。通常（当然并非总是）相反的情况才是真的。
 
 ### 19.3.2.2 void*
@@ -418,8 +422,6 @@ extern "C" double sqrt(double);
 现在 `sqrt(double)` 可以从 C 或 C++ 代码片段调用。`sqrt(double)` 的定义也可以编译为 C 函数或 C++ 函数。
 
 在一个作用域中，只能有一个给定名称的函数具有 C 链接（因为 C 不允许函数重载）。链接规范不影响类型检查，因此 C++ 的函数调用和参数检查规则仍然适用于声明为 `extern "C"` 的函数。
-
-## 19.4 参考文献
 
 # 19.4 参考文献
 
@@ -471,7 +473,7 @@ extern "C" double sqrt(double);
 
 **[Kernighan,1978]** Brian W. Kernighan and Dennis M. Ritchie: The C Programming Language. Prentice Hall. Englewood Cliffs, New Jersey. 1978.
 
-**[Kernighan,1988]** Brian W. Kernighan and Dennis M. Ritchie: The C Programming Language, Second Edition. Prentice-Hall. Englewood Cliffs, New Jersey. 1988. ISBN 0-13- 110362-8.
+**[Kernighan,1988]** Brian W. Kernighan and Dennis M. Ritchie: The C Programming Language, Second Edition. Prentice-Hall. Englewood Cliffs, New Jersey. 1988. ISBN 0-13-110362-8.
 
 **[Knuth,1968]** Donald E. Knuth: The Art of Computer Programming. Addison-Wesley. Reading, Massachusetts. 1968.
 
@@ -487,7 +489,7 @@ extern "C" double sqrt(double);
 
 **[Stepanov,1994]** Alexander Stepanov and Meng Lee: The Standard Template Library. HP Labs Technical Report HPL-94-34 (R. 1). 1994.
 
-**[Stepanov,2009]** Alexander Stepanov and Paul McJones: Elements of Programming. Addison- Wesley. Boston, Massachusetts. 2009. ISBN 978-0-321-63537-2.
+**[Stepanov,2009]** Alexander Stepanov and Paul McJones: Elements of Programming. Addison-Wesley. Boston, Massachusetts. 2009. ISBN 978-0-321-63537-2.
 
 **[Stroustrup,1979]** Personal lab notes.
 
@@ -505,7 +507,7 @@ extern "C" double sqrt(double);
 
 **[Stroustrup,1988]** B. Stroustrup: Parameterized Types for C++. Proc. USENIX C++ Conference, Denver, Colorado. 1988.
 
-**[Stroustrup,1991]** B. Stroustrup: The C++ Programming Language (Second Edition). Addison- Wesley. Reading, Massachusetts. 1991. ISBN 0-201-53992-6.
+**[Stroustrup,1991]** B. Stroustrup: The C++ Programming Language (Second Edition). Addison-Wesley. Reading, Massachusetts. 1991. ISBN 0-201-53992-6.
 
 **[Stroustrup,1993]** B. Stroustrup: A History of C++: 1979–1991. Proc. ACM History of Programming Languages Conference (HOPL-2). ACM Sigplan Notices. Vol 28, No 3. 1993.
 
@@ -513,25 +515,33 @@ extern "C" double sqrt(double);
 
 **[Stroustrup,1997]** B. Stroustrup: The C++ Programming Language, Third Edition. Addison-Wesley. Reading, Massachusetts. 1997. ISBN 0-201-88954-4. Hardcover (“Special”) Edition. 2000. ISBN 0-201-70073-5.
 
-**[Stroustrup,2002]** B. Stroustrup: C and C++: Siblings, C and C++: A Case for Compatibility, and C and C++: Case Studies in Compatibility. The C/C++ Users Journal. July- September 2002. www.stroustrup.com/papers.xhtml.
+**[Stroustrup,2002]** B. Stroustrup: C and C++: Siblings, C and C++: A Case for Compatibility, and C and C++: Case Studies in Compatibility. The C/C++ Users Journal. July-September 2002. www.stroustrup.com/papers.xhtml.
 
 **[Stroustrup,2007]** B. Stroustrup: Evolving a language in and for the real world: C++ 1991-2006. ACM HOPL-III. June 2007.
 
-**[Stroustrup,2009]** B. Stroustrup: Programming – Principles and Practice Using C++. Addison- Wesley. Boston, Massachusetts. 2009. ISBN 0-321-54372-6.
+**[Stroustrup,2009]** B. Stroustrup: Programming – Principles and Practice Using C++. Addison-Wesley. Boston, Massachusetts. 2009. ISBN 0-321-54372-6.
 
-**[Stroustrup,2010]** B. Stroustrup: "New" Value Terminology. https://www.stroustrup.com/terminology.pdf. April 2010. [Stroustrup,2012a]B. Stroustrup and A. Sutton: A Concept Design for the STL. WG21 Technical Report N3351==12-0041. January 2012. [Stroustrup,2012b]B. Stroustrup: Software Development for Infrastructure. Computer. January 2012. doi:10.1109/MC.2011.353.
+**[Stroustrup,2010]** B. Stroustrup: "New" Value Terminology. https://www.stroustrup.com/terminology.pdf. April 2010.
 
-**[Stroustrup,2013]** B. Stroustrup: The C++ Programming Language (Fourth Edition). Addison- Wesley. Boston, Massachusetts. 2013. ISBN 0-321-56384-0.
+**[Stroustrup,2012a]** B. Stroustrup and A. Sutton: A Concept Design for the STL. WG21 Technical Report N3351==12-0041. January 2012.
+
+**[Stroustrup,2012b]** B. Stroustrup: Software Development for Infrastructure. Computer. January 2012. doi:10.1109/MC.2011.353.
+
+**[Stroustrup,2013]** B. Stroustrup: The C++ Programming Language (Fourth Edition). Addison-Wesley. Boston, Massachusetts. 2013. ISBN 0-321-56384-0.
 
 **[Stroustrup,2014]** B. Stroustrup: C++ Applications. http://www.stroustrup.com/applications.xhtml.
 
-**[Stroustrup,2015]** B. Stroustrup and H. Sutter: C++ Core Guidelines. https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md. [Stroustrup,2015b]B. Stroustrup, H. Sutter, and G. Dos Reis: A brief introduction to C++’s model for type- and resource-safety. Isocpp.org. October 2015. Revised December 2015. http://www.stroustrup.com/resource-model.pdf.
+**[Stroustrup,2015]** B. Stroustrup and H. Sutter: C++ Core Guidelines. https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md.
+
+**[Stroustrup,2015b]** B. Stroustrup, H. Sutter, and G. Dos Reis: A brief introduction to C++’s model for type- and resource-safety. Isocpp.org. October 2015. Revised December 2015. http://www.stroustrup.com/resource-model.pdf.
 
 **[Stroustrup,2017]** B. Stroustrup: Concepts: The Future of Generic Programming (or How to design good concepts and use them well). WG21 P0557R1. https://www.stroustrup.com/good_concepts.pdf. January 2017.
 
 **[Stroustrup,2020]** B. Stroustrup: Thriving in a crowded and changing world: C++ 2006-2020. ACM/SIGPLAN History of Programming Languages conference, HOPL-IV. June 2020.
 
-**[Stroustrup,2021]** B. Stroustrup: Type-and-resource safety in modern C++. WG21 P2410R0. July 2021. [Stroustrup,2021b]B. Stroustrup: Minimal module support for the standard library. P2412r0. July 2021.
+**[Stroustrup,2021]** B. Stroustrup: Type-and-resource safety in modern C++. WG21 P2410R0. July 2021.
+
+**[Stroustrup,2021b]** B. Stroustrup: Minimal module support for the standard library. P2412r0. July 2021.
 
 **[Sutton,2011]** A. Sutton and B. Stroustrup: Design of Concept Libraries for C++. Proc. SLE 2011 (International Conference on Software Language Engineering). July 2011.
 
@@ -541,81 +551,52 @@ extern "C" double sqrt(double);
 
 **[Wong,2020]** Michael Wong, Howard Hinnant, Roger Orr, Bjarne Stroustrup, Daveed Vandevoorde: Direction for ISO C++. WG21 P2000R1. July 2020.
 
-**[Woodward,1974]** P. M. Woodward and S. G. Bond: Algol 68-R Users Guide. Her Majesty’s Stationery Office. London. 1974. 19.5 Advice
-
-**[1]** The ISO C++ standard [C++,2020] defines C++.
-
-**[2]** When choosing a style for a new project or when modernizing a code base, rely on the C++ Core Guidelines; §19.1.4.
-
-**[3]** When learning C++, don’t focus on language features in isolation; §19.2.1.
-
-**[4]** Don’t get stuck with decades-old language-feature sets and design techniques; §19.1.4.
-
-**[5]** Before using a new feature in production code, try it out by writing small programs to test the standards conformance and performance of the implementations you plan to use.
-
-**[6]** For learning C++, use the most up-to-date and complete implementation of Standard C++ that you can get access to.
-
-**[7]** The common subset of C and C++ is not the best initial subset of C++ to learn; §19.3.2.1.
-
-**[8]** Avoid casts; §19.3.2.1; [CG: ES.48].
-
-**[9]** Prefer named casts, such as static_cast over C-style casts; §5.2.3; [CG: ES.49].
-
-**[10]** When converting a C program to C++, rename variables that are C++ keywords; §19.3.2.
-
-**[11]** For portability and type safety, if you must use C, write in the common subset of C and C++; §19.3.2.1; [CG: CPL.2].
-
-**[12]** When converting a C program to C++, cast the result of malloc() to the proper type or change all uses of malloc() to uses of new; §19.3.2.2.
-
-**[13]** When converting from malloc() and free() to new and delete, consider using vector, push_back(), and reserve() instead of realloc(); §19.3.2.1.
-
-**[14]** In C++, there are no implicit conversions from ints to enumerations; use explicit type conversion where necessary.
-
-**[15]** For each standard C header <X.h> that places names in the global namespace, the header <cX> places the names in namespace std.
-
-**[16]** Use extern "C" when declaring C functions; §19.3.2.3.
-
-**[17]** Prefer string over C-style strings (direct manipulation of zero-terminated arrays of char); [CG: SL.str.1].
-
-**[18]** Prefer iostreams over stdio; [CG: SL.io.3].
-
-**[19]** Prefer containers (e.g., vector) over built-in arrays. A Module std That is a big thing with an invention: You have to have a whole system that works. – J. Presper Eckert Introduction Use What Your Implementation Offers Use Headers Make Your Own module std Advice
+**[Woodward,1974]** P. M. Woodward and S. G. Bond: Algol 68-R Users Guide. Her Majesty’s Stationery Office. London. 1974.
 
 # 19.5 建议
 
 [1] ISO C++ 标准 [C++,2020] 定义了 C++。
-[2] 当为新项目选择风格或现代化代码库时，依赖 C++ 核心指南；§19.1.4。
-[3] 学习 C++ 时，不要孤立地关注语言特性；§19.2.1。
-[4] 不要固守几十年前的语言特性集和设计技术；§19.1.4。
+[2] 当为新项目选择风格或现代化代码库时，依赖 C++ 核心指南；[§19.1.4](19-1-history.md#19.1.4)。
+[3] 学习 C++ 时，不要孤立地关注语言特性；[§19.2.1](19-2-cpp-evolution.md#19.2.1)。
+[4] 不要固守几十年前的语言特性集和设计技术；[§19.1.4](19-1-history.md#19.1.4)。
 [5] 在生产代码中使用新特性之前，通过编写小程序测试你计划使用的实现的标准符合性和性能。
 [6] 为了学习 C++，使用你能获得的最新的、最完整的标准 C++ 实现。
-[7] C 和 C++ 的公共子集不是学习 C++ 的最佳初始子集；§19.3.2.1。
-[8] 避免强制转换；§19.3.2.1；[CG: ES.48]。
-[9] 优先选择命名强制转换（如 `static_cast`）而不是 C 风格强制转换；§5.2.3；[CG: ES.49]。
-[10] 将 C 程序转换为 C++ 时，重命名作为 C++ 关键字的变量；§19.3.2。
-[11] 为了可移植性和类型安全，如果必须使用 C，请用 C 和 C++ 的公共子集编写；§19.3.2.1；[CG: CPL.2]。
-[12] 将 C 程序转换为 C++ 时，将 `malloc()` 的结果强制转换为正确的类型，或将所有 `malloc()` 的使用改为使用 `new`；§19.3.2.2。
-[13] 从 `malloc()` 和 `free()` 转换到 `new` 和 `delete` 时，考虑使用 `vector`、`push_back()` 和 `reserve()` 而不是 `realloc()`；§19.3.2.1。
+[7] C 和 C++ 的公共子集不是学习 C++ 的最佳初始子集；[§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1)。
+[8] 避免强制转换；[§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1)；[CG: ES.48]。
+[9] 优先选择命名强制转换（如 `static_cast`）而不是 C 风格强制转换；[§5.2.3](../ch05/5-2-concrete-types.md#5.2.3)；[CG: ES.49]。
+[10] 将 C 程序转换为 C++ 时，重命名作为 C++ 关键字的变量；[§19.3.2](19-3-c-cpp-compatibility.md#19.3.2)。
+[11] 为了可移植性和类型安全，如果必须使用 C，请用 C 和 C++ 的公共子集编写；[§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1)；[CG: CPL.2]。
+[12] 将 C 程序转换为 C++ 时，将 `malloc()` 的结果强制转换为正确的类型，或将所有 `malloc()` 的使用改为使用 `new`；[§19.3.2.2](19-3-c-cpp-compatibility.md#19.3.2.2)。
+[13] 从 `malloc()` 和 `free()` 转换到 `new` 和 `delete` 时，考虑使用 `vector`、`push_back()` 和 `reserve()` 而不是 `realloc()`；[§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1)。
 [14] 在 C++ 中，没有从 `int` 到枚举的隐式转换；必要时使用显式类型转换。
 [15] 对于每个将名称放在全局命名空间中的标准 C 头文件 `<X.h>`，头文件 `<cX>` 将名称放在命名空间 `std` 中。
-[16] 在声明 C 函数时使用 `extern "C"`；§19.3.2.3。
+[16] 在声明 C 函数时使用 `extern "C"`；[§19.3.2.3](19-3-c-cpp-compatibility.md#19.3.2.3)。
 [17] 相对于 C 风格字符串（直接操作零结尾的 `char` 数组），优先选择 `string`；[CG: SL.str.1]。
 [18] 相对于 `stdio`，优先选择 `iostream`；[CG: SL.io.3]。
 [19] 相对于内置数组，优先选择容器（例如 `vector`）。
 
-# 附录 A：模�?std
+# 附录 A：module std
 
-发明中的大事是：你必须有一个能工作的完整系统�?�?J. Presper Eckert
+<div class="no-float" markdown="1">
+> **发明中的大事是：你必须有一个能工作的完整系统。**
+>
+> —— J. Presper Eckert
+</div>
 
 # A.1 引言
 
-在撰写本文时，模�?std [Stroustrup,2021b] 不幸地尚未成为标准的一部分。我有合理的希望它会成为 C++23 的一部分。本附录提供了一些目前如何应对的想法�?
-模块 `std` 的理念是使用单个 `import std;` 语句就可以简单且廉价地获得标准库的所有组件。我在全书各章节中都依赖于此。提到头文件并命名它们主要是因为它们是传统的且普遍可用的，部分原因是它们反映了标准库（不完美的）历史组织�?
-少数标准库组件将名称（例�?`<cmath>` 中的 `sqrt()`）转储到全局命名空间中。模�?`std` 不会这样做，但当我们需要获得这些全局名称时，可以导入 `std.compat`。导�?`std.compat` 而非 `std` 的唯一真正好的理由是为了避免弄乱旧代码库，同时仍然获得模块带来的编译速度提升的部分好处�?
-请注意，模块特意不导出宏。如果你需要宏，请使用 `#include`。模块和头文件共存；也就是说，如果你同时 `#include` �?`import` 一组相同的声明，你将得到一个一致的程序。这对于大型代码库从依赖头文件演进到使用模块至关重要�?
+在撰写本文时，module `std` [Stroustrup,2021b] 不幸地尚未成为标准的一部分。我有合理的希望它会成为 C++23 的一部分。本附录提供了一些目前如何应对的想法。
 
-# A.2 使用实现提供的内�?
-如果运气好，我们想要使用的实现已经提供了一个模�?`std`。在这种情况下，我们的首要选择应该是使用它。它可能被标记为"实验性的"，使用它可能需要一些设置或一些编译器选项。因此，首先要探索实现是否提供了模块 `std` 或等价物。例如，当前�?022 年春季）Visual Studio 提供了一�?实验�?模块，因此使用该实现，我们可以像这样定义模块 `std`�?
+module `std` 的理念是：通过单个 `import std;` 语句，就能简单且廉价地获得标准库的所有组件。我在全书各章节中都依赖于此。提到并命名各个头文件，主要是因为它们是传统的且普遍可用的，部分也因为它们反映了标准库（不完美的）历史组织。
+
+少数标准库组件会把名称（例如 `<cmath>` 中的 `sqrt()`）转储到全局命名空间中。module `std` 不会这样做，但当我们需要获得这些全局名称时，可以导入 `std.compat`。导入 `std.compat` 而非 `std` 的唯一真正好的理由，是为了避免弄乱旧代码库，同时仍然获得模块带来的编译速度提升的部分好处。
+
+请注意，模块特意不导出宏。如果你需要宏，请使用 `#include`。模块和头文件可以共存；也就是说，如果你同时 `#include` 和 `import` 一组相同的声明，你将得到一个一致的程序。这对于大型代码库从依赖头文件演进到使用模块至关重要。
+
+# A.2 使用实现所提供的内容
+
+如果运气好，我们想要使用的实现已经提供了一个 module `std`。在这种情况下，我们的首要选择应该是使用它。它可能被标记为“实验性的”，使用它可能需要一些设置或一些编译器选项。因此，首先要探查该实现是否提供了 module `std` 或等价物。例如，当前（2022 年春季）Visual Studio 提供了若干“实验性”模块，因此使用该实现，我们可以像这样定义 module `std`：
+
 ```cpp
 export module std;
 export import std.regex;          // <regex>
@@ -623,21 +604,24 @@ export import std.filesystem;     // <filesystem>
 export import std.memory;         // <memory>
 export import std.threading;      // <atomic>, <condition_variable>, <future>, <mutex>,
                                   // <shared_mutex>, <thread>
-export import std.core;           // 其他所�?```
+export import std.core;           // 其余全部
+```
 
-显然，要做到这一点，我们必须使用 C++20 编译器，并且还需要设置选项以访问实验性模块。请注意，所�?实验�?的东西都会随时间变化�?
+显然，要做到这一点，我们必须使用 C++20 编译器，并且还需要设置选项以访问实验性模块。请注意，所有“实验性”的东西都会随时间变化。
 
-# A.3 使用头文�?
-如果一个实现尚未支持模块，或者尚未提供模�?`std` 或等价的模块，我们可以回退到使用传统头文件。它们是标准且普遍可用的。问题在于，要使示例工作，我们需要弄清楚需要哪些头文件�?`#include` 它们。第 9 章可以提供帮助，我们可以�?[Cppreference] 上查找我们想要使用的特性的名称，以查看它属于哪个头文件。如果这变得乏味，我们可以将常用的头文件收集到一�?`std.h` 头文件中�?
+# A.3 使用头文件
+
+如果一个实现尚未支持模块，或者尚未提供 module `std` 或等价的模块，我们可以回退到使用传统头文件。它们是标准且普遍可用的。问题在于，要使示例工作，我们需要弄清楚需要哪些头文件并 `#include` 它们。[第 9 章](../ch09/index.md)可以提供帮助，我们也可以在 [Cppreference] 上查找想要使用的特性名称，以查看它属于哪个头文件。如果这变得乏味，我们可以把常用的头文件收集到一个 `std.h` 头文件中：
+
 ```cpp
 // std.h
 
 #include <iostream>
-#include <string>
-#include <vector>
-#include <list>
-#include <memory>
-#include <algorithm>
+#include<string>
+#include<vector>
+#include<list>
+#include<memory>
+#include<algorithms>
 // ...
 ```
 
@@ -647,28 +631,26 @@ export import std.core;           // 其他所�?```
 #include "std.h"
 ```
 
-这里的问题在于，`#include` 如此多的内容可能会导致编译非常慢 [Stroustrup,2021b]�?
+这里的问题在于，`#include` 如此多的内容可能会导致编译非常慢 [Stroustrup,2021b]。
 
-# A.4 制作你自己的模块 std
+# A.4 制作你自己的 module std
 
-这是最不吸引人的替代方案，因为它可能是最费力的工作，但一旦有人完成了，就可以共享�?
+这是最不吸引人的替代方案，因为它可能是最费力的工作，但一旦有人完成了，就可以共享：
+
 ```cpp
 module;
 #include <iostream>
-#include <string>
-#include <vector>
-#include <list>
-#include <memory>
-#include <algorithm>
+#include<string>
+#include<vector>
+#include<list>
+#include<memory>
+#include<algorithms>
 // ...
 
 export module std;
-export import <iostream>;
-export import <string>;
-export import <vector>;
-export import <list>;
-export import <memory>;
-export import <algorithm>;
+export istream;
+export ostream;
+export iostream;
 // ...
 ```
 
@@ -686,13 +668,20 @@ export import "algorithms";
 // ...
 ```
 
-构�?`import "iostream";` 导入头文件单元是模块和头文件之间的一个中间地带。它接受一个头文件并将其变成类似于模块的东西，但它也可能将名称注入全局命名空间（如 `#include`）并泄露宏�?
-这不�?`#include` 那样编译得那么慢，但也不像一个正确构造的命名模块那样快�?
+构造
+
+```cpp
+import "iostream";
+```
+
+导入头文件单元是模块和头文件之间的一个中间地带。它接受一个头文件并将其变成类似于模块的东西，但它也可能将名称注入全局命名空间（如 `#include`）并泄露宏。
+
+这不像 `#include` 那样编译得那么慢，但也不像一个正确构造的命名模块那样快。
 
 # A.5 建议
 
-[1] 优先使用实现提供的模块；§A.2。
-[2] 使用模块；§A.3。
-[3] 优先使用命名模块而不是头文件单元；§A.4。
-[4] 要使用 C 标准中的宏和全局名称，请导入 `std.compat`；§A.1。
-[5] 避免使用宏；§A.1。[CG: ES.30] [CG: ES.31]。
+[1] 优先使用实现提供的模块；[§A.2](A-2-using-implementation.md)。
+[2] 使用模块；[§A.3](A-3-using-header-files.md)。
+[3] 优先使用命名模块而不是头文件单元；[§A.4](A-4-make-your-own-std-module.md)。
+[4] 要使用 C 标准中的宏和全局名称，请导入 `std.compat`；[§A.1](A-1-introduction.md)。
+[5] 避免使用宏；[§A.1](A-1-introduction.md)。[CG: ES.30] [CG: ES.31]。

@@ -1,35 +1,35 @@
-# 15.4 表示“多选一”的类型
+# 15.4 替代方案
 
-标准库提供三类类型来表达“若干候选之一”：
+标准库提供三种类型来表达替代：
 
-**备选类型一览**
+**替代方案**
 
 | 类型 | 说明 |
 |------|------|
-| `union` | 语言内置：保存若干候选字段之一（[§2.5](../ch02/2-5-union.md)） |
-| `variant<T...>` | `<variant>`：保存若干指定类型之一 |
-| `optional<T>` | `<optional>`：要么保存 `T`，要么为空 |
-| `any` | `<any>`：保存某个未知类型的值 |
+| `union` | 内置类型，保存一组替代中的一个（[§2.5](../ch02/2-5-union.md)） |
+| `variant<T...>` | 指定的一组替代中的一个（在 `<variant>` 中） |
+| `optional<T>` | 类型为 `T` 的值，或没有值（在 `<optional>` 中） |
+| `any` | 无界替代类型集合中某一类型的值（在 `<any>` 中） |
 
-它们彼此相关，遗憾的是接口并不统一。
+这些类型为用户提供相关功能。遗憾的是，它们并不提供统一的接口。
 
 ## 15.4.1 `variant`
 
-`variant<A, B, C>` 常常比显式 `union`（[§2.5](../ch02/2-5-union.md)）更安全也更顺手。最简单的用法莫过于返回“要么成功值要么错误码”：
+`variant<A,B,C>` 常常是显式使用 `union`（[§2.5](../ch02/2-5-union.md)）的更安全、更方便的替代。可能最简单的例子是返回一个值或一个错误码：
 
 ```cpp
-variant<string, Error_code> compose_message(istream& s)
+variant<string,Error_code> compose_message(istream& s)
 {
     string mess;
     // ... 从 s 读取并拼装消息 ...
     if (no_problems)
-        return mess;
+        return mess;                                               // 返回 string
     else
-        return Error_code{some_problem};
+        return Error_code{some_problem};        // 返回 Error_code
 }
 ```
 
-赋值或初始化 `variant` 时，它会记住当前持有的类型；随后可以查询并向正确的类型索取值：
+当你用一个值赋值或初始化 `variant` 时，它会记住该值的类型。之后，我们可以查询 `variant` 持有何种类型并取出该值。例如：
 
 ```cpp
 auto m = compose_message(cin);
@@ -43,10 +43,10 @@ else {
 }
 ```
 
-有人会偏爱这种风格胜过异常（[§4.4](../ch04/4-4-alternatives.md)）；此外还有更丰富用途——例如简易编译器要把不同节点区别开来：
+这种风格对某些不喜欢异常的人有吸引力（见 [§4.4](../ch04/4-4-alternatives.md)），但还有更有趣的用途。例如，一个简单的编译器可能需要区分具有不同表示的不同种类的节点：
 
 ```cpp
-using Node = variant<Expression, Statement, Declaration, Type>;
+using Node = variant<Expression,Statement,Declaration,Type>;
 
 void check(Node* p)
 {
@@ -62,7 +62,7 @@ void check(Node* p)
 }
 ```
 
-这种手写分支的模式既啰嗦也相对低效，值得单独封装——于是可以用 `visit`：
+这种检查各个替代以决定适当动作的模式如此常见，又相对低效，因而值得直接支持：
 
 ```cpp
 void check(Node* p)
@@ -75,99 +75,101 @@ void check(Node* p)
 }
 ```
 
-它在语义上接近虚函数调用，有时还可能更快；但若性能关键仍需实测。多数差异并不重要。
+这基本上等价于虚函数调用，但可能更快。与所有关于性能的断言一样，当性能关键时，这一“可能更快”应当用测量来核实。对多数用途，性能差异并不显著。
 
-`overloaded` 必不可少却又诡异：**它不是标准类型**。它像魔法一样把一组候选（通常是 lambda）捏成一个可调对象：
+`overloaded` 类是必要的，而且奇怪的是，它并非标准的。它是一块“魔法”，从一组实参（通常是 lambda）构造一个重载集：
 
 ```cpp
 template<class... Ts>
-struct overloaded : Ts... {
+struct overloaded : Ts... {            // 可变参数模板（[§8.4](../ch08/8-4-variadic-templates.md)）
     using Ts::operator()...;
 };
 
 template<class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>; // 推导指引
+overloaded(Ts...) -> overloaded<Ts...>;    // 推导指引
 ```
 
-随后 `visit` 会把 `()` 作用在该对象上，按常规重载决议挑出最合适的 lambda。
+然后“访问者”`visit` 把 `()` 作用到该重载对象上，后者按重载规则选出最合适的 lambda 来调用。
 
-推导指引主要用来消解微妙的歧义，是基础库类模板构造的重要工具（[§7.2.3](../ch07/7-2-parameterized-types.md#7.2.3)）。
+推导指引是一种消解微妙歧义的机制，主要用于基础库中类模板的构造函数（[§7.2.3](../ch07/7-2-parameterized-types.md#7.2.3)）。
 
-若试图取出并非当前激活类型的分支，`variant` 会抛出 `bad_variant_access`。
+若我们试图访问持有与期望类型不同的 `variant`，会抛出 `bad_variant_access`。
 
 ## 15.4.2 `optional`
 
-可以把 `optional<A>` 看成特殊的 `variant`（类似 `variant<A, monostate>`），或是“指向 `A` 的指针但不会出现所有权问题”的泛化。
+可以把 `optional<A>` 看成一种特殊的 `variant`（类似 `variant<A,nothing>`），或看成“`A*` 要么指向对象要么为 `nullptr`”这一观念的推广。
 
-对那些“可能有返回值也可能没有”的函数很有帮助：
+`optional` 对那些可能返回对象也可能不返回对象的函数很有用：
 
 ```cpp
 optional<string> compose_message(istream& s)
 {
     string mess;
-    // ... 读取 ...
+
+    // ... 从 s 读取并拼装消息 ...
+
     if (no_problems)
         return mess;
-    return {}; // 空 optional
+    return {};          // 空 optional
 }
 ```
 
-调用方可写成：
+有了它，我们可以写：
 
 ```cpp
 if (auto m = compose_message(cin))
-    cout << *m;
+    cout << *m;               // 注意解引用（*）
 else {
-    // ...
+    // ... 处理错误 ...
 }
 ```
 
-这也迎合厌恶异常的程序员（[§4.4](../ch04/4-4-alternatives.md)）。注意这里的 `*`：`optional` 更像指针语义而非对象本体。
+这对某些不喜欢异常的人有吸引力（见 [§4.4](../ch04/4-4-alternatives.md)）。注意对 `*` 的奇特用法。`optional` 被当作指向其对象的指针，而非对象本身。
 
-“空指针”对应 `{}`。例如：
+与 `nullptr` 对应的 `optional` 是空对象 `{}`。例如：
 
 ```cpp
 int sum(optional<int> a, optional<int> b)
 {
     int res = 0;
-    if (a)
-        res += *a;
-    if (b)
-        res += *b;
+    if (a) res += *a;
+    if (b) res += *b;
     return res;
 }
 
-int x = sum(17, 19); // 36
-int y = sum(17, {}); // 17
-int z = sum({}, {}); // 0
+int x = sum(17, 19);         // 36
+int y = sum(17, {});          // 17
+int z = sum({}, {});            // 0
 ```
 
-倘若在没有值的时候强行访问 `optional`，结果是未定义行为——并不会抛异常。因此它谈不上百分之百类型安全；千万别写：
+若我们试图访问不持有值的 `optional`，结果是未定义的；不会抛出异常。因此，`optional` 并不保证类型安全。不要尝试：
 
 ```cpp
 int sum2(optional<int> a, optional<int> b)
 {
-    return *a + *b; // 自讨苦吃
+    return *a + *b;     // 自讨苦吃
 }
 ```
 
 ## 15.4.3 `any`
 
-`any` 容纳任意类型，并且知道自己装着谁——可以理解成“不加模板约束的 `variant`”：
+`any` 可以持有任意类型，并知道它持有何种类型（如果有的话）。它基本上是不受约束的 `variant` 版本：
 
 ```cpp
 any compose_message(istream& s)
 {
     string mess;
-    // ...
+
+    // ... 从 s 读取并拼装消息 ...
+
     if (no_problems)
-        return mess;
+        return mess;                        // 返回 string
     else
-        return error_number;
+        return error_number;          // 返回 int
 }
 ```
 
-赋值之后同样可以按断言的类型取出：
+当你用一个值赋值或初始化 `any` 时，它会记住该值的类型。之后，我们可以通过断言该值的期望类型来取出 `any` 所持有的值。例如：
 
 ```cpp
 auto m = compose_message(cin);
@@ -175,4 +177,4 @@ string& s = any_cast<string>(m);
 cout << s;
 ```
 
-若类型不匹配，`any_cast` 抛出 `bad_any_access`。
+若我们试图访问持有与期望类型不同的 `any`，会抛出 `bad_any_access`。

@@ -37,7 +37,11 @@
 ofstream ofs {"target"};   // “o” 代表 “output”
 if (!ofs)
     error("couldn't open 'target' for writing");
+```
 
+检验文件流是否已正确打开，通常通过检查其状态来完成。
+
+```cpp
 ifstream ifs {"source"};   // “i” 代表 “input”
 if (!ifs)
     error("couldn't open 'source' for reading");
@@ -122,7 +126,7 @@ void user(int arg)
 
 ## 11.7.5 同步流
 
-在多线程系统中，除非满足以下条件之一，否则 I/O 会变得不可靠：
+在多线程系统中，除非满足以下条件之一，否则 I/O 会变得一团糟、不可靠：
 
 - 只有一个线程使用该流。
 - 对流的访问是同步的，以便一次只有一个线程获得访问。

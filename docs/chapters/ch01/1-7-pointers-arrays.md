@@ -21,7 +21,7 @@ char x = *p;        // *p是p指向的对象
 
 在表达式中，前缀“*”表示“内容”，而前缀“&”则表示“地址”。我们可以用图形的方式来表示这一点：
 
-![alt text](../../assets/images/ch01/content-of-and-address-of.png)
+![解引用与取地址](../../assets/images/ch01/content-of-and-address-of.png)
 
 考虑打印数组中的各个元素：
 

@@ -40,7 +40,7 @@ constexpr complex<double> operator""i(long double arg)   // 虚数字面量
 有了这个，我们可以写：
 
 ```cpp
-complex<double> z = 2.7182818 + 6.2831851i;
+complex<double> z = 2.7182818 + 6.283185i;
 ```
 
 后缀 `i` 的实现和 `+` 都是 `constexpr`，因此 `z` 的计算在编译时完成。

@@ -1,16 +1,8 @@
-# 13.2 使用迭代器
+# 13.2 迭代器的使用
 
 对容器而言，我们能拿到若干指向有用元素的迭代器；`begin()` 与 `end()` 就是最典型的例子。此外，许多算法也会返回迭代器。例如标准算法 `find` 在一个序列里查找某个值，并返回指向找到的元素的迭代器：
 
 ```cpp
-list<Entry> f(vector<Entry>& vec)
-{
-    list<Entry> res;
-    sort(vec.begin(), vec.end());
-    unique_copy(vec.begin(), vec.end(), back_inserter(res)); // 追加到 res
-    return res;
-}
-
 bool has_c(const string& s, char c) // s 是否包含字符 c？
 {
     auto p = find(s.begin(), s.end(), c);
@@ -30,15 +22,15 @@ bool has_c(const string& s, char c) // s 是否包含字符 c？
 }
 ```
 
-更有趣的练习是在字符串中找到某个字符出现的所有位置。可以把每次出现的位置作为一组指针返回；由于 `vector` 提供了移动语义（[§6.2.1](../ch06/6-2-copy-move.md#6.2.1)），返回 `vector` 本身是高效的。若希望对找到的位置进行修改，则传入非常量的 `string`：
+更有趣的练习是在字符串中找到某个字符出现的所有位置。可以把每次出现的位置作为一组 `char*` 返回；由于 `vector` 提供了移动语义（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)），返回 `vector` 本身是高效的。若希望对找到的位置进行修改，则传入非常量的 `string`：
 
 ```cpp
-vector<string::iterator> find_all(string& s, char c) // 找出 s 中所有为 c 的位置
+vector<char*> find_all(string& s, char c) // 找出 s 中所有为 c 的位置
 {
-    vector<string::iterator> res;
+    vector<char*> res;
     for (auto p = s.begin(); p != s.end(); ++p)
         if (*p == c)
-            res.push_back(p);
+            res.push_back(&*p);
     return res;
 }
 ```
@@ -55,7 +47,9 @@ void test()
 }
 ```
 
-对这次 `find_all()` 调用，也可以画图示意。
+对这次 `find_all()` 调用，也可以画图示意：
+
+![find_all(m, 'a') 返回指向各 'a' 的指针](../../assets/images/ch13/find-all.png)
 
 迭代器与标准算法对所有适用它们的容器能起到同样的效果。因此可以把 `find_all()` 推广：
 
@@ -71,13 +65,13 @@ vector<typename C::iterator> find_all(C& c, V v) // 找出容器 c 中所有值�
 }
 ```
 
-这里的 `typename` 用来告诉编译器：`C::iterator` 应当被视为类型，而不是某个类型的某个具体取值。
+这里的 `typename` 用来告诉编译器：`C` 的 `iterator` 应当被视为类型，而不是某个类型的某个具体取值（比方说整数 `7`）。
 
 等价的做法是返回一组指向元素的普通指针：
 
 ```cpp
 template<typename C, typename V>
-auto find_all(C& c, V v)
+auto find_all(C& c, V v) // 找出容器 c 中所有值为 v 的位置
 {
     vector<range_value_t<C>*> res;
     for (auto& x : c)
@@ -121,3 +115,5 @@ void test()
 ```
 
 迭代器用来把算法与容器隔开：算法只通过迭代器操作数据，不知道元素存放在何种容器中；反过来容器也不知道有哪些算法作用于元素——它只是按需给出迭代器（例如 `begin()` 与 `end()`）。这种把存储与计算分离的模型非常通用且灵活。
+
+![算法经迭代器作用于容器](../../assets/images/ch13/algorithms-iterators-containers.png)

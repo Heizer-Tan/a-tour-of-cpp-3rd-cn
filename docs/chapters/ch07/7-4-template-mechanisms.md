@@ -34,7 +34,7 @@ auto acc = external_acceleration<float>;
 
 ```cpp
 template<typename T, typename T2>
-constexpr bool Assignable = is_assignable_v<T&, T2>;   // is_assignable_v 是标准类型谓词
+constexpr bool Assignable = is_assignable<T&, T2>::value;   // is_assignable 是标准类型谓词
 
 template<typename T>
 void testing()

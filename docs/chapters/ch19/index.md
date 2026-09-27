@@ -5,7 +5,7 @@
 # 历史和兼容性
 
 <div class="no-float" markdown="1">
-> **了解过去，才能更好地把握未来。**
+> **慢慢赶路（festina lente）。**
 >
-> —— Bjarne Stroustrup
+> —— 屋大维（Octavius），奥古斯都（Caesar Augustus）
 </div>

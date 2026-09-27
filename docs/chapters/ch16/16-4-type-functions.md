@@ -2,7 +2,7 @@
 
 类型函数是在编译期求值的函数：以类型为实参，或返回类型。标准库提供多种类型函数，帮助库实现者（以及广大程序员）写出能够利用语言特性、标准库以及一般代码方方面面的程序。
 
-对算术类型，`<limits>` 中的 `numeric_limits` 提供诸多有用信息（[§17.7](../ch17/17-7-numeric-limits.md)）。例如：
+对数值类型，`<limits>` 中的 `numeric_limits` 提供诸多有用信息（[§17.7](../ch17/17-7-numeric-limits.md)）。例如：
 
 ```cpp
 constexpr float min = numeric_limits<float>::min();   // 最小正 float
@@ -17,7 +17,7 @@ constexpr int szi = sizeof(int);   // 一个 int 占用的字节数
 在 `<type_traits>` 中，标准库提供了大量用于查询类型性质的函数。例如：
 
 ```cpp
-bool b = is_arithmetic_v<X>;                        // 若 X 为（内建）算术类型则为 true
+bool b = is_arithmetic_v<X>;                        // 若 X 为（内建）算术类型之一则为 true
 using Res = invoke_result_t<decltype(f)>;           // 若 f 是返回 int 的函数，则 Res 为 int
 ```
 
@@ -49,9 +49,9 @@ auto call(F f, Args... a, Allocator alloc)
 
 记法约定容易令人困惑。标准库用后缀 `_v` 表示返回值的类型函数，用 `_t` 表示返回类型的类型函数。这是 C 以及 concept 之前 C++ 弱类型时代的遗存。没有任何标准库类型函数既返回类型又返回值，因此这些后缀其实是冗余的。有了 concept——无论是在标准库还是别处——都不需要也不使用后缀。
 
-类型函数属于 C++ 编译期计算机制的一部分；相较没有它们的情形，能实现更严格的类型检查和更好的性能。类型函数与 concept（第 8 章，[§14.5](../ch14/14-5-concept-overview.md)）的使用常被称为元编程，或（当涉及模板时）模板元编程。
+类型函数属于 C++ 编译期计算机制的一部分；相较没有它们的情形，能实现更严格的类型检查和更好的性能。类型函数与 concept（[第 8 章](../ch08/index.md)，[§14.5](../ch14/14-5-concept-overview.md)）的使用常被称为元编程，或（当涉及模板时）模板元编程。
 
-## 16.4.1
+## 16.4.1 类型谓词
 
 在 `<type_traits>` 中，标准库提供数十个简单的类型函数，称为**类型谓词**，回答关于类型的基本问题。下面是一小部分：
 
@@ -125,7 +125,7 @@ template<class T>
 void cpy1(T* first, T* last, T* target)
 {
     if constexpr (is_trivially_copyable_v<T>)
-        memcpy(target, first, (last - first) * sizeof(T));   // 注意：示意 memcpy 参数顺序
+        memcpy(first, target, (last - first) * sizeof(T));
     else
         while (first != last)
             *target++ = *first++;
@@ -134,7 +134,7 @@ void cpy1(T* first, T* last, T* target)
 
 这类简单优化在某些实现上可比未优化版本快大约一半。**除非**你已核实标准库没有做得更好，否则不要沉迷于这类技巧。手工优化的代码通常不如更简单替代品易于维护。
 
-## 16.4.2
+## 16.4.2 条件性质
 
 考虑定义「智能指针」：
 
@@ -147,7 +147,7 @@ class Smart_pointer {
 };
 ```
 
-`operator->` 当且仅当 `T` 为类类型时才应定义。例如，`Smart_pointer<vector<int>>` 应有 `->`，但 `Smart_pointer<int>` 不应有。
+`operator->` 当且仅当 `T` 为类类型时才应定义。例如，`Smart_pointer<vector<T>>` 应有 `->`，但 `Smart_pointer<int>` 不应有。
 
 我们不能使用编译期 `if`，因为不在函数体内。应写成：
 
@@ -156,7 +156,7 @@ template<typename T>
 class Smart_pointer {
     // ...
     T& operator*() const;
-    T* operator->() const requires is_class_v<T>;   // 当且仅当……时定义 ->
+    T* operator->() const requires is_class_v<T>;   // 当且仅当 T 为类类型时定义 ->
 };
 ```
 
@@ -164,19 +164,19 @@ class Smart_pointer {
 
 ```cpp
 template<typename T>
-concept Class = is_class_v<T> || is_union_v<T>;   // 联合体也算一类 class-key
+concept Class = is_class_v<T> || is_union_v<T>;   // 联合体也是类
 
 template<typename T>
 class Smart_pointer {
     // ...
     T& operator*() const;
-    T* operator->() const requires Class<T>;      // 当且仅当 T 为类类型……
+    T* operator->() const requires Class<T>;      // 当且仅当 T 为类类型时定义 ->
 };
 ```
 
 常常 concept 比直接使用标准库类型谓词更一般，或单纯更合适。
 
-## 16.4.3
+## 16.4.3 类型生成器
 
 许多类型函数返回类型——常常是据此计算出的新类型。我把这类函数称为**类型生成器**，以区别于类型谓词。标准库提供的一部分如下：
 
@@ -202,13 +202,13 @@ template<typename T>
 class Smart_pointer {
     // ...
     T& operator*();
-    enable_if_t<is_class_v<T>, T&> operator->();   // 当且仅当 T 为类类型……
+    enable_if<is_class_v<T>, T&> operator->();   // 当且仅当 T 为类类型时定义 ->
 };
 ```
 
-我觉得这并不好读，更复杂的用法糟得多。`enable_if` 的定义依赖一门精微的语言特性，称为 SFINAE（替换失败不是错误）。只有在你**确实需要**时再去查阅它。
+我觉得这并不好读，更复杂的用法糟得多。`enable_if` 的定义依赖一门精微的语言特性，称为 SFINAE（「替换失败不是错误」）。只有在你**确实需要**时再去查阅它。
 
-## 16.4.4
+## 16.4.4 关联类型
 
 所有标准容器（[§12.8](../ch12/12-8-container-overview.md)）以及遵循其模式的容器都有若干关联类型，例如值类型与迭代器类型。在 `<iterator>` 与 `<ranges>` 中，标准库为这些类型提供了名字：
 

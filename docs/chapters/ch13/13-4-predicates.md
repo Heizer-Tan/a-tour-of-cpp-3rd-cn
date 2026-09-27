@@ -1,20 +1,4 @@
-# 13.4 谓词
-
-```cpp
-int main()
-{
-    string from, to;
-    cin >> from >> to;
-
-    ifstream is {from};
-    ofstream os {to};
-
-    set<string> b {istream_iterator<string>{is}, istream_iterator<string>{}};
-    copy(b, ostream_iterator<string>{os, "\n"});
-
-    return !is.eof() || !os;
-}
-```
+# 13.4 谓词的使用
 
 此前的例子中，算法对每个元素要做什么往往是“内置固定”的；但我们常常希望把这项动作参数化。譬如 `find`（[§13.2](13-2-using-iterators.md)，[§13.5](13-5-algorithm-overview.md)）提供了查找特定值的便捷途径；更一般的变体则是查找满足某个要求的元素——这类要求称为**谓词**（predicate）。
 

@@ -6,11 +6,11 @@ I/O 流库提供文本和数值的格式化和非格式化缓冲 I/O。它是可
 
 `ostream` 将类型化对象转换为字符（字节）流：
 
-[图片描述]
+![ostream：类型化对象经流缓冲成为字节序列](../../assets/images/ch11/ostream.png)
 
 `istream` 将字符（字节）流转换为类型化对象：
 
-[图片描述]
+![istream：字节序列经流缓冲成为类型化对象](../../assets/images/ch11/istream.png)
 
 `istream` 和 `ostream` 的操作在 [§11.2](11-2-output.md) 和 [§11.3](11-3-input.md) 中描述。这些操作是类型安全、类型敏感且可扩展的，能够处理用户定义类型（[§11.5](11-5-user-defined-io.md)）。
 

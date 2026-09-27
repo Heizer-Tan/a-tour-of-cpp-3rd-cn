@@ -12,11 +12,11 @@ I/O 流库提供文本和数值的格式化和非格式化缓冲 I/O。它是可
 
 `ostream` 将类型化对象转换为字符（字节）流：
 
-[图片描述]
+![ostream：类型化对象经流缓冲成为字节序列](../../assets/images/ch11/ostream.png)
 
 `istream` 将字符（字节）流转换为类型化对象：
 
-[图片描述]
+![istream：字节序列经流缓冲成为类型化对象](../../assets/images/ch11/istream.png)
 
 `istream` 和 `ostream` 的操作在 [§11.2](11-2-output.md) 和 [§11.3](11-3-input.md) 中描述。这些操作是类型安全、类型敏感且可扩展的，能够处理用户定义类型（[§11.5](11-5-user-defined-io.md)）。
 
@@ -146,7 +146,7 @@ Hello, Eric Bloodaxe!
 
 终止该行的换行符被丢弃，因此 `cin` 已为下一行输入做好准备。
 
-使用格式化 I/O 操作通常比逐个操作字符更不容易出错、更高效且代码更少。特别是，`istream` 负责内存管理和范围检查。我们可以使用 `stringstream`（[§11.7.3](11-7-streams.md#1173-字符串流)）或内存流（[§11.7.4](11-7-streams.md#1174-内存流)）在内存中进行格式化。
+使用格式化 I/O 操作通常比逐个操作字符更不容易出错、更高效且代码更少。特别是，`istream` 负责内存管理和范围检查。我们可以使用 `stringstream`（[§11.7.3](11-7-streams.md#1173-字符串流)）或内存流（[§11.7.4](11-7-streams.md#1174-内存流)）在内存中进行格式化输入与输出。
 
 标准字符串具有很好的属性：它们会扩展以容纳放入其中的内容；你不必预先计算最大大小。因此，如果你输入几兆字节的分号，`hello_line()` 会回显给你很多页的分号。
 
@@ -386,6 +386,8 @@ cout << format("{3:} {1:x} {2:o} {0:b}\n", 000, 111, 222, 333);
 cout << format("{0:} {0:x} {0:o} {0:d} {0:b}\n", 1234);
 ```
 
+把参数“乱序”放入输出的能力，深受用不同自然语言撰写消息的人赞赏。
+
 浮点格式与 `ostream` 相同：`e` 表示科学计数法，`a` 表示十六进制浮点，`f` 表示定点，`g` 表示默认。例如：
 
 ```cpp
@@ -414,7 +416,9 @@ precision(4): 1235 1234.56789 123456
 1234.56789
 ```
 
-与流格式化器一样，`format()` 也可以处理时间和日期（[§16.2](../ch16/16-2-time.md)）。例如：
+与流格式化器一样，我们也可以指定数字要放入的字段大小及其在字段中的对齐方式。
+
+与流格式化器一样，`format()` 也可以处理时间和日期（[§16.2.2](../ch16/16-2-time.md#1622-日历)）。例如：
 
 ```cpp
 cout << format("birthday: {}\n", November/28/2021);
@@ -501,7 +505,11 @@ cout << buf;   // iterator: Hi! 2022
 ofstream ofs {"target"};   // “o” 代表 “output”
 if (!ofs)
     error("couldn't open 'target' for writing");
+```
 
+检验文件流是否已正确打开，通常通过检查其状态来完成。
+
+```cpp
 ifstream ifs {"source"};   // “i” 代表 “input”
 if (!ifs)
     error("couldn't open 'source' for reading");
@@ -586,7 +594,7 @@ void user(int arg)
 
 ## 11.7.5 同步流
 
-在多线程系统中，除非满足以下条件之一，否则 I/O 会变得不可靠：
+在多线程系统中，除非满足以下条件之一，否则 I/O 会变得一团糟、不可靠：
 
 - 只有一个线程使用该流。
 - 对流的访问是同步的，以便一次只有一个线程获得访问。
@@ -683,7 +691,15 @@ void use(path p)
 
 除了 `path`，`<filesystem>` 还提供了用于遍历目录和查询所找到文件属性的类型：
 
-[表：文件系统类型（部分）]
+**文件系统类型（部分）**
+
+| 类型 | 说明 |
+|------|------|
+| `path` | 目录路径 |
+| `filesystem_error` | 文件系统异常 |
+| `directory_entry` | 目录项 |
+| `directory_iterator` | 用于遍历目录 |
+| `recursive_directory_iterator` | 用于遍历目录及其子目录 |
 
 考虑一个简单但并非完全不现实的例子：
 
@@ -716,11 +732,33 @@ void use()
 }
 ```
 
-如果我还想列出子目录，我会使用 `recursive_directory_iterator(p)`。如果我想按字典顺序打印条目，我会将路径复制到一个 `vector` 中，并在打印前对其进行排序。
+如果我还想列出子目录，我会使用 `recursive_directory_iterator{p}`。如果我想按字典顺序打印条目，我会将路径复制到一个 `vector` 中，并在打印前对其进行排序。
 
 类 `path` 提供了许多常见且有用的操作：
 
-[表：路径操作（部分）]
+**路径操作（部分）**（`p`、`p2` 为路径）
+
+| 操作 | 说明 |
+|------|------|
+| `value_type` | 文件系统本地编码所用的字符类型：POSIX 上为 `char`，Windows 上为 `wchar_t` |
+| `string_type` | `std::basic_string<value_type>` |
+| `const_iterator` | 值为 `path` 的常双向迭代器 |
+| `iterator` | `const_iterator` 的别名 |
+| `p=p2` | 将 `p2` 赋给 `p` |
+| `p/=p2` | 用文件名分隔符（默认 `/`）连接 `p` 与 `p2` |
+| `p+=p2` | 连接 `p` 与 `p2`（无分隔符） |
+| `s=p.native()` | 对 `p` 本地格式的引用 |
+| `s=p.string()` | 以 `string` 表示的 `p` 的本地格式 |
+| `s=p.generic_string()` | 以 `string` 表示的通用格式的 `p` |
+| `p2=p.filename()` | `p` 的文件名部分 |
+| `p2=p.stem()` | `p` 的词干部分 |
+| `p2=p.extension()` | `p` 的扩展名部分 |
+| `i=p.begin()` | `p` 元素序列的起始迭代器 |
+| `i=p.end()` | `p` 元素序列的结束迭代器 |
+| `p==p2`, `p!=p2` | `p` 与 `p2` 的相等与不等 |
+| `p<p2`, `p<=p2`, `p>p2`, `p>=p2` | 字典序比较 |
+| `is>>p`, `os<<p` | 对 `p` 的流输入/输出 |
+| `u8path(s)` | 由 UTF-8 编码的源 `s` 构造路径 |
 
 例如：
 

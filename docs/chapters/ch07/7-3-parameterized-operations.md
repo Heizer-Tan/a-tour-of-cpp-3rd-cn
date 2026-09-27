@@ -236,7 +236,7 @@ void user(Init_mode m, int n, vector<int>& arg, Iterator p, Iterator q)
     vector<int> v = [&] {
         switch (m) {
         case zero: return vector<int>(n);      // n 个元素初始化为 0
-        case seq:  return vector<int>(p, q);   // 从序列 [p:q) 拷贝
+        case seq:  return vector<int>{p, q};   // 从序列 [p:q) 拷贝
         case cpy:  return arg;
         }
     }();

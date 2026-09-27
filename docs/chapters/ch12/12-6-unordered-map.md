@@ -2,7 +2,7 @@
 
 `map` 查找的成本是 O(log(n))，其中 `n` 是 `map` 中元素的数量。这相当不错。例如，对于一个包含 1,000,000 个元素的 `map`，我们只需大约 20 次比较和间接寻址就能找到一个元素。然而，在许多情况下，我们可以使用哈希查找而不是使用排序函数（如 `<`）进行比较，从而做得更好。标准库的哈希容器被称为“无序的”，因为它们不需要排序函数：
 
-[图片描述：unordered_map 结构示意图]
+![unordered_map 哈希表布局](../../assets/images/ch12/unordered-map-layout.png)
 
 例如，我们可以使用 `<unordered_map>` 中的 `unordered_map` 来实现我们的电话簿：
 
@@ -35,7 +35,7 @@ struct Record {
 struct Rhash {   // 为 Record 定义的哈希函数
     size_t operator()(const Record& r) const
     {
-        return hash<string>{}(r.name) ^ hash<int>{}(r.product_code);
+        return hash<string>()(r.name) ^ hash<int>()(r.product_code);
     }
 };
 
@@ -54,7 +54,7 @@ namespace std {   // 为 Record 创建一个哈希函数
 
         result_type operator()(const Record& r) const
         {
-            return hash<string>{}(r.name) ^ hash<int>{}(r.product_code);
+            return hash<string>()(r.name) ^ hash<int>()(r.product_code);
         }
     };
 }

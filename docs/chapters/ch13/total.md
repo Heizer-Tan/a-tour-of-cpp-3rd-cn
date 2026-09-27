@@ -27,7 +27,7 @@ bool operator<(const Entry& x, const Entry& y)   // 小于
 
 标准算法用（半开）元素序列来描述问题：序列由一对迭代器表示，分别指向首元素与尾后位置：
 
-[图片描述：序列 `[begin:end)` 示意图]
+![迭代器 begin() 与 end() 界定的半开序列](../../assets/images/ch13/begin-end-sequence.png)
 
 在上面的例子里，`sort()` 对迭代器对 `vec.begin()`、`vec.end()` 所限制的序列排序——该序列恰好覆盖整个 `vector`。对于写出（输出），只需要指明写入的起点；若要写出多个元素，则会从起点开始向后覆盖。因而为避免错误，`lst` 至少要有与 `vec` 中互不相同元素个数一样多的元素。
 
@@ -79,9 +79,9 @@ list<Entry> f(vector<Entry>& vec)
 }
 ```
 
-`back_inserter(res)` 会构造一个指向 `res` 的迭代器：写入时在容器末尾添加元素，并扩展容器以容纳它们。这样就不必先分配一块固定空间再填入。于是标准容器配合 `back_inserter()`，可以避免那种容易出错、手工管理的 C 风格 `realloc()` 用法。标准库的 `list` 带有移动构造函数（§6.2.2），因此即便元素很多，按值返回 `res` 也仍然高效。
+`back_inserter(res)` 会构造一个指向 `res` 的迭代器：写入时在容器末尾添加元素，并扩展容器以容纳它们。这样就不必先分配一块固定空间再填入。于是标准容器配合 `back_inserter()`，可以避免那种容易出错、手工管理的 C 风格 `realloc()` 用法。标准库的 `list` 带有移动构造函数（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)），因此即便元素很多，按值返回 `res` 也仍然高效。
 
-当我们觉得 `sort(vec.begin(), vec.end())` 这种“迭代器对”写法累赘时，可以使用算法的范围（range）版本写成 `sort(vec)`（§13.5）；两者等价。类似地，范围 `for` 大致等价于手写的使用迭代器的循环：
+当我们觉得 `sort(vec.begin(), vec.end())` 这种“迭代器对”写法累赘时，可以使用算法的范围（range）版本写成 `sort(vec)`（[§13.5](13-5-algorithm-overview.md)）；两者等价。类似地，范围 `for` 大致等价于手写的使用迭代器的循环：
 
 ```cpp
 for (auto& x : v)
@@ -92,19 +92,11 @@ for (auto p = v.begin(); p != v.end(); ++p)
 
 除了更简单、更不易出错之外，范围 `for` 往往也更高效。
 
-# 13.2 使用迭代器
+# 13.2 迭代器的使用
 
 对容器而言，我们能拿到若干指向有用元素的迭代器；`begin()` 与 `end()` 就是最典型的例子。此外，许多算法也会返回迭代器。例如标准算法 `find` 在一个序列里查找某个值，并返回指向找到的元素的迭代器：
 
 ```cpp
-list<Entry> f(vector<Entry>& vec)
-{
-    list<Entry> res;
-    sort(vec.begin(), vec.end());
-    unique_copy(vec.begin(), vec.end(), back_inserter(res)); // 追加到 res
-    return res;
-}
-
 bool has_c(const string& s, char c) // s 是否包含字符 c？
 {
     auto p = find(s.begin(), s.end(), c);
@@ -124,15 +116,15 @@ bool has_c(const string& s, char c) // s 是否包含字符 c？
 }
 ```
 
-更有趣的练习是在字符串中找到某个字符出现的所有位置。可以把每次出现的位置作为一组指针返回；由于 `vector` 提供了移动语义（§6.2.1），返回 `vector` 本身是高效的。若希望对找到的位置进行修改，则传入非常量的 `string`：
+更有趣的练习是在字符串中找到某个字符出现的所有位置。可以把每次出现的位置作为一组 `char*` 返回；由于 `vector` 提供了移动语义（[§6.2.2](../ch06/6-2-copy-move.md#6.2.2)），返回 `vector` 本身是高效的。若希望对找到的位置进行修改，则传入非常量的 `string`：
 
 ```cpp
-vector<string::iterator> find_all(string& s, char c) // 找出 s 中所有为 c 的位置
+vector<char*> find_all(string& s, char c) // 找出 s 中所有为 c 的位置
 {
-    vector<string::iterator> res;
+    vector<char*> res;
     for (auto p = s.begin(); p != s.end(); ++p)
         if (*p == c)
-            res.push_back(p);
+            res.push_back(&*p);
     return res;
 }
 ```
@@ -149,7 +141,9 @@ void test()
 }
 ```
 
-对这次 `find_all()` 调用，也可以画图示意。
+对这次 `find_all()` 调用，也可以画图示意：
+
+![find_all(m, 'a') 返回指向各 'a' 的指针](../../assets/images/ch13/find-all.png)
 
 迭代器与标准算法对所有适用它们的容器能起到同样的效果。因此可以把 `find_all()` 推广：
 
@@ -165,13 +159,13 @@ vector<typename C::iterator> find_all(C& c, V v) // 找出容器 c 中所有值�
 }
 ```
 
-这里的 `typename` 用来告诉编译器：`C::iterator` 应当被视为类型，而不是某个类型的某个具体取值。
+这里的 `typename` 用来告诉编译器：`C` 的 `iterator` 应当被视为类型，而不是某个类型的某个具体取值（比方说整数 `7`）。
 
 等价的做法是返回一组指向元素的普通指针：
 
 ```cpp
 template<typename C, typename V>
-auto find_all(C& c, V v)
+auto find_all(C& c, V v) // 找出容器 c 中所有值为 v 的位置
 {
     vector<range_value_t<C>*> res;
     for (auto& x : c)
@@ -181,7 +175,7 @@ auto find_all(C& c, V v)
 }
 ```
 
-这里顺带把遍历改成了范围 `for`，并用标准库的 `range_value_t`（§16.4.4）命名元素的类型。`range_value_t` 的一种极简等价写法可以是：
+这里顺带把遍历改成了范围 `for`，并用标准库的 `range_value_t`（[§16.4.4](../ch16/16-4-type-functions.md#16.4.4)）命名元素的类型。`range_value_t` 的一种极简等价写法可以是：
 
 ```cpp
 template<typename T>
@@ -216,33 +210,35 @@ void test()
 
 迭代器用来把算法与容器隔开：算法只通过迭代器操作数据，不知道元素存放在何种容器中；反过来容器也不知道有哪些算法作用于元素——它只是按需给出迭代器（例如 `begin()` 与 `end()`）。这种把存储与计算分离的模型非常通用且灵活。
 
+![算法经迭代器作用于容器](../../assets/images/ch13/algorithms-iterators-containers.png)
+
 # 13.3 迭代器类型
 
 迭代器究竟是什么？任何一个迭代器都是某个类型的对象。但迭代器的类型很多：它需要携带在某个容器上做本职工作所需的足够信息。这些迭代器类型之间的差别可以像容器及其特定用途的差异那么大。
 
 举例来说，`vector` 的迭代器完全可以是普通指针——指针恰好是一种很自然地指向 `vector` 元素的引用：
 
-[图片描述：把 vector 的迭代器实现成指针]
+![把 vector 的迭代器实现成指针](../../assets/images/ch13/vector-iterator-pointer.png)
 
 或者，`vector` 迭代器也可以实现成「指向 `vector` 的指针 + 下标」：
 
-[图片描述：把 vector 的迭代器实现成指针加索引]
+![把 vector 的迭代器实现成指针加索引](../../assets/images/ch13/vector-iterator-index.png)
 
 使用此类迭代器就便于做范围检查。
 
 相较之下，`list` 迭代器往往比一个指向节点的裸指针更复杂：链表中的一个节点通常并不知道表中下一个节点在哪儿，于是 `list` 迭代器可能表现为指向某个链接（link）的指针：
 
-[图片描述：list 迭代器指向链表结点链接]
+![list 迭代器指向链表结点链接](../../assets/images/ch13/list-iterator.png)
 
-对所有迭代器共同的，是其语义以及操作的命名。例如对任一迭代器做 `++` 都得到指向下一元素的迭代器；`*` 则给出迭代器所指的元素。实际上，只要遵循几条诸如此类的规则的对象都可视作迭代器。迭代器是一种宽泛的观念（概念，§8.2）；不同类别的迭代器在标准库里也以概念的形式给出，例如 `forward_iterator`、`random_access_iterator`（§14.5）。
+对所有迭代器共同的，是其语义以及操作的命名。例如对任一迭代器做 `++` 都得到指向下一元素的迭代器；`*` 则给出迭代器所指的元素。实际上，只要遵循几条诸如此类的规则的对象都可视作迭代器。迭代器是一种宽泛的观念（概念，[§8.2](../ch08/8-2-concepts.md)）；不同类别的迭代器在标准库里也以概念的形式给出，例如 `forward_iterator`、`random_access_iterator`（[§14.5](../ch14/14-5-concept-overview.md)）。
 
 此外，使用者也很少真的关心某个迭代器的具体类型；每种容器都“知道”自己的迭代器类型，并用常规的别名把它们提供给外部：`iterator` 与 `const_iterator`。例如 `list<Entry>::iterator` 就是 `list<Entry>` 的一般迭代器类型；我们通常无须深究它的底层定义。
 
 有些情形下迭代器并不是嵌套的成员类型，此时标准库提供 `iterator_t<X>`：凡是能为 `X` 定义迭代器的地方，`iterator_t<X>` 都好用。
 
-## 13.3.1 输入迭代器与输出迭代器
+## 13.3.1 流迭代器
 
-迭代器是把容器中元素序列当作序列来处理时一个非常通用而有用的抽象；然而序列不只存在于容器里。输入流会产生一串值，而我们会向输出流写出一串值。因而迭代器的观念同样可以应用于输入与输出。
+迭代器是处理容器中元素序列时一个非常通用而有用的抽象；然而序列不只存在于容器里。例如，输入流会产生一串值，而我们会向输出流写出一串值。因而迭代器的观念同样可以应用于输入与输出。
 
 若要构造 `ostream_iterator`，需要指明要写往哪一个流，以及写入对象值的类型。例如：
 
@@ -288,11 +284,11 @@ int main()
     string from, to;
     cin >> from >> to;                     // 源文件名与目标文件名
 
-    ifstream is {from};                    // 来自文件 `from` 的输入流
+    ifstream is {from};                    // 来自文件 "from" 的输入流
     istream_iterator<string> ii {is};      // 针对流的输入迭代器
     istream_iterator<string> eos {};       // 输入哨兵
 
-    ofstream os {to};                      // 写入文件 `to` 的输出流
+    ofstream os {to};                      // 写入文件 "to" 的输出流
     ostream_iterator<string> oo {os, "\n"}; // 输出迭代器，带分隔串
 
     vector<string> b {ii, eos};            // 用输入初始化缓冲区 b
@@ -305,19 +301,18 @@ int main()
 
 这里用的是 `sort()` 与 `unique_copy()` 的范围版本；也可以写成 `sort(b.begin(), b.end())`——在老代码里更常见。
 
-请记住（§9.3.2）：若要在同一作用域里同时使用传统迭代器版本与其范围版本，要么显式限定命名空间（例如 `ranges::copy`），要么通过 `using` 声明消除歧义：
+请记住（[§9.3.2](../ch09/9-3-standard-library-organization.md#9.3.2)）：若要在同一作用域里同时使用传统迭代器版本与其范围版本，要么显式限定命名空间（例如 `ranges::copy`），要么通过 `using` 声明消除歧义：
 
 ```cpp
 copy(v, oo);           // 可能产生歧义
 ranges::copy(v, oo);   // OK
-
-using std::ranges::copy;
-copy(v, oo);           // OK（在本作用域中指范围版本）
+using ranges::copy;    // 自此 copy(v, oo) 即指范围版本
+copy(v, oo);           // OK
 ```
 
-`ifstream` 是可附着到文件的输入流（§11.7.2），`ofstream` 是可附着到文件的输出流。`ostream_iterator` 的第二个参数用来分隔输出的各个值。
+`ifstream` 是可附着到文件的输入流（[§11.7.2](../ch11/11-7-streams.md#11.7.2)），`ofstream` 是可附着到文件的输出流。`ostream_iterator` 的第二个参数用来分隔输出的各个值。
 
-坦诚地说，这个示例还可以写得更短：我们先读入 `vector`、排序，再写出并去掉重复。更优雅的思路是根本不必保存重复——把它们放进 `set` 即可：`set` 既不含重复元素，又自动保持有序（§12.5）。于是可以把原先两行基于 `vector` 的逻辑换成一行基于 `set`，并把 `unique_copy()` 换成更直接的 `copy()`：
+坦诚地说，这个示例还可以写得更短：我们先读入 `vector`、排序，再写出并去掉重复。更优雅的思路是根本不必保存重复——把它们放进 `set` 即可：`set` 既不含重复元素，又自动保持有序（[§12.5](../ch12/12-5-map.md)）。于是可以把原先两行基于 `vector` 的逻辑换成一行基于 `set`，并把 `unique_copy()` 换成更直接的 `copy()`：
 
 ```cpp
 set<string> b {ii, eos}; // 从输入收集字符串
@@ -330,39 +325,23 @@ copy(b, oo);             // 写出缓冲区
 int main()
 {
     string from, to;
-    cin >> from >> to;
+    cin >> from >> to;               // 源文件名与目标文件名
 
-    ifstream is {from};
-    ofstream os {to};
+    ifstream is {from};              // 来自文件 "from" 的输入流
+    ofstream os {to};                // 写入文件 "to" 的输出流
 
-    set<string> b {istream_iterator<string>{is}, istream_iterator<string>{}};
-    copy(b, ostream_iterator<string>{os, "\n"});
+    set<string> b {istream_iterator<string>{is}, istream_iterator<string>{}}; // 从输入收集字符串
+    copy(b, ostream_iterator<string>{os, "\n"});                              // 写出缓冲区
 
-    return !is.eof() || !os;
+    return !is.eof() || !os;         // 返回错误状态（§1.2.1，§11.4）
 }
 ```
 
 是否要把程序压到这么短，归根结底关乎品味与经验。
 
-# 13.4 谓词
+# 13.4 谓词的使用
 
-```cpp
-int main()
-{
-    string from, to;
-    cin >> from >> to;
-
-    ifstream is {from};
-    ofstream os {to};
-
-    set<string> b {istream_iterator<string>{is}, istream_iterator<string>{}};
-    copy(b, ostream_iterator<string>{os, "\n"});
-
-    return !is.eof() || !os;
-}
-```
-
-此前的例子中，算法对每个元素要做什么往往是“内置固定”的；但我们常常希望把这项动作参数化。譬如 `find`（§13.2，§13.5）提供了查找特定值的便捷途径；更一般的变体则是查找满足某个要求的元素——这类要求称为**谓词**（predicate）。
+此前的例子中，算法对每个元素要做什么往往是“内置固定”的；但我们常常希望把这项动作参数化。譬如 `find`（[§13.2](13-2-using-iterators.md)，[§13.5](13-5-algorithm-overview.md)）提供了查找特定值的便捷途径；更一般的变体则是查找满足某个要求的元素——这类要求称为**谓词**（predicate）。
 
 例如我们可能想在 `map` 里寻找第一个值大于 `42` 的项。`map` 的元素序列可以视作一串 `(key, value)` 对，于是能在 `map<string,int>` 上搜索第一个满足“`int` 部分大于 `42`”的 `pair<const string,int>`：
 
@@ -374,7 +353,7 @@ void f(map<string, int>& m)
 }
 ```
 
-这里的 `Greater_than` 是函数对象（§7.3.2），内部保存要与 `map` 元素（类型为 `pair<string,int>`）比较的阈值：
+这里的 `Greater_than` 是函数对象（[§7.3.2](../ch07/7-3-parameterized-operations.md#7.3.2)），内部保存要与 `map` 元素（类型为 `pair<string,int>`）比较的阈值：
 
 ```cpp
 struct Greater_than {
@@ -384,7 +363,7 @@ struct Greater_than {
 };
 ```
 
-等价地，也可以用 lambda（§7.3.3）：
+等价地，也可以用 lambda（[§7.3.3](../ch07/7-3-parameterized-operations.md#7.3.3)）：
 
 ```cpp
 auto p = find_if(m, [](const auto& r) { return r.second > 42; });
@@ -394,7 +373,7 @@ auto p = find_if(m, [](const auto& r) { return r.second > 42; });
 
 # 13.5 算法概览
 
-算法的一般定义是：“有限的若干规则，给出求解一类具体问题的一组运算序列”，并具有五个关键特性——有限性、确定性、输入、输出与有效性等。[Knuth,1968, §1.1] 就强调了这一点。
+算法的一般定义是：“有限的若干规则，给出求解一类具体问题的一组运算序列”，并具有五个关键特性——有限性、确定性、输入、输出与有效性 [Knuth,1968,§1.1]。
 
 就 C++ 标准库的语境而言，算法是指在元素序列上工作的函数模板。
 
@@ -421,11 +400,11 @@ auto p = find_if(m, [](const auto& r) { return r.second > 42; });
 | `p = merge(b, e, b2, e2, out)` | 合并两个有序序列 `[b:e)` 与 `[b2:e2)` 到 `[out:p)` |
 | `p = merge(b, e, b2, e2, out, f)` | 用比较函数 `f` 合并两个有序序列 |
 
-凡是形如 `[b:e)` 的传统迭代器接口，`<ranges>` 几乎都提供一个直接接收范围的版本。请记住（§9.3.2）：若想同时使用同名算法的迭代器版本与范围版本，需要显式限定调用或通过 `using` 引入其中之一。
+凡是形如 `[b:e)` 的传统迭代器接口，`<ranges>` 几乎都提供一个直接接收范围的版本。请记住（[§9.3.2](../ch09/9-3-standard-library-organization.md#9.3.2)）：若想同时使用同名算法的迭代器版本与范围版本，需要显式限定调用或通过 `using` 引入其中之一。
 
-这些（再加上 §17.3 等章节提到的算法）都可施加于容器、字符串乃至内置数组中的元素。
+这些（再加上 [§17.3](../ch17/17-3-numeric-algorithms.md) 等章节提到的算法）都可施加于容器、字符串乃至内置数组中的元素。
 
-部分算法（例如 `replace()`、`sort()`）会改写元素的值，但不会凭空增减容器元素个数——原因很简单：序列并不指明背后的容器是谁。若要增删元素，需要知晓容器本身的某种抽象（例如 `back_inserter`；§13.1），或直接调用容器提供的接口（如 `push_back()`、`erase()`；§12.2）。
+部分算法（例如 `replace()`、`sort()`）会改写元素的值，但不会凭空增减容器元素个数——原因很简单：序列并不指明背后的容器是谁。若要增删元素，需要知晓容器本身的某种抽象（例如 `back_inserter`；[§13.1](13-1-introduction.md)），或直接调用容器提供的接口（如 `push_back()`、`erase()`；[§12.2](../ch12/12-2-vector.md)）。
 
 Lambda 很适合充当传给算法的运算参数：
 
@@ -471,32 +450,32 @@ void sort(auto pol, random_access_range auto& r)
 }
 ```
 
-绝大多数标准库算法（§13.5 表格中的算法除 `equal_range` 之外）都可以像上面这样对 `sort()` 那样指定 `par` / `par_unseq`。为何暂时没有并行版 `equal_range()`？因为迄今仍未找到足够有意义的并行算法。
+绝大多数标准库算法（包括 [§13.5](13-5-algorithm-overview.md) 表格中除 `equal_range` 以外的全部算法）都可以像 `sort()` 一样用 `par` 与 `par_unseq` 请求并行与向量化。为何暂时没有并行版 `equal_range()`？因为迄今仍未找到足够有意义的并行算法。
 
-许多并行算法主要服务于数值计算场景（§17.3.1）。
+许多并行算法主要服务于数值计算场景（[§17.3.1](../ch17/17-3-numeric-algorithms.md#17.3.1)）。
 
-请求并行执行时，务必避免数据竞争（§18.2）与死锁（§18.3）。
+请求并行执行时，务必避免数据竞争（[§18.2](../ch18/18-2-tasks-and-threads.md)）与死锁（[§18.3](../ch18/18-3-shared-data.md)）。
 
 # 13.7 建议
 
-[1] STL 算法对一个或多个序列进行操作；§13.1。
+[1] STL 算法对一个或多个序列进行操作；[§13.1](13-1-introduction.md)。
 
-[2] 输入序列是半开区间，由一对迭代器界定；§13.1。
+[2] 输入序列是半开区间，由一对迭代器界定；[§13.1](13-1-introduction.md)。
 
-[3] 你可以为满足特定需求自定义迭代器；§13.1。
+[3] 你可以为满足特定需求自定义迭代器；[§13.1](13-1-introduction.md)。
 
-[4] 许多算法也能作用于 I/O 流；§13.3.1。
+[4] 许多算法也能作用于 I/O 流；[§13.3.1](13-3-iterator-types.md#13.3.1)。
 
-[5] 查找类算法通常用返回输入序列尾迭代器表示“未找到”；§13.2。
+[5] 查找类算法通常用返回输入序列尾迭代器表示“未找到”；[§13.2](13-2-using-iterators.md)。
 
-[6] 算法不会直接对其参数序列增删元素；§13.2，§13.5。
+[6] 算法不会直接对其参数序列增删元素；[§13.2](13-2-using-iterators.md)，[§13.5](13-5-algorithm-overview.md)。
 
-[7] 编写循环时，想一想是否能改写为标准算法；§13.2。
+[7] 编写循环时，想一想是否能改写为标准算法；[§13.2](13-2-using-iterators.md)。
 
-[8] 使用类型别名整理累赘的类型记号；§13.2。
+[8] 使用类型别名整理累赘的类型记号；[§13.2](13-2-using-iterators.md)。
 
-[9] 借助谓词与其他函数对象，可以让标准算法表达更丰富的含义；§13.4，§13.5。
+[9] 借助谓词与其他函数对象，可以让标准算法表达更丰富的含义；[§13.4](13-4-predicates.md)，[§13.5](13-5-algorithm-overview.md)。
 
-[10] 谓词不得修改其参数；§13.4。
+[10] 谓词不得修改其参数；[§13.4](13-4-predicates.md)。
 
-[11] 熟悉标准库算法并优先于手写循环使用它们；§13.5。
+[11] 熟悉标准库算法并优先于手写循环使用它们；[§13.5](13-5-algorithm-overview.md)。

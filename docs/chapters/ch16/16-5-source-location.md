@@ -18,20 +18,22 @@ void log(const string& mess = "", const source_location loc = source_location::c
          << loc.function_name() << ": "
          << mess;
 }
+```
 
+对 `current()` 的调用位于默认实参中，于是我们得到的是 **`log()` 调用方** 的位置，而不是 `log()` 自身的位置：
+
+```cpp
 void foo()
 {
-    log("Hello");               // myfile.cpp(17,4) foo: Hello
+    log("Hello");               // myfile.cpp (17,4) foo: Hello
     // ...
 }
 
 int bar(const string& label)
 {
-    log(label);                 // myfile.cpp(23,4) bar: <label 的值>
+    log(label);                 // myfile.cpp (23,4) bar: <<label 的值>>
     // ...
 }
 ```
-
-对 `current()` 的调用位于默认实参中，于是我们得到的是 **`log()` 调用方** 的位置，而不是 `log()` 自身的位置。
 
 在 C++20 之前编写、或需在旧编译器上编译的代码，对此通常使用宏 `__FILE__` 与 `__LINE__`。

@@ -2,7 +2,7 @@
 
 最有用的标准库容器是 `vector`。`vector` 是给定类型元素的一个序列。元素在内存中连续存储。`vector` 的一个典型实现（[§5.2.2](../ch05/5-2-concrete-types.md#522-容器)，[§6.2](../ch06/6-2-copy-move.md)）将包含一个句柄，其中持有指向第一个元素、最后一个元素之后位置以及最后分配空间之后位置的指针（[§13.1](../ch13/13-1-introduction.md)）（或表示为指针加偏移量的等效信息）：
 
-[图片描述：vector 结构示意图]
+![vector 句柄与元素/额外空间布局](../../assets/images/ch12/vector-layout.png)
 
 此外，它还持有一个分配器（此处为 `alloc`），`vector` 可以从该分配器获取其元素所需的内存。默认分配器使用 `new` 和 `delete` 来获取和释放内存（[§12.7](12-7-allocators.md)）。使用稍微高级的实现技术，我们可以避免在 `vector` 对象中为简单的分配器存储任何数据。
 
@@ -64,7 +64,7 @@ void input()
 
 这从标准输入读取 `Entry` 到 `phone_book` 中，直到到达输入末尾（例如文件结束）或输入操作遇到格式错误。
 
-标准库 `vector` 的实现使得通过重复 `push_back()` 来增长 `vector` 是高效的。为了说明这一点，考虑使用上面图中指示的表示法对第 5 章和第 7 章中的简单 `Vector` 进行细化：
+标准库 `vector` 的实现使得通过重复 `push_back()` 来增长 `vector` 是高效的。为了说明这一点，考虑使用上面图中指示的表示法对[第 5 章](../ch05/index.md)和[第 7 章](../ch07/index.md)中的简单 `Vector` 进行细化：
 
 ```cpp
 template<typename T>
@@ -116,10 +116,10 @@ vector<Entry> book2 = phone_book;
 
 与所有标准库容器一样，`vector` 是某种类型 `T` 的元素的容器，即 `vector<T>`。几乎任何类型都可以作为元素类型：内置数值类型（如 `char`、`int` 和 `double`）、用户定义类型（如 `string`、`Entry`、`list<int>` 和 `Matrix<double,2>`）以及指针（如 `const char*`、`Shape*` 和 `double*`）。当你插入一个新元素时，它的值会被拷贝到容器中。例如，当你将一个值为 `7` 的整数放入容器时，结果元素的值就是 `7`。该元素不是对某个包含 `7` 的对象的引用或指针。这使得容器很好、很紧凑，并且访问速度快。对于那些关心内存大小和运行时性能的人来说，这一点至关重要。
 
-如果你有一个依赖于虚函数来实现多态行为的类层次结构（[§5.5](../ch05/5-5-hierarchies.md)），不要直接将对象存储在容器中。而是存储指针（或智能指针；[§15.2.1](../ch15/15-2-pointers.md#1521-unique_ptr-和-shared_ptr)）。例如：
+如果你有一个依赖于虚函数来实现多态行为的类层次结构（[§5.5](../ch05/5-5-hierarchies.md)），不要直接将对象存储在容器中。而是存储指针（或智能指针；[§15.2.1](../ch15/15-2-pointers.md#15.2.1)）。例如：
 
 ```cpp
-vector<Shape> vs;                     // 不，不要这样做 - 没有空间存放 Circle 或 Smiley
+vector<Shape> vs;                     // 不，不要这样做——没有空间存放 Circle 或 Smiley（[§5.5](../ch05/5-5-hierarchies.md)）
 vector<Shape*> vps;                   // 更好，但见 [§5.5.3](../ch05/5-5-hierarchies.md#5.5.3)（不要泄漏）
 vector<unique_ptr<Shape>> vups;       // OK
 ```
@@ -141,10 +141,10 @@ void silly(vector<Entry>& book)
 ```cpp
 template<typename T>
 struct Vec : std::vector<T> {
-    using vector<T>::vector;   // 使用来自 vector 的构造函数
+    using vector<T>::vector;   // 使用来自 vector 的构造函数（以 Vec 之名）
 
     T& operator[](int i) { return vector<T>::at(i); }               // 范围检查
-    const T& operator[](int i) const { return vector<T>::at(i); }   // 范围检查（const）
+    const T& operator[](int i) const { return vector<T>::at(i); }   // 范围检查 const 对象；[§5.2.1](../ch05/5-2-concrete-types.md#5.2.1)
 
     auto begin() { return Checked_iter<vector<T>>{*this}; }         // 见 [§13.1](../ch13/13-1-introduction.md)
     auto end()   { return Checked_iter<vector<T>>{*this, vector<T>::end()}; }

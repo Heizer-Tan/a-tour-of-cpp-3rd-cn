@@ -2,7 +2,7 @@
 
 `Container` 示例是一个非常简单的类层次结构示例。类层次结构是一组通过派生（例如 `: public`）排序的类构成的网格。我们使用类层次结构来表示具有层次关系的概念，例如“消防车是一种卡车，卡车是一种车辆”以及“笑脸是一种圆形，圆形是一种形状”。包含数百个类的、既深又广的大型层次结构很常见。作为一个半真实的经典例子，让我们考虑屏幕上的形状：
 
-[图片描述：形状层次结构图，Shape 派生出 Circle、Triangle 等，Circle 派生出 Smiley]
+![Shape 类层次结构](../../assets/images/ch05/shape-hierarchy.png)
 
 箭头表示继承关系。例如，`Circle` 类派生自 `Shape` 类。类层次结构通常从最基本的类（根）向下（朝向后面定义的派生类）绘制。为了在代码中表示这个简单的图，我们首先必须定义一个指定所有形状通用属性的类：
 
@@ -166,7 +166,7 @@ else {
 
 ```cpp
 Shape* ps {read_shape(cin)};
-Smiley& r {dynamic_cast<Smiley&>(ps)};   // 在某个地方捕获 std::bad_cast
+Smiley& r {dynamic_cast<Smiley&>(*ps)};   // 在某个地方捕获 std::bad_cast
 ```
 
 谨慎使用 `dynamic_cast` 时代码更清晰。如果我们能避免在运行时测试类型信息，就可以编写更简单、更高效的代码，但偶尔类型信息会丢失且必须恢复。这通常发生在我们将对象传递给某个接受基类指定接口的系统时。当该系统稍后将对象传递回给我们时，我们可能必须恢复原始类型。类似于 `dynamic_cast` 的操作被称为“is kind of”和“is instance of”操作。

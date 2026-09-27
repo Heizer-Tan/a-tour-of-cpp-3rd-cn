@@ -5,19 +5,19 @@
 1. **引擎**：产生一串随机或伪随机值；
 2. **分布**：把这些值映射到某个区间上的数学分布。
 
-分布的例子包括：`uniform_int_distribution`（生成的整数等概率）、`normal_distribution`（「钟形曲线」）、以及 `exponential_distribution`（指数衰减）；各自对应某个指定区间。
+分布的例子包括：`uniform_int_distribution`（生成的整数等概率）、`normal_distribution`（「钟形曲线」）、以及 `exponential_distribution`（指数增长）；各自对应某个指定区间。
 
 例如：
 
 ```cpp
-using my_engine = default_random_engine;
-using my_distribution = uniform_int_distribution<>;
+using my_engine = default_random_engine;            // 引擎类型
+using my_distribution = uniform_int_distribution<>; // 分布类型
 
-my_engine eng{};
-my_distribution dist{1, 6};
-auto die = [&]() { return dist(eng); };   // 构造一个发生器
+my_engine eng{};                                    // 默认引擎
+my_distribution dist{1, 6};                         // 映射到掷骰结果的分布
+auto die = [&]() { return dist(eng); };             // 构造一个发生器
 
-int x = die();                              // 掷骰子：x 成为某个值
+int x = die();                                      // 掷骰子：x 成为某个值
 ```
 
 多亏它对泛化与性能的不妥协，曾有专家评价标准库的随机数组件是「每个随机数库长大后想成为的样子」。但它也很难被称为「新手友好」。`using` 与 lambda 能让正在发生的事稍微直白一点。
@@ -69,7 +69,14 @@ int main()
 ```
 0      *********************
 1      ****************
-...
+2      *******************
+3      ********************
+4      ****************
+5      ***********************
+6      **************************
+7      ***********
+8      **********************
+9      *************************
 ```
 
 C++ 没有标准图形库，所以我用「ASCII 图形」。显然有大量开源与商业图形/GUI 库可用，但本书只使用 ISO 标准设施。
@@ -79,18 +86,18 @@ C++ 没有标准图形库，所以我用「ASCII 图形」。显然有大量开�
 ```cpp
 Rand_int rnd{10, 20};
 for (int i = 0; i < 10; ++i)
-    cout << rnd() << ' ';
+    cout << rnd() << ' ';     // 16 13 20 19 14 17 10 16 15 14
 cout << '\n';
 
 rnd.seed(999);
 for (int i = 0; i < 10; ++i)
-    cout << rnd() << ' ';
+    cout << rnd() << ' ';     // 11 17 14 19 20 13 20 14 16 19
 cout << '\n';
 
 rnd.seed(999);
 for (int i = 0; i < 10; ++i)
-    cout << rnd() << ' ';
+    cout << rnd() << ' ';     // 11 17 14 19 20 13 20 14 16 19
 cout << '\n';
 ```
 
-重复序列对可重复的调试很重要；用不同值播种则在不想重复时很重要。若你需要真正的随机数而非生成的伪随机序列，请查看你的机器上 `random_device` 如何实现。
+重复序列对**确定性调试**很重要；用不同值播种则在不想重复时很重要。若你需要真正的随机数而非生成的伪随机序列，请查看你的机器上 `random_device` 如何实现。

@@ -3,23 +3,23 @@
 **协程**是在调用之间保持状态的函数。在这一点上它有点像函数对象，但在调用之间保存与恢复状态是隐式且完整的。考虑经典示例：
 
 ```cpp
-generator<long long> fib()
+generator<long long> fib()   // 生成 Fibonacci 数
 {
     long long a = 0;
     long long b = 1;
-    while (true) {
+    while (a < b) {
         auto next = a + b;
         co_yield next;           // 保存状态，返回值并等待
         a = b;
         b = next;
     }
+    co_return 0;                 // Fibonacci 溢出了
 }
 
 void user(int max)
 {
-    auto g = fib();
-    for (int i = 0; i < max; ++i)
-        cout << g() << ' ';
+    for (int i = 0; i++ < max;)
+        cout << fib() << ' ';
 }
 ```
 
@@ -29,21 +29,19 @@ void user(int max)
 1 2 3 5 8 13 ...
 ```
 
-（具体调用语法取决于所用的 `generator` 设施；关键是保存发生器对象并在其上前进。）
-
 `generator` 返回类型用来存放协程在调用之间的状态。我们当然可以手写函数对象 `Fib` 达成类似效果，但那就必须亲自维护状态。状态更大、计算更复杂时，手写保存/恢复既乏味又难优化，也容易出错。实际上，协程会在调用之间保存其栈帧。`co_yield` 返回值并等待下一次调用。`co_return` 返回值并终止协程。
 
-协程可以是同步的（调用者等待结果）或异步的（调用者先做别的工作，再在稍后取用结果）。上面的 Fibonacci 示例显然是同步的，这也让某些优化成为可能——例如，优秀的优化器可以把对 `fib()` 的调用内联并展开循环，最终只留下一连串 `<<`，再继续优化成：
+协程可以是同步的（调用者等待结果）或异步的（调用者先做别的工作，再在稍后取用协程的结果）。上面的 Fibonacci 示例显然是同步的，这也让某些优化成为可能——例如，优秀的优化器可以把对 `fib()` 的调用内联并展开循环，最终只留下一连串 `<<`，再继续优化成：
 
 ```cpp
-cout << "1 2 3 5 8 13";   // fib(6)，示意
+cout << "1 2 3 5 7 12";   // fib(6)
 ```
 
 协程实现为极度灵活的框架，足以涵盖很广的潜在用途；它由专家设计并服务于专家，又带点委员会设计的痕迹。这没问题——唯独 **C++20 的标准库尚未提供足够设施把简单用法简单化**。例如，`generator` 还不在标准库里（至少在写作本文时如此）。不过提案已有；在网上检索可以找到稳妥的实现，`[Cppcoro]` 便是一例。
 
-## 18.6.1
+## 18.6.1 协作式多任务
 
-在《计算机程序设计艺术》第一卷里，高德纳肯定了协程的用处，但也慨叹难以给出简短示例——协程最擅长简化复杂系统。在此我只举一个把玩 primitive 的极简示例，用以演示早年促成 C++ 成功的一类事件驱动仿真所需的想法。关键想法是把系统表示成一个由简单任务（协程）组成的网络，它们协作完成复杂任务。基本上每个任务都是一个参与者（actor），承担宏大工作中很小的一块：有些是发生器，源源不断地产出请求（可能用到随机数，也可能接入真实数据）；有些是网络片段，计算结果；还有些负责产出输出。我个人更倾向于任务（协程）经由消息队列通信。组织此类系统的一种方式是让每个任务在产出结果之后把自己放回事件队列等待更多工作；需要时再由上层的调度器从事件队列挑选下一个任务运行。这是**协作式多任务**。我曾致谢借用 Simula [Dahl,1970] 的关键想法，把它们化作最早的 C++ 库的基础之一（[§19.1.2](../ch19/19-1-history.md#19.1.2)）。
+在《计算机程序设计艺术》第一卷里，高德纳肯定了协程的用处，但也慨叹难以给出简短示例——协程最擅长简化复杂系统。在此我只举一个演练原语的极简示例，用以演示早年促成 C++ 成功的一类事件驱动仿真所需的想法。关键想法是把系统表示成一个由简单任务（协程）组成的网络，它们协作完成复杂任务。基本上每个任务都是一个参与者（actor），承担宏大工作中很小的一块：有些是发生器，源源不断地产出请求（可能用到随机数，也可能接入真实数据）；有些是网络片段，计算结果；还有些负责产出输出。我个人更倾向于任务（协程）经由消息队列通信。组织此类系统的一种方式是让每个任务在产出结果之后把自己放回事件队列等待更多工作；需要时再由上层的调度器从事件队列挑选下一个任务运行。这是**协作式多任务**。我曾致谢借用 Simula [Dahl,1970] 的关键想法，把它们化作最早的 C++ 库的基础之一（[§19.1.2](../ch19/19-1-history.md#19.1.2)）。
 
 此类设计的要点包括：
 
@@ -58,13 +56,13 @@ cout << "1 2 3 5 8 13";   // fib(6)，示意
 ```cpp
 struct Event_base {
     virtual void operator()() = 0;
-    virtual ~Event_base() = default;
+    virtual ~Event_base() {}
 };
 
 template<class Act>
 struct Event : Event_base {
-    Event(std::string n, Act a) : name{move(n)}, act{move(a)} {}
-    std::string name;
+    Event(const string n, Act a) : name{n}, act{move(a)} {}
+    string name;
     Act act;
     void operator()() override { act(); }
 };
@@ -77,17 +75,17 @@ struct Event : Event_base {
 ```cpp
 void test()
 {
-    vector<Event_base*> events = {
+    vector<Event_base*> events = {   // 创建几个 Event
         new Event{"integers ", sequencer(10)},
         new Event{"chars ", char_seq('a')}
     };
 
-    vector order{0, 1, 1, 0, 1, 0, 1, 0, 0};
+    vector order{0, 1, 1, 0, 1, 0, 1, 0, 0};   // 选定某种顺序
 
-    for (int x : order)
+    for (int x : order)   // 按选定顺序调用协程
         (*events[x])();
 
-    for (auto p : events)
+    for (auto p : events)   // 清理
         delete p;
 }
 ```
@@ -99,7 +97,7 @@ task sequencer(int start, int step = 1)
 {
     auto value = start;
     while (true) {
-        cout << "value: " << value << '\n';    // 输出结果
+        cout << "value: " << value << '\n';    // 传达一个结果
         co_yield 0;                             // 挂起，直到再次被唤起
         value += step;                          // 更新状态
     }
@@ -117,7 +115,7 @@ task char_seq(char start)
 {
     auto value = start;
     while (true) {
-        cout << "value: " << value << '\n';
+        cout << "value: " << value << '\n';    // 传达结果
         co_yield 0;
         ++value;
     }
@@ -133,14 +131,26 @@ struct task {
 };
 ```
 
-若 `task` 来自库（最好是标准库），我们通常只知道这么多就够；但事实并非如此，所以下面略微暗示如何实现此类「协程句柄」类型。提案在路上；网上同样有可参考的实现，`[Cppcoro]` 便是其中之一。
+若 `task` 来自库（最好是标准库），我们通常只知道这么多就够；但事实并非如此，所以下面略微暗示如何实现此类「协程句柄」类型。提案在路上；网上同样有可参考的实现，`[Cppcoro]` 库便是其中之一。
 
 我把 `task` 写成能实现示例所需的极简版本：
 
 ```cpp
 struct task {
     void operator()() { coro.resume(); }
-    // ... promise_type、coroutine_handle 等细节 ...
+
+    struct promise_type {   // 映射到语言机制
+        suspend_always initial_suspend() { return {}; }
+        suspend_always final_suspend() noexcept { return {}; }   // co_return
+        suspend_always yield_value(int) { return {}; }           // co_yield
+        auto get_return_object() { return task{handle_type::from_promise(*this)}; }
+        void return_void() {}
+        void unhandled_exception() { exit(1); }
+    };
+
+    using handle_type = coroutine_handle<promise_type>;
+    task(handle_type h) : coro(h) {}   // 由 get_return_object() 调用
+    handle_type coro;                  // 此处是协程句柄
 };
 ```
 

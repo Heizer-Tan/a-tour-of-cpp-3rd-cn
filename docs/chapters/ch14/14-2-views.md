@@ -72,7 +72,7 @@ for (int x : take_view{filter_view{r, [](int x) { return x % 2; }}, 3})
 auto bad()
 {
     vector v = {1, 2, 3, 4};
-    return filter_view{v, [](int x) { return x % 2; }}; // 危险：`v` 会先被销毁
+    return filter_view{v, odd}; // `v` 会在视图之前被销毁
 }
 ```
 

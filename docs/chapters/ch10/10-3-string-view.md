@@ -2,16 +2,16 @@
 
 字符序列最常见的用途是将其传递给某个函数进行读取。这可以通过按值传递 `string`、传递 `string` 的引用或传递 C 风格字符串来实现。在许多系统中还有更多选择，例如标准未提供的字符串类型。在所有这些情况下，当我们要传递子串时，会遇到额外的复杂性。为了解决这个问题，标准库提供了 `string_view`；`string_view` 基本上是一个（指针，长度）对，表示一个字符序列：
 
-[图片描述]
+![string_view 为（指针，长度）对](../../assets/images/ch10/string-view.png)
 
 `string_view` 提供了对连续字符序列的访问。这些字符可以以多种方式存储，包括在 `string` 中和在 C 风格字符串中。`string_view` 像指针或引用一样，它不拥有它指向的字符。在这方面，它类似于 STL 的一对迭代器（[§13.3](../ch13/13-3-iterator-types.md)）。
 
-考虑一个简单的函数：
+考虑一个连接两个字符串的简单函数：
 
 ```cpp
 string cat(string_view sv1, string_view sv2)
 {
-    string res {sv1};        // 用 sv1 初始化字符串
+    string res {sv1};        // 用 sv1 初始化
     return res += sv2;       // 追加 sv2 并返回
 }
 ```
@@ -20,12 +20,12 @@ string cat(string_view sv1, string_view sv2)
 
 ```cpp
 string king = "Harold";
-auto s1 = cat(king, "William");            // HaroldWilliam
-auto s2 = cat(king, king);                 // HaroldHarold
-auto s3 = cat("Edward", "Stephen"sv);      // EdwardStephen
-auto s4 = cat("Canute"sv, king);           // CanuteHarold
-auto s5 = cat({&king[0], 2}, "Henry"sv);   // HaHenry
-auto s6 = cat({&king[0], 2}, {&king[2], 4}); // Harold
+auto s1 = cat(king, "William");                 // HaroldWilliam：string 与 const char*
+auto s2 = cat(king, king);                      // HaroldHarold：string 与 string
+auto s3 = cat("Edward", "Stephen"sv);           // EdwardStephen：const char* 与 string_view
+auto s4 = cat("Canute"sv, king);                // CanuteHarold
+auto s5 = cat({&king[0], 2}, "Henry"sv);        // HaHenry
+auto s6 = cat({&king[0], 2}, {&king[2], 4});    // Harold
 ```
 
 这个 `cat()` 相比于接受 `const string&` 参数的 `compose()`（[§10.2](10-2-strings.md)）有三个优势：
@@ -64,6 +64,6 @@ string_view bad()
 }
 ```
 
-这里，返回的 `string_view` 会在我们能够使用其字符之前，字符串 `s` 就被销毁了。
+这里，局部 `string` 会在我们能够使用其字符之前被销毁。
 
-对 `string_view` 进行越界访问的行为是未定义的。如果你需要保证范围检查，请使用 `at()`，它会在尝试越界访问时抛出 `out_of_range`，或者使用 `gsl::string_span`（[§15.2.2](../ch15/15-2-pointers.md#1522-span)）。
+对 `string_view` 进行越界访问的行为是未定义的。如果你需要保证范围检查，请使用 `at()`（尝试越界访问时会抛出 `out_of_range`），或者使用 `gsl::string_span`（[§15.2.2](../ch15/15-2-pointers.md#1522-span)）。

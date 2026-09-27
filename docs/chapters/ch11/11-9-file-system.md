@@ -53,7 +53,15 @@ void use(path p)
 
 除了 `path`，`<filesystem>` 还提供了用于遍历目录和查询所找到文件属性的类型：
 
-[表：文件系统类型（部分）]
+**文件系统类型（部分）**
+
+| 类型 | 说明 |
+|------|------|
+| `path` | 目录路径 |
+| `filesystem_error` | 文件系统异常 |
+| `directory_entry` | 目录项 |
+| `directory_iterator` | 用于遍历目录 |
+| `recursive_directory_iterator` | 用于遍历目录及其子目录 |
 
 考虑一个简单但并非完全不现实的例子：
 
@@ -86,11 +94,33 @@ void use()
 }
 ```
 
-如果我还想列出子目录，我会使用 `recursive_directory_iterator(p)`。如果我想按字典顺序打印条目，我会将路径复制到一个 `vector` 中，并在打印前对其进行排序。
+如果我还想列出子目录，我会使用 `recursive_directory_iterator{p}`。如果我想按字典顺序打印条目，我会将路径复制到一个 `vector` 中，并在打印前对其进行排序。
 
 类 `path` 提供了许多常见且有用的操作：
 
-[表：路径操作（部分）]
+**路径操作（部分）**（`p`、`p2` 为路径）
+
+| 操作 | 说明 |
+|------|------|
+| `value_type` | 文件系统本地编码所用的字符类型：POSIX 上为 `char`，Windows 上为 `wchar_t` |
+| `string_type` | `std::basic_string<value_type>` |
+| `const_iterator` | 值为 `path` 的常双向迭代器 |
+| `iterator` | `const_iterator` 的别名 |
+| `p=p2` | 将 `p2` 赋给 `p` |
+| `p/=p2` | 用文件名分隔符（默认 `/`）连接 `p` 与 `p2` |
+| `p+=p2` | 连接 `p` 与 `p2`（无分隔符） |
+| `s=p.native()` | 对 `p` 本地格式的引用 |
+| `s=p.string()` | 以 `string` 表示的 `p` 的本地格式 |
+| `s=p.generic_string()` | 以 `string` 表示的通用格式的 `p` |
+| `p2=p.filename()` | `p` 的文件名部分 |
+| `p2=p.stem()` | `p` 的词干部分 |
+| `p2=p.extension()` | `p` 的扩展名部分 |
+| `i=p.begin()` | `p` 元素序列的起始迭代器 |
+| `i=p.end()` | `p` 元素序列的结束迭代器 |
+| `p==p2`, `p!=p2` | `p` 与 `p2` 的相等与不等 |
+| `p<p2`, `p<=p2`, `p>p2`, `p>=p2` | 字典序比较 |
+| `is>>p`, `os<<p` | 对 `p` 的流输入/输出 |
+| `u8path(s)` | 由 UTF-8 编码的源 `s` 构造路径 |
 
 例如：
 

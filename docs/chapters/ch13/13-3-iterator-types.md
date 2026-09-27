@@ -4,17 +4,17 @@
 
 举例来说，`vector` 的迭代器完全可以是普通指针——指针恰好是一种很自然地指向 `vector` 元素的引用：
 
-[图片描述：把 vector 的迭代器实现成指针]
+![把 vector 的迭代器实现成指针](../../assets/images/ch13/vector-iterator-pointer.png)
 
 或者，`vector` 迭代器也可以实现成「指向 `vector` 的指针 + 下标」：
 
-[图片描述：把 vector 的迭代器实现成指针加索引]
+![把 vector 的迭代器实现成指针加索引](../../assets/images/ch13/vector-iterator-index.png)
 
 使用此类迭代器就便于做范围检查。
 
 相较之下，`list` 迭代器往往比一个指向节点的裸指针更复杂：链表中的一个节点通常并不知道表中下一个节点在哪儿，于是 `list` 迭代器可能表现为指向某个链接（link）的指针：
 
-[图片描述：list 迭代器指向链表结点链接]
+![list 迭代器指向链表结点链接](../../assets/images/ch13/list-iterator.png)
 
 对所有迭代器共同的，是其语义以及操作的命名。例如对任一迭代器做 `++` 都得到指向下一元素的迭代器；`*` 则给出迭代器所指的元素。实际上，只要遵循几条诸如此类的规则的对象都可视作迭代器。迭代器是一种宽泛的观念（概念，[§8.2](../ch08/8-2-concepts.md)）；不同类别的迭代器在标准库里也以概念的形式给出，例如 `forward_iterator`、`random_access_iterator`（[§14.5](../ch14/14-5-concept-overview.md)）。
 
@@ -22,9 +22,9 @@
 
 有些情形下迭代器并不是嵌套的成员类型，此时标准库提供 `iterator_t<X>`：凡是能为 `X` 定义迭代器的地方，`iterator_t<X>` 都好用。
 
-## 13.3.1 输入迭代器与输出迭代器
+## 13.3.1 流迭代器
 
-迭代器是把容器中元素序列当作序列来处理时一个非常通用而有用的抽象；然而序列不只存在于容器里。输入流会产生一串值，而我们会向输出流写出一串值。因而迭代器的观念同样可以应用于输入与输出。
+迭代器是处理容器中元素序列时一个非常通用而有用的抽象；然而序列不只存在于容器里。例如，输入流会产生一串值，而我们会向输出流写出一串值。因而迭代器的观念同样可以应用于输入与输出。
 
 若要构造 `ostream_iterator`，需要指明要写往哪一个流，以及写入对象值的类型。例如：
 
@@ -70,11 +70,11 @@ int main()
     string from, to;
     cin >> from >> to;                     // 源文件名与目标文件名
 
-    ifstream is {from};                    // 来自文件 `from` 的输入流
+    ifstream is {from};                    // 来自文件 "from" 的输入流
     istream_iterator<string> ii {is};      // 针对流的输入迭代器
     istream_iterator<string> eos {};       // 输入哨兵
 
-    ofstream os {to};                      // 写入文件 `to` 的输出流
+    ofstream os {to};                      // 写入文件 "to" 的输出流
     ostream_iterator<string> oo {os, "\n"}; // 输出迭代器，带分隔串
 
     vector<string> b {ii, eos};            // 用输入初始化缓冲区 b
@@ -92,9 +92,8 @@ int main()
 ```cpp
 copy(v, oo);           // 可能产生歧义
 ranges::copy(v, oo);   // OK
-
-using std::ranges::copy;
-copy(v, oo);           // OK（在本作用域中指范围版本）
+using ranges::copy;    // 自此 copy(v, oo) 即指范围版本
+copy(v, oo);           // OK
 ```
 
 `ifstream` 是可附着到文件的输入流（[§11.7.2](../ch11/11-7-streams.md#11.7.2)），`ofstream` 是可附着到文件的输出流。`ostream_iterator` 的第二个参数用来分隔输出的各个值。
@@ -112,15 +111,15 @@ copy(b, oo);             // 写出缓冲区
 int main()
 {
     string from, to;
-    cin >> from >> to;
+    cin >> from >> to;               // 源文件名与目标文件名
 
-    ifstream is {from};
-    ofstream os {to};
+    ifstream is {from};              // 来自文件 "from" 的输入流
+    ofstream os {to};                // 写入文件 "to" 的输出流
 
-    set<string> b {istream_iterator<string>{is}, istream_iterator<string>{}};
-    copy(b, ostream_iterator<string>{os, "\n"});
+    set<string> b {istream_iterator<string>{is}, istream_iterator<string>{}}; // 从输入收集字符串
+    copy(b, ostream_iterator<string>{os, "\n"});                              // 写出缓冲区
 
-    return !is.eof() || !os;
+    return !is.eof() || !os;         // 返回错误状态（§1.2.1，§11.4）
 }
 ```
 

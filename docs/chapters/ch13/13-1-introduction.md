@@ -21,7 +21,7 @@ bool operator<(const Entry& x, const Entry& y)   // 小于
 
 标准算法用（半开）元素序列来描述问题：序列由一对迭代器表示，分别指向首元素与尾后位置：
 
-[图片描述：序列 `[begin:end)` 示意图]
+![迭代器 begin() 与 end() 界定的半开序列](../../assets/images/ch13/begin-end-sequence.png)
 
 在上面的例子里，`sort()` 对迭代器对 `vec.begin()`、`vec.end()` 所限制的序列排序——该序列恰好覆盖整个 `vector`。对于写出（输出），只需要指明写入的起点；若要写出多个元素，则会从起点开始向后覆盖。因而为避免错误，`lst` 至少要有与 `vec` 中互不相同元素个数一样多的元素。
 

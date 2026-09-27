@@ -2,7 +2,7 @@
 
 标准库提供了一个称为 `list` 的双向链表：
 
-[图片描述：list 结构示意图]
+![list 双向链表布局](../../assets/images/ch12/list-layout.png)
 
 当我们希望在不移动其他元素的情况下插入和删除元素时，我们使用 `list`。电话簿条目的插入和删除可能很常见，因此 `list` 可能适合表示一个简单的电话簿。例如：
 
@@ -36,7 +36,7 @@ int get_number(const string& s)
     for (auto p = phone_book.begin(); p != phone_book.end(); ++p)
         if (p->name == s)
             return p->number;
-    return 0;
+    return 0;   // 用 0 表示“未找到号码”
 }
 ```
 
@@ -54,4 +54,4 @@ void f(const Entry& ee, list<Entry>::iterator p, list<Entry>::iterator q)
 
 对于 `list`，`insert(p, elem)` 在 `p` 指向的元素之前插入一个值为 `elem` 的副本。这里，`p` 可以是一个指向 `list` 末尾之后位置的迭代器。相反，`erase(p)` 删除 `p` 指向的元素并销毁它。
 
-这些 `list` 的例子可以完全类似地用 `vector` 编写，并且（除非你了解计算机体系结构，否则会令人惊讶地）通常使用 `vector` 比使用 `list` 性能更好。当我们只需要一个元素序列时，我们可以在 `vector` 和 `list` 之间选择。除非你有理由不这样做，否则请使用 `vector`。`vector` 在遍历（例如 `find()` 和 `count()`）以及排序和搜索（例如 `sort()` 和 `equal_range()`；[§13.5](../ch13/13-5-algorithm-overview.md)，[§15.3.3](../ch15/15-3-containers.md#15.3.3)）方面表现更好。
+这些 `list` 的例子可以完全相同地用 `vector` 编写，并且（除非你了解计算机体系结构，否则会令人惊讶地）通常使用 `vector` 比使用 `list` 性能更好。当我们只需要一个元素序列时，我们可以在 `vector` 和 `list` 之间选择。除非你有理由不这样做，否则请使用 `vector`。`vector` 在遍历（例如 `find()` 和 `count()`）以及排序和搜索（例如 `sort()` 和 `equal_range()`；[§13.5](../ch13/13-5-algorithm-overview.md)，[§15.3.3](../ch15/15-3-containers.md#15.3.3)）方面表现更好。

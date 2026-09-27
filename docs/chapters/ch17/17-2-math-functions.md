@@ -32,15 +32,15 @@
 错误通过把 `<cerrno>` 中的 `errno` 设为 `EDOM`（定义域错误）或 `ERANGE`（值域错误）来报告。例如：
 
 ```cpp
-errno = 0;              // 清除旧状态
+errno = 0;              // 清除旧的错误状态
 double d = sqrt(-1);    // 示意：非法实参
 if (errno == EDOM)
     cerr << "sqrt() not defined for negative argument\n";
 
-errno = 0;
+errno = 0;              // 清除旧的错误状态
 double dd = pow(numeric_limits<double>::max(), 2);
 if (errno == ERANGE)
     cerr << "result of pow() too large to represent as a double\n";
 ```
 
-更多数学函数见 `<cmath>` 与 `<cstdlib`。所谓**特殊数学函数**，例如 `beta()`、`riemann_zeta()`、`sph_bessel()` 等，也在 `<cmath>` 中。
+更多数学函数见 `<cmath>` 与 `<cstdlib>`。所谓**特殊数学函数**，例如 `beta()`、`riemann_zeta()`、`sph_bessel()` 等，也在 `<cmath>` 中。

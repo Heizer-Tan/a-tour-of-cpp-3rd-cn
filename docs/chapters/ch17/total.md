@@ -42,22 +42,22 @@ C++ 在设计之初并非主要针对数值计算。然而数值计算通常发�
 错误通过把 `<cerrno>` 中的 `errno` 设为 `EDOM`（定义域错误）或 `ERANGE`（值域错误）来报告。例如：
 
 ```cpp
-errno = 0;              // 清除旧状态
+errno = 0;              // 清除旧的错误状态
 double d = sqrt(-1);    // 示意：非法实参
 if (errno == EDOM)
     cerr << "sqrt() not defined for negative argument\n";
 
-errno = 0;
+errno = 0;              // 清除旧的错误状态
 double dd = pow(numeric_limits<double>::max(), 2);
 if (errno == ERANGE)
     cerr << "result of pow() too large to represent as a double\n";
 ```
 
-更多数学函数见 `<cmath>` 与 `<cstdlib`。所谓**特殊数学函数**，例如 `beta()`、`riemann_zeta()`、`sph_bessel()` 等，也在 `<cmath>` 中。
+更多数学函数见 `<cmath>` 与 `<cstdlib>`。所谓**特殊数学函数**，例如 `beta()`、`riemann_zeta()`、`sph_bessel()` 等，也在 `<cmath>` 中。
 
 # 17.3 数值算法
 
-在 `<numeric>` 中可以找到一组泛化的数值算法，例如 `accumulate()`。
+在 `<numeric>` 中可以找到一小套泛化的数值算法，例如 `accumulate()`。
 
 **数值算法**
 
@@ -80,12 +80,12 @@ if (errno == ERANGE)
 
 ```cpp
 list<double> lst{1, 2, 3, 4, 5, 9999.99999};
-auto s = accumulate(lst.begin(), lst.end(), 0.0);   // 求和：约 10014.9999
+auto s = accumulate(lst.begin(), lst.end(), 0.0);   // 求和：10014.9999
 ```
 
 这些算法适用于每一种标准库序列，并且能把运算作为实参传入（§17.3）。
 
-## 17.3.1
+## 17.3.1 并行数值算法 {#17.3.1}
 
 在 `<numeric>` 中，数值算法（§17.3）还有并行版本，与顺序版本略有不同。特别是，并行版本允许按未指明顺序对元素进行操作。并行数值算法可以接受执行策略实参（§13.6）：`seq`、`unseq`、`par`、`par_unseq`。
 
@@ -154,19 +154,19 @@ void f(complex<float> fl, complex<double> db)
 1. **引擎**：产生一串随机或伪随机值；
 2. **分布**：把这些值映射到某个区间上的数学分布。
 
-分布的例子包括：`uniform_int_distribution`（生成的整数等概率）、`normal_distribution`（「钟形曲线」）、以及 `exponential_distribution`（指数衰减）；各自对应某个指定区间。
+分布的例子包括：`uniform_int_distribution`（生成的整数等概率）、`normal_distribution`（「钟形曲线」）、以及 `exponential_distribution`（指数增长）；各自对应某个指定区间。
 
 例如：
 
 ```cpp
-using my_engine = default_random_engine;
-using my_distribution = uniform_int_distribution<>;
+using my_engine = default_random_engine;            // 引擎类型
+using my_distribution = uniform_int_distribution<>; // 分布类型
 
-my_engine eng{};
-my_distribution dist{1, 6};
-auto die = [&]() { return dist(eng); };   // 构造一个发生器
+my_engine eng{};                                    // 默认引擎
+my_distribution dist{1, 6};                         // 映射到掷骰结果的分布
+auto die = [&]() { return dist(eng); };             // 构造一个发生器
 
-int x = die();                              // 掷骰子：x 成为某个值
+int x = die();                                      // 掷骰子：x 成为某个值
 ```
 
 多亏它对泛化与性能的不妥协，曾有专家评价标准库的随机数组件是「每个随机数库长大后想成为的样子」。但它也很难被称为「新手友好」。`using` 与 lambda 能让正在发生的事稍微直白一点。
@@ -218,7 +218,14 @@ int main()
 ```
 0      *********************
 1      ****************
-...
+2      *******************
+3      ********************
+4      ****************
+5      ***********************
+6      **************************
+7      ***********
+8      **********************
+9      *************************
 ```
 
 C++ 没有标准图形库，所以我用「ASCII 图形」。显然有大量开源与商业图形/GUI 库可用，但本书只使用 ISO 标准设施。
@@ -228,25 +235,25 @@ C++ 没有标准图形库，所以我用「ASCII 图形」。显然有大量开�
 ```cpp
 Rand_int rnd{10, 20};
 for (int i = 0; i < 10; ++i)
-    cout << rnd() << ' ';
+    cout << rnd() << ' ';     // 16 13 20 19 14 17 10 16 15 14
 cout << '\n';
 
 rnd.seed(999);
 for (int i = 0; i < 10; ++i)
-    cout << rnd() << ' ';
+    cout << rnd() << ' ';     // 11 17 14 19 20 13 20 14 16 19
 cout << '\n';
 
 rnd.seed(999);
 for (int i = 0; i < 10; ++i)
-    cout << rnd() << ' ';
+    cout << rnd() << ' ';     // 11 17 14 19 20 13 20 14 16 19
 cout << '\n';
 ```
 
-重复序列对可重复的调试很重要；用不同值播种则在不想重复时很重要。若你需要真正的随机数而非生成的伪随机序列，请查看你的机器上 `random_device` 如何实现。
+重复序列对**确定性调试**很重要；用不同值播种则在不想重复时很重要。若你需要真正的随机数而非生成的伪随机序列，请查看你的机器上 `random_device` 如何实现。
 
 # 17.6 向量算术
 
-§12.2 描述的 `vector` 旨在成为容纳值的一般机制，灵活并嵌入容器、迭代器与算法的体系之中。然而它并不支持数学意义上的向量运算。把此类运算加到 `vector` 上并不容易违背其通用性；而其通用与灵活又排除了数值工作中常常认为至关重要的优化。因此，标准库在 `<valarray>` 中提供了另一种更像数组的模板，名为 `valarray`：它不那么通用，却更容易为数值计算优化：
+§12.2 描述的 `vector` 旨在成为容纳值的一般机制，灵活并嵌入容器、迭代器与算法的体系之中。然而它并不支持数学意义上的向量运算。把这类运算加到 `vector` 上并不难，但其通用性与灵活性排除了严肃数值工作中往往视为至关重要的那些优化。因此，标准库在 `<valarray>` 中提供了一种类似向量的模板，名为 `valarray`：它不那么通用，却更适于为数值计算做优化：
 
 ```cpp
 template<typename T>
@@ -282,17 +289,17 @@ static_assert(numeric_limits<char>::is_signed, "unsigned characters!");
 static_assert(100000 < numeric_limits<int>::max(), "small ints!");
 ```
 
-第二个断言之所以可行，是因为 `numeric_limits<int>::max()` 是 `constexpr` 函数（§1.6）。
+第二个断言之所以可行（也仅此断言依赖这一点），是因为 `numeric_limits<int>::max()` 是 `constexpr` 函数（§1.6）。
 
 我们也可以为自己的用户定义类型定义 `numeric_limits`。
 
 # 17.8 类型别名
 
-`int`、`long long` 等基本类型的大小由实现定义；也就是说，不同 C++ 实现上可能不同。若我们需要明确整数宽度，可以使用 `<cstdint>` 中定义的别名，例如 `int32_t` 与 `uint_least64_t`。后者表示「至少 64 位的无符号整数」。
+`int`、`long long` 等基本类型的大小由实现定义；也就是说，不同 C++ 实现上可能不同。若我们需要明确整数宽度，可以使用 `<stdint>` 中定义的别名，例如 `int32_t` 与 `uint_least64_t`。后者表示「至少 64 位的无符号整数」。
 
 古怪的 `_t` 后缀是 C 时代的遗迹：那时人们认为名字应当表明它是别名。
 
-其它常见别名，例如 `size_t`（`sizeof` 运算符结果的类型）与 `ptrdiff_t`（两指针相减结果的类型），见 `<cstddef>`。
+其它常见别名，例如 `size_t`（`sizeof` 运算符结果的类型）与 `ptrdiff_t`（两指针相减结果的类型），见 `<stddef>`。
 
 # 17.9 数学常数
 
@@ -308,9 +315,9 @@ void area(float r)
 }
 ```
 
-此处的数值差别很小（往往要打印到十几位小数才能看出来），但在严肃的物理计算中很快就会放大。高精度常数在图形学、人工智能等领域也很重要——更小数值表示在这些场景日益常见。
+此处的数值差别很小（往往要打印到精度约 16 才能看出来），但在严肃的物理计算中很快就会放大。高精度常数在图形学、人工智能等领域也很重要——更小数值表示在这些场景日益常见。
 
-在 `<numbers>` 中可以找到 `e`（欧拉数）、`log2e`、`log10e`、`pi`、`inv_pi`（`1/pi`）、`inv_sqrtpi`（`1/sqrt(pi)`）、`ln2`、`ln10`、`sqrt2`（`sqrt(2)`）、`sqrt3`（`sqrt(3)`）、`inv_sqrt3`、`egamma`（欧拉–马斯刻罗尼常数）与 `phi`（黄金比例）。
+在 `<numbers>` 中可以找到 `e`（欧拉数）、`log2e`（以 2 为底的 `e` 的对数）、`log10e`（以 10 为底的 `e` 的对数）、`pi`、`inv_pi`（`1/pi`）、`inv_sqrtpi`（`1/sqrt(pi)`）、`ln2`、`ln10`、`sqrt2`（`sqrt(2)`）、`sqrt3`（`sqrt(3)`）、`inv_sqrt3`（`1/sqrt3`）、`egamma`（欧拉–马斯刻罗尼常数）与 `phi`（黄金比例）。
 
 当然我们可能想要更多数学常数，或面向不同领域的常数。这很容易实现：它们是变量模板，并（默认）针对 `double`（或对给定领域最合适的类型）特化：
 

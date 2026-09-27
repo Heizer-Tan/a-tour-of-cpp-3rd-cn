@@ -48,7 +48,7 @@
 
 **[Kernighan,1978]** Brian W. Kernighan and Dennis M. Ritchie: The C Programming Language. Prentice Hall. Englewood Cliffs, New Jersey. 1978.
 
-**[Kernighan,1988]** Brian W. Kernighan and Dennis M. Ritchie: The C Programming Language, Second Edition. Prentice-Hall. Englewood Cliffs, New Jersey. 1988. ISBN 0-13- 110362-8.
+**[Kernighan,1988]** Brian W. Kernighan and Dennis M. Ritchie: The C Programming Language, Second Edition. Prentice-Hall. Englewood Cliffs, New Jersey. 1988. ISBN 0-13-110362-8.
 
 **[Knuth,1968]** Donald E. Knuth: The Art of Computer Programming. Addison-Wesley. Reading, Massachusetts. 1968.
 
@@ -64,7 +64,7 @@
 
 **[Stepanov,1994]** Alexander Stepanov and Meng Lee: The Standard Template Library. HP Labs Technical Report HPL-94-34 (R. 1). 1994.
 
-**[Stepanov,2009]** Alexander Stepanov and Paul McJones: Elements of Programming. Addison- Wesley. Boston, Massachusetts. 2009. ISBN 978-0-321-63537-2.
+**[Stepanov,2009]** Alexander Stepanov and Paul McJones: Elements of Programming. Addison-Wesley. Boston, Massachusetts. 2009. ISBN 978-0-321-63537-2.
 
 **[Stroustrup,1979]** Personal lab notes.
 
@@ -82,7 +82,7 @@
 
 **[Stroustrup,1988]** B. Stroustrup: Parameterized Types for C++. Proc. USENIX C++ Conference, Denver, Colorado. 1988.
 
-**[Stroustrup,1991]** B. Stroustrup: The C++ Programming Language (Second Edition). Addison- Wesley. Reading, Massachusetts. 1991. ISBN 0-201-53992-6.
+**[Stroustrup,1991]** B. Stroustrup: The C++ Programming Language (Second Edition). Addison-Wesley. Reading, Massachusetts. 1991. ISBN 0-201-53992-6.
 
 **[Stroustrup,1993]** B. Stroustrup: A History of C++: 1979–1991. Proc. ACM History of Programming Languages Conference (HOPL-2). ACM Sigplan Notices. Vol 28, No 3. 1993.
 
@@ -90,25 +90,33 @@
 
 **[Stroustrup,1997]** B. Stroustrup: The C++ Programming Language, Third Edition. Addison-Wesley. Reading, Massachusetts. 1997. ISBN 0-201-88954-4. Hardcover (“Special”) Edition. 2000. ISBN 0-201-70073-5.
 
-**[Stroustrup,2002]** B. Stroustrup: C and C++: Siblings, C and C++: A Case for Compatibility, and C and C++: Case Studies in Compatibility. The C/C++ Users Journal. July- September 2002. www.stroustrup.com/papers.xhtml.
+**[Stroustrup,2002]** B. Stroustrup: C and C++: Siblings, C and C++: A Case for Compatibility, and C and C++: Case Studies in Compatibility. The C/C++ Users Journal. July-September 2002. www.stroustrup.com/papers.xhtml.
 
 **[Stroustrup,2007]** B. Stroustrup: Evolving a language in and for the real world: C++ 1991-2006. ACM HOPL-III. June 2007.
 
-**[Stroustrup,2009]** B. Stroustrup: Programming – Principles and Practice Using C++. Addison- Wesley. Boston, Massachusetts. 2009. ISBN 0-321-54372-6.
+**[Stroustrup,2009]** B. Stroustrup: Programming – Principles and Practice Using C++. Addison-Wesley. Boston, Massachusetts. 2009. ISBN 0-321-54372-6.
 
-**[Stroustrup,2010]** B. Stroustrup: "New" Value Terminology. https://www.stroustrup.com/terminology.pdf. April 2010. [Stroustrup,2012a]B. Stroustrup and A. Sutton: A Concept Design for the STL. WG21 Technical Report N3351==12-0041. January 2012. [Stroustrup,2012b]B. Stroustrup: Software Development for Infrastructure. Computer. January 2012. doi:10.1109/MC.2011.353.
+**[Stroustrup,2010]** B. Stroustrup: "New" Value Terminology. https://www.stroustrup.com/terminology.pdf. April 2010.
 
-**[Stroustrup,2013]** B. Stroustrup: The C++ Programming Language (Fourth Edition). Addison- Wesley. Boston, Massachusetts. 2013. ISBN 0-321-56384-0.
+**[Stroustrup,2012a]** B. Stroustrup and A. Sutton: A Concept Design for the STL. WG21 Technical Report N3351==12-0041. January 2012.
+
+**[Stroustrup,2012b]** B. Stroustrup: Software Development for Infrastructure. Computer. January 2012. doi:10.1109/MC.2011.353.
+
+**[Stroustrup,2013]** B. Stroustrup: The C++ Programming Language (Fourth Edition). Addison-Wesley. Boston, Massachusetts. 2013. ISBN 0-321-56384-0.
 
 **[Stroustrup,2014]** B. Stroustrup: C++ Applications. http://www.stroustrup.com/applications.xhtml.
 
-**[Stroustrup,2015]** B. Stroustrup and H. Sutter: C++ Core Guidelines. https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md. [Stroustrup,2015b]B. Stroustrup, H. Sutter, and G. Dos Reis: A brief introduction to C++’s model for type- and resource-safety. Isocpp.org. October 2015. Revised December 2015. http://www.stroustrup.com/resource-model.pdf.
+**[Stroustrup,2015]** B. Stroustrup and H. Sutter: C++ Core Guidelines. https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md.
+
+**[Stroustrup,2015b]** B. Stroustrup, H. Sutter, and G. Dos Reis: A brief introduction to C++’s model for type- and resource-safety. Isocpp.org. October 2015. Revised December 2015. http://www.stroustrup.com/resource-model.pdf.
 
 **[Stroustrup,2017]** B. Stroustrup: Concepts: The Future of Generic Programming (or How to design good concepts and use them well). WG21 P0557R1. https://www.stroustrup.com/good_concepts.pdf. January 2017.
 
 **[Stroustrup,2020]** B. Stroustrup: Thriving in a crowded and changing world: C++ 2006-2020. ACM/SIGPLAN History of Programming Languages conference, HOPL-IV. June 2020.
 
-**[Stroustrup,2021]** B. Stroustrup: Type-and-resource safety in modern C++. WG21 P2410R0. July 2021. [Stroustrup,2021b]B. Stroustrup: Minimal module support for the standard library. P2412r0. July 2021.
+**[Stroustrup,2021]** B. Stroustrup: Type-and-resource safety in modern C++. WG21 P2410R0. July 2021.
+
+**[Stroustrup,2021b]** B. Stroustrup: Minimal module support for the standard library. P2412r0. July 2021.
 
 **[Sutton,2011]** A. Sutton and B. Stroustrup: Design of Concept Libraries for C++. Proc. SLE 2011 (International Conference on Software Language Engineering). July 2011.
 
@@ -118,42 +126,4 @@
 
 **[Wong,2020]** Michael Wong, Howard Hinnant, Roger Orr, Bjarne Stroustrup, Daveed Vandevoorde: Direction for ISO C++. WG21 P2000R1. July 2020.
 
-**[Woodward,1974]** P. M. Woodward and S. G. Bond: Algol 68-R Users Guide. Her Majesty’s Stationery Office. London. 1974. 19.5 Advice
-
-**[1]** The ISO C++ standard [C++,2020] defines C++.
-
-**[2]** When choosing a style for a new project or when modernizing a code base, rely on the C++ Core Guidelines; [§19.1.4](19-1-history.md#19.1.4).
-
-**[3]** When learning C++, don’t focus on language features in isolation; [§19.2.1](19-2-cpp-evolution.md#19.2.1).
-
-**[4]** Don’t get stuck with decades-old language-feature sets and design techniques; [§19.1.4](19-1-history.md#19.1.4).
-
-**[5]** Before using a new feature in production code, try it out by writing small programs to test the standards conformance and performance of the implementations you plan to use.
-
-**[6]** For learning C++, use the most up-to-date and complete implementation of Standard C++ that you can get access to.
-
-**[7]** The common subset of C and C++ is not the best initial subset of C++ to learn; [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1).
-
-**[8]** Avoid casts; [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1); [CG: ES.48].
-
-**[9]** Prefer named casts, such as static_cast over C-style casts; [§5.2.3](../ch05/5-2-concrete-types.md#5.2.3); [CG: ES.49].
-
-**[10]** When converting a C program to C++, rename variables that are C++ keywords; [§19.3.2](19-3-c-cpp-compatibility.md#19.3.2).
-
-**[11]** For portability and type safety, if you must use C, write in the common subset of C and C++; [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1); [CG: CPL.2].
-
-**[12]** When converting a C program to C++, cast the result of malloc() to the proper type or change all uses of malloc() to uses of new; [§19.3.2.2](19-3-c-cpp-compatibility.md#19.3.2.2).
-
-**[13]** When converting from malloc() and free() to new and delete, consider using vector, push_back(), and reserve() instead of realloc(); [§19.3.2.1](19-3-c-cpp-compatibility.md#19.3.2.1).
-
-**[14]** In C++, there are no implicit conversions from ints to enumerations; use explicit type conversion where necessary.
-
-**[15]** For each standard C header <X.h> that places names in the global namespace, the header <cX> places the names in namespace std.
-
-**[16]** Use extern "C" when declaring C functions; [§19.3.2.3](19-3-c-cpp-compatibility.md#19.3.2.3).
-
-**[17]** Prefer string over C-style strings (direct manipulation of zero-terminated arrays of char); [CG: SL.str.1].
-
-**[18]** Prefer iostreams over stdio; [CG: SL.io.3].
-
-**[19]** Prefer containers (e.g., vector) over built-in arrays. A Module std That is a big thing with an invention: You have to have a whole system that works. – J. Presper Eckert Introduction Use What Your Implementation Offers Use Headers Make Your Own module std Advice
+**[Woodward,1974]** P. M. Woodward and S. G. Bond: Algol 68-R Users Guide. Her Majesty’s Stationery Office. London. 1974.

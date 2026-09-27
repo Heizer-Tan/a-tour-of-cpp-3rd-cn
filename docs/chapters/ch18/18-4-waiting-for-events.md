@@ -3,7 +3,7 @@
 有时线程需要等待某种外部事件：例如另一线程完成任务，或经过一段时间。最简单的「事件」只是时间流逝。借助 `<chrono>` 的时间设施可以写成：
 
 ```cpp
-using namespace chrono;
+using namespace chrono;       // 见 §16.2.1
 
 auto t0 = high_resolution_clock::now();
 this_thread::sleep_for(milliseconds{20});
@@ -21,13 +21,13 @@ cout << duration_cast<nanoseconds>(t1 - t0).count() << " nanoseconds passed\n";
 使用条件变量能实现多种优雅高效的共享方式，但也颇为棘手。考虑经典的两线程经由队列传消息的例子。为简单起见，我把队列以及避免队列竞争的机制声明在生产者与消费者的全局作用域：
 
 ```cpp
-class Message {
+class Message {          // 要传递的对象
     // ...
 };
 
-queue<Message> mqueue;
-condition_variable mcond;
-mutex mmutex;
+queue<Message> mqueue;           // 消息队列
+condition_variable mcond;        // 用于传达事件的变量
+mutex mmutex;                    // 用于同步对 mcond 的访问
 ```
 
 类型 `queue`、`condition_variable` 与 `mutex` 均由标准库提供。
@@ -39,9 +39,10 @@ void consumer()
 {
     while (true) {
         unique_lock lck{mmutex};                           // 取得 mmutex
-        mcond.wait(lck, [] { return !mqueue.empty(); });    // 释放 mmutex 并等待；
-                                                              // 唤醒时重新取得 mmutex
-        auto m = mqueue.front();
+                  mcond.wait(lck, [] { return !mqueue.empty(); });    // 释放 mmutex 并等待；
+                                                              // 唤醒时重新取得 mmutex；
+                                                              // 除非 mqueue 非空否则不唤醒
+        auto m = mqueue.front();                                          // 取得消息
         mqueue.pop();
         lck.unlock();                                      // 释放 mmutex
         // ... 处理 m ...

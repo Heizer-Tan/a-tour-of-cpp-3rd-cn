@@ -60,17 +60,17 @@ PaHerallllel o World!
 
 定义并发程序的任务时，目标是除了在简单而明确的通信点之外**彼此分离**。思考并发任务的最简单方式是：把它视作碰巧与其调用者并发运行的函数。要做到这点，只要传入参数、收回结果，并确保其间不使用共享数据（没有数据竞争）。
 
-## 18.2.1
+## 18.2.1 传递参数
 
-通常任务需要数据来工作。我们可以很方便地把数据（或指针或引用）作为实参传入。考虑：
+通常任务需要数据来工作。我们可以很方便地把数据（或指向数据的指针或引用）作为实参传入。考虑：
 
 ```cpp
-void f(vector<double>& v);
+void f(vector<double>& v);        // 函数：对 v 做些事情
 
-struct F {
+struct F {                        // 函数对象：对 v 做些事情
     vector<double>& v;
     F(vector<double>& vv) : v{vv} { }
-    void operator()();           // 调用运算符；§7.3.2
+    void operator()();            // 应用运算符；§7.3.2
 };
 
 int main()
@@ -78,8 +78,8 @@ int main()
     vector<double> some_vec{1, 2, 3, 4, 5, 6, 7, 8, 9};
     vector<double> vec2{10, 11, 12, 13, 14};
 
-    jthread t1{f, ref(some_vec)};   // f(some_vec) 在独立线程运行
-    jthread t2{F{vec2}};             // F{vec2}() 在独立线程运行
+    jthread t1{f, ref(some_vec)};   // f(some_vec) 在独立线程执行
+    jthread t2{F{vec2}};             // F(vec2)() 在独立线程执行
 }
 ```
 
@@ -87,23 +87,23 @@ int main()
 
 `{f, ref(some_vec)}` 的初始化采用线程的变参模板构造函数，能接受任意实参序列（[§8.4](../ch08/8-4-variadic-templates.md)）。`ref()` 来自 `<functional>`，不幸的是需要用这一类型函数告诉变参模板把 `some_vec` **当作引用**，而不是对象本身。若没有 `ref()`，`some_vec` 会以值传递。编译器会检查第一个实参能否在给定后续实参的情况下调用，并构造必要的函数对象交给线程。因而若 `F::operator()()` 与 `f()` 做的是同一种算法，两种任务处理方式大体等价：都会构造供线程执行的函数对象。
 
-## 18.2.2
+## 18.2.2 返回结果
 
 在 [§18.2.1](18-2-tasks-and-threads.md#18.2.1) 的例子里，我通过非常量引用传递实参。仅当我期望任务修改所指数据的值时才这么做（[§1.7](../ch01/1-7-pointers-arrays.md)）。这是有点取巧但并不少见的结果返回方式。不那么费解的技巧是按常量引用传入输入数据，另外传入单独的结果写入位置：
 
 ```cpp
-void f(const vector<double>& v, double* res);
+void f(const vector<double>& v, double* res);   // 从 v 取输入；把结果写入 *res
 
 class F {
 public:
     F(const vector<double>& vv, double* p) : v{vv}, res{p} { }
     void operator()();                     // 把结果写入 *res
 private:
-    const vector<double>& v;
-    double* res;
+    const vector<double>& v;               // 输入来源
+    double* res;                           // 输出目标
 };
 
-double g(const vector<double>&);
+double g(const vector<double>&);           // 使用返回值
 
 void user(vector<double>& vec1, vector<double> vec2, vector<double> vec3)
 {
@@ -111,9 +111,9 @@ void user(vector<double>& vec1, vector<double> vec2, vector<double> vec3)
     double res2;
     double res3;
 
-    thread t1{f, cref(vec1), &res1};
-    thread t2{F{vec2, &res2}};
-    thread t3{[&]() { res3 = g(vec3); }};   // 以引用捕获局部变量
+    thread t1{f, cref(vec1), &res1};       // f(vec1,&res1) 在独立线程执行
+    thread t2{F{vec2, &res2}};             // F{vec2,&res2}() 在独立线程执行
+    thread t3{[&]() { res3 = g(vec3); }};  // 以引用捕获局部变量
 
     t1.join();      // 使用结果前先汇合
     t2.join();

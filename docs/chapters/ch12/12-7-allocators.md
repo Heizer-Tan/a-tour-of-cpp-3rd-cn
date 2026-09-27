@@ -49,6 +49,6 @@ void producer()
 这类技术从 C++ 的早期就被应用并取得了良好的效果，但通常需要重写代码以使用专门的容器。现在，标准容器可以选择性地接受分配器参数。默认情况下，容器使用 `new` 和 `delete`。其他多态内存资源包括：
 
 - `unsynchronized_pool_resource`：与 `synchronized_pool_resource` 类似，但只能由一个线程使用。
-- `monotonic_buffer_resource`：一种快速分配器，仅在销毁自身时释放内存，并且通常供单线程使用。
+- `monotonic_buffer_resource`：一种快速分配器，仅在销毁自身时释放内存，并且只能由一个线程使用。
 
 多态资源必须派生自 `memory_resource` 并定义成员 `allocate()`、`deallocate()` 和 `is_equal()`。其理念是让用户构建自己的资源来调整代码。

@@ -93,10 +93,10 @@ int sum2(T... v)
 template<Printable... T>
 void print(T&&... args)
 {
-    (std::cout << ... << std::forward<T>(args)) << '\n';   // 依次输出各个实参
+    (std::cout << ... << args) << '\n';   // 打印所有实参
 }
 
-print("Hello!"s, ' ', "World ", 2017);
+print("Hello!"s, ' ', "World ", 2017);   // (((((std::cout << "Hello!"s) << ' ') << "World ") << 2017) << '\n')
 ```
 
 为何特意写 2017？因为折叠表达式正式进入 C++ 的年份正是 2017（[§19.2.3](../ch19/19-2-cpp-evolution.md#19.2.3)）。
@@ -109,15 +109,16 @@ print("Hello!"s, ' ', "World ", 2017);
 template<concepts::InputTransport Transport>
 class InputChannel {
 public:
-    template<class... Args>
-    explicit InputChannel(Args&&... transportArgs)
-        : _transport(std::forward<Args>(transportArgs)...) { }
-private:
+    // ...
+    InputChannel(Transport::Args&&... transportArgs)
+        : _transport(std::forward<TransportArgs>(transportArgs)...)
+    {}
+    // ...
     Transport _transport;
 };
 ```
 
-借助 `forward()`（[§16.6](../ch16/16-6-move-forward.md)），参数可以无损地从外层构造函数钻入 `Transport` 的构造函数。
+标准库函数 `forward()`（[§16.6](../ch16/16-6-move-forward.md)）用于把参数原封不动地从 `InputChannel` 构造函数传到 `Transport` 构造函数。
 
 这里的要点是，`InputChannel` 的编写者可以在不知道构造特定 `Transport` 需要什么参数的情况下构造一个 `Transport` 类型的对象。`InputChannel` 的实现者只需要知道所有 `Transport` 对象的共同用户接口。
 
